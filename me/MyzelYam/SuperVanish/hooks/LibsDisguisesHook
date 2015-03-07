@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 
 public class LibsDisguisesHook implements Listener {
 
-    public SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
+    private SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
             .getPlugin("SuperVanish");
 
     @EventHandler
