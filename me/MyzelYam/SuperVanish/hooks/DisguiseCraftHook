@@ -11,7 +11,7 @@ import pgDev.bukkit.DisguiseCraft.api.PlayerDisguiseEvent;
 
 public class DisguiseCraftHook implements Listener {
 
-    public SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
+    private SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
             .getPlugin("SuperVanish");
 
     @EventHandler
