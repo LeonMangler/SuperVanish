@@ -1,0 +1,32 @@
+package me.MyzelYam.SuperVanish.cmd;
+
+import java.io.File;
+
+import me.MyzelYam.SuperVanish.SVUtils;
+
+import org.bukkit.command.CommandSender;
+
+public class CmdUpdateCfg extends SVUtils {
+
+	public CmdUpdateCfg(CommandSender p, String[] args, String label) {
+		if (canDo(p, CommandAction.UPDATE_CFG)) {
+			if (args.length == 0) {
+				if ((!plugin.requiresCfgUpdate) && (!plugin.requiresMsgsUpdate)) {
+					p.sendMessage(convertString(getMsg("NoConfigUpdateAvailableMessage"), p));
+					return;
+				}
+				return;
+			}
+			// delete necessary files
+			File file = new File(plugin.getDataFolder().getPath()
+					+ File.separator + "config.yml");
+			file.delete();
+			File file2 = new File(plugin.getDataFolder().getPath()
+					+ File.separator + "messages.yml");
+			file2.delete();
+			// recreate necessary files
+			plugin.mcfg.saveDefaultConfig();
+			plugin.ccfg.saveDefaultConfig();
+		}
+	}
+}
