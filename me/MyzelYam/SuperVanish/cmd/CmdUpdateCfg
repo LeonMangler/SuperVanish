@@ -10,6 +10,7 @@ public class CmdUpdateCfg extends SVUtils {
 
 	public CmdUpdateCfg(CommandSender p, String[] args, String label) {
 		if (canDo(p, CommandAction.UPDATE_CFG)) {
+		// unfinished command
 			if (args.length == 0) {
 				if ((!plugin.requiresCfgUpdate) && (!plugin.requiresMsgsUpdate)) {
 					p.sendMessage(convertString(getMsg("NoConfigUpdateAvailableMessage"), p));
