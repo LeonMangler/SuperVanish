@@ -1,0 +1,365 @@
+package me.MyzelYam.SuperVanish;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import me.MyzelYam.SuperVanish.cmd.CmdManager;
+import me.MyzelYam.SuperVanish.config.ConfigCfg;
+import me.MyzelYam.SuperVanish.config.MessagesCfg;
+import me.MyzelYam.SuperVanish.events.JoinEvent;
+import me.MyzelYam.SuperVanish.events.PlayerControl;
+import me.MyzelYam.SuperVanish.events.QuitEvent;
+import me.MyzelYam.SuperVanish.events.WorldChangeEvent;
+import me.MyzelYam.SuperVanish.hider.ServerlistAdjustments;
+import me.MyzelYam.SuperVanish.hider.SilentChestListeners;
+import me.MyzelYam.SuperVanish.hooks.DisguiseCraftHook;
+import me.MyzelYam.SuperVanish.hooks.LibsDisguisesHook;
+import me.confuser.barapi.BarAPI;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Team;
+
+import ru.tehkode.permissions.PermissionUser;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.User;
+
+public class SuperVanish extends JavaPlugin {
+
+	private final List<String> nonRequiredConfigUpdates = Arrays.asList(
+			"5.1.0-5.2.0", "5.2.0-5.2.1", "5.1.0-5.2.1");
+
+	private final List<String> nonRequiredMsgsUpdates = Arrays.asList();
+
+	public boolean requiresCfgUpdate = false;
+
+	public boolean requiresMsgsUpdate = false;
+
+	public Team ghostTeam;
+
+	public FileConfiguration msgs;
+
+	public FileConfiguration cfg;
+
+	public File pdf = new File(this.getDataFolder().getPath() + File.separator
+			+ "playerdata.yml");
+
+	public void spd() {
+		try {
+			pd.save(pdf);
+		} catch (IOException e) {
+			printException(e);
+		}
+	}
+
+	public FileConfiguration pd = YamlConfiguration.loadConfiguration(pdf);
+
+	public MessagesCfg mcfg;
+
+	public ConfigCfg ccfg;
+
+	public void onEnable() {
+		try {
+			prepareConfig();
+			registerEvents();
+			checkForReload();
+			checkGhostPlayers();
+			if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
+				ServerlistAdjustments.setupProtocolLib();
+				if (cfg.getBoolean("Configuration.Players.SilentOpenChest")) {
+					SilentChestListeners.setupAnimationListener();
+					SilentChestListeners.setupSoundListener();
+				}
+			}
+		} catch (Exception e) {
+			printException(e);
+		}
+	}
+
+	public void onDisable() {
+		SVUtils.cfg = null;
+		SVUtils.pd = null;
+	}
+
+	private void prepareConfig() {
+		try {
+			// messages
+			mcfg = new MessagesCfg();
+			mcfg.saveDefaultConfig();
+			this.msgs = mcfg.getConfig();
+			// config
+			ccfg = new ConfigCfg();
+			ccfg.saveDefaultConfig();
+			this.cfg = ccfg.getConfig();
+			// playerdata
+			pd.options().header(
+					"SuperVanish v" + getDescription().getVersion()
+							+ " - Playerdata");
+			pd.options().copyHeader(true);
+			spd();
+			// check for updates
+			checkConfig();
+		} catch (Exception e) {
+			printException(e);
+		}
+	}
+
+	private void checkGhostPlayers() {
+		try {
+			List<String> vpl = pd.getStringList("InvisiblePlayers");
+			if (cfg.getBoolean("Configuration.Players.EnableGhostPlayers")) {
+				ghostTeam = Bukkit.getServer().getScoreboardManager()
+						.getMainScoreboard().getTeam("SuperVanishGT");
+				if (ghostTeam == null) {
+					ghostTeam = Bukkit.getServer().getScoreboardManager()
+							.getMainScoreboard()
+							.registerNewTeam("SuperVanishGT");
+				}
+				ghostTeam.setCanSeeFriendlyInvisibles(true);
+				for (Player p : Bukkit.getOnlinePlayers()) {
+					if (!ghostTeam.hasPlayer(p)) {
+						if (p.hasPermission("sv.see")
+								|| p.hasPermission("sv.use")
+								|| vpl.contains(p.getUniqueId().toString()))
+							ghostTeam.addPlayer(p);
+					} else {
+						if (p.hasPermission("sv.see")
+								|| p.hasPermission("sv.use")
+								|| vpl.contains(p.getUniqueId().toString())) {
+						} else
+							ghostTeam.removePlayer(p);
+					}
+				}
+			}
+		} catch (Exception e) {
+			printException(e);
+		}
+	}
+
+	private void checkForReload() {
+		try {
+			List<String> vpl = pd.getStringList("InvisiblePlayers");
+			if (this.getServer().getPluginManager().getPlugin("BarAPI") != null
+					&& cfg.getBoolean("Configuration.Messages.UseBarAPI") == true) {
+				for (Player p : Bukkit.getOnlinePlayers()) {
+					if (vpl.contains(p.getUniqueId().toString())) {
+						String onVanish = msgs.getString("Messages.OnVanish");
+						BarAPI.setMessage(p, convertString(onVanish, p), 100f);
+					}
+				}
+			}
+		} catch (Exception e) {
+			printException(e);
+		}
+	}
+
+	private EventPriority getEventPriority(Class<? extends Event> clazz) {
+		try {
+			String eventName = clazz.getSimpleName();
+			String cfgp = cfg.getString("Configuration.CompatibilityOptions."
+					+ eventName + "Priority");
+			if (cfgp == null)
+				return EventPriority.NORMAL;
+			EventPriority priority = EventPriority.valueOf(cfgp);
+			return priority == null ? EventPriority.NORMAL : priority;
+		} catch (Exception e) {
+			printException(e);
+			return EventPriority.NORMAL;
+		}
+	}
+
+	private void registerEvents() {
+		try {
+			PluginManager pm = this.getServer().getPluginManager();
+			// general
+			pm.registerEvents(new PlayerControl(), this);
+			pm.registerEvents(WorldChangeEvent.getInstance(), this);
+			// hooks
+			if (pm.getPlugin("LibsDisguises") != null)
+				pm.registerEvents(new LibsDisguisesHook(), this);
+			if (pm.getPlugin("DisguiseCraft") != null)
+				pm.registerEvents(new DisguiseCraftHook(), this);
+			// join
+			JoinEvent jevent = new JoinEvent();
+			pm.registerEvent(PlayerJoinEvent.class, jevent,
+					getEventPriority(PlayerJoinEvent.class), jevent, this,
+					false);
+			// quit
+			QuitEvent qevent = new QuitEvent();
+			pm.registerEvent(PlayerQuitEvent.class, qevent,
+					getEventPriority(PlayerQuitEvent.class), qevent, this,
+					false);
+		} catch (Exception e) {
+			printException(e);
+		}
+	}
+
+	public void printException(Exception e) {
+		try {
+			System.err.println("[SuperVanish] Unknown Exception occurred!");
+			if (requiresCfgUpdate || requiresMsgsUpdate) {
+				System.err
+						.println("[SuperVanish] You have an outdated configuration,");
+				System.err
+						.println("[SuperVanish] regenerating it might fix this problem.");
+			}
+			System.err.println("[SuperVanish] Please report this issue!");
+			System.err.println("Message: ");
+			System.err.println("  " + e.getMessage());
+			System.err.println("General information: ");
+			String plugins = "";
+			for (Plugin s : Bukkit.getServer().getPluginManager().getPlugins()) {
+				if (s.getName().equalsIgnoreCase("SuperVanish"))
+					continue;
+				plugins = plugins + s.getName();
+				plugins = plugins + " v"
+						+ s.getDescription().getVersion().toString();
+				plugins = plugins + ", ";
+			}
+			System.err.println("  ServerVersion: "
+					+ this.getServer().getVersion().toString());
+			System.err.println("  PluginVersion: "
+					+ this.getDescription().getVersion().toString());
+			System.err.println("  ServerPlugins: " + plugins);
+			System.err.println("StackTrace: ");
+			e.printStackTrace();
+			System.err.println("[SuperVanish] Please include this information");
+			System.err.println("[SuperVanish] if you report the issue.");
+		} catch (Exception e2) {
+			System.err
+					.println("[SuperVanish] An exception occurred while trying to print a detailed stacktrace, printing an undetailed stacktrace of both exceptions:");
+			System.err.println("ORIGINAL EXCEPTION:");
+			e.printStackTrace();
+			System.err.println("SECOND EXCEPTION:");
+			e2.printStackTrace();
+		}
+	}
+
+	public boolean onCommand(CommandSender sender, Command cmd,
+			String cmdLabel, String[] args) {
+		new CmdManager(cmd, sender, args, cmdLabel);
+		return true;
+	}
+
+	public void checkConfig() {
+		try {
+			String currentCfgVersion = cfg.getString("ConfigVersion");
+			String newestVersion = getDescription().getVersion();
+			String currentMsgsVersion = msgs.getString("MessagesVersion");
+			this.requiresMsgsUpdate = requiresUpdate(currentMsgsVersion,
+					newestVersion, false);
+			this.requiresCfgUpdate = requiresUpdate(currentCfgVersion,
+					newestVersion, true);
+		} catch (Exception e) {
+			printException(e);
+		}
+	}
+
+	private boolean requiresUpdate(String currentVersion, String newestVersion,
+			boolean checkCfg) {
+		for (String s : (checkCfg ? nonRequiredConfigUpdates
+				: nonRequiredMsgsUpdates)) {
+			String[] splitted = s.split("-");
+			if (currentVersion.equalsIgnoreCase(splitted[0])
+					&& newestVersion.equalsIgnoreCase(splitted[1]))
+				return false;
+		}
+		return true;
+	}
+
+	public String convertString(String message, CommandSender p) {
+		try {
+			if (p instanceof Player) {
+				if (getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
+					block: {
+						PermissionUser user = PermissionsEx.getUser((Player) p);
+						if (user == null)
+							break block;
+						if (user.getPrefix() != null)
+							message = message.replace("%prefix",
+									user.getPrefix());
+						if (user.getSuffix() != null)
+							message = message.replace("%suffix",
+									user.getSuffix());
+					}
+				}
+				if (getServer().getPluginManager().getPlugin("Essentials") != null) {
+					Essentials ess = (Essentials) Bukkit.getServer()
+							.getPluginManager().getPlugin("Essentials");
+					User u = ess.getUser((Player) p);
+					if (u != null)
+						if (u.getNickname() != null)
+							message = message.replace("%nick", u.getNickname());
+				}
+				message = message.replace("%d",
+						"" + ((Player) p).getDisplayName());
+				message = message.replace("%p", "" + p.getName());
+				message = message.replace("%t",
+						"" + ((Player) p).getPlayerListName());
+			} else {
+				if (getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
+					message = message.replace("%prefix", "");
+					message = message.replace("%suffix", "");
+				}
+				message = message.replace("%d", "Console");
+				message = message.replace("%p", "Console");
+				message = message.replace("%t", "Console");
+			}
+			message = message.replace("&", "§");
+			return message;
+		} catch (Exception e) {
+			printException(e);
+			return "SV-Error occurred; more information in console";
+		}
+	}
+
+	public String convertString2(String message, OfflinePlayer p) {
+		try {
+			if (this.getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
+				message = message.replace("%prefix", "");
+				message = message.replace("%suffix", "");
+			}
+			if (this.getServer().getPluginManager().getPlugin("Essentials") != null) {
+				Essentials ess = (Essentials) Bukkit.getServer()
+						.getPluginManager().getPlugin("Essentials");
+				User u = ess.getUser(p.getPlayer());
+				if (u != null)
+					if (u.getNickname() != null)
+						message = message.replace("%nick", u.getNickname());
+			}
+			message = message.replace("%d", p.getName());
+			message = message.replace("%p", p.getName());
+			message = message.replace("%t", p.getName());
+			message = message.replace("&", "§");
+			return message;
+		} catch (Exception e) {
+			printException(e);
+			return "SV-Error occurred; more information in console";
+		}
+	}
+
+	// override the standart config-api
+	public FileConfiguration getConfig() {
+		return cfg;
+	}
+
+	public void saveDefaultConfig() {
+		ccfg.saveDefaultConfig();
+	}
+}
