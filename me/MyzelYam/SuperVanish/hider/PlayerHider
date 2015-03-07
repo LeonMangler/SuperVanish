@@ -1,0 +1,55 @@
+package me.MyzelYam.SuperVanish.hider;
+
+import me.MyzelYam.ForbiddenEarthCore.api.HideManager;
+import me.MyzelYam.SuperVanish.SVUtils;
+import me.MyzelYam.SuperVanish.api.SVAPI;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+public class PlayerHider extends SVUtils {
+
+	protected void showToAll(Player p) {
+		for (Player ap2 : Bukkit.getOnlinePlayers()) {
+			HideManager.getInstance(plugin).removeHide(
+					HideManager.getInstance(plugin).getCombi(
+							HideManager.getInstance(plugin).new PlayerCombi(p,
+									ap2)), plugin);
+		}
+	}
+
+	protected void hideToAll(Player p) {
+		for (Player ap2 : Bukkit.getOnlinePlayers()) {
+			if (ap2.hasPermission("sv.see")
+					&& cfg.getBoolean("Configuration.Players.EnableSeePermission")) {
+			} else {
+				HideManager
+						.getInstance(plugin)
+						.addHide(
+								HideManager
+										.getInstance(plugin)
+										.getCombi(
+												HideManager.getInstance(plugin).new PlayerCombi(
+														p, ap2)), plugin);
+			}
+		}
+	}
+
+	protected void hideAllInvisibleTo(Player p) {
+		if (p.hasPermission("sv.see")
+				&& cfg.getBoolean("Configuration.Players.EnableSeePermission"))
+			return;
+		for (Player ap2 : Bukkit.getOnlinePlayers()) {
+			if (SVAPI.getInvisiblePlayers().contains(
+					ap2.getUniqueId().toString()))
+				HideManager
+						.getInstance(plugin)
+						.addHide(
+								HideManager
+										.getInstance(plugin)
+										.getCombi(
+												HideManager.getInstance(plugin).new PlayerCombi(
+														ap2, p)), plugin);
+		}
+	}
+}
