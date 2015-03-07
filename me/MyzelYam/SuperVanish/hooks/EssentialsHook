@@ -10,7 +10,7 @@ import com.earth2me.essentials.User;
 
 public abstract class EssentialsHook {
 
-    public static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
+    private static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
             .getPlugin("SuperVanish");
 
     public static void adjustVisibility(String pn, boolean hide) {
