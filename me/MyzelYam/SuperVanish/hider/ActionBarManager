@@ -48,10 +48,10 @@ public class ActionBarManager {
 	private void sendActionBar(Player p, String bar) {
 		String json = "{\"text\": \"" + bar.replaceAll("&", "§") + "\"}";
 		WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
-		PacketContainer chatMsg = ProtocolLibrary.getProtocolManager()
-				.createPacket(PacketType.Play.Server.CHAT);
-		chatMsg.getBytes().write(0, (byte) 2);
+		PacketContainer chatMsg = new PacketContainer(
+				PacketType.Play.Server.CHAT);
 		chatMsg.getChatComponents().write(0, msg);
+		chatMsg.getBytes().write(0, (byte) 2);
 		try {
 			ProtocolLibrary.getProtocolManager().sendServerPacket(p, chatMsg);
 		} catch (InvocationTargetException e) {
