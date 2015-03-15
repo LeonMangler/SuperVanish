@@ -78,10 +78,7 @@ public class SVUtils {
 	}
 
 	protected String getMsg(String msg) {
-		String rn = plugin.msgs.getString("Messages." + msg);
-		if (rn == null)
-			rn = "SV: Unavailable message in messages.yml: " + msg;
-		return rn;
+		return plugin.getMsg(msg);
 	}
 
 	public String convertString(String message, CommandSender p) {
