@@ -266,6 +266,11 @@ public class SuperVanish extends JavaPlugin {
 					newestVersion, false);
 			this.requiresCfgUpdate = requiresUpdate(currentCfgVersion,
 					newestVersion, true);
+			// check if same
+			if (currentCfgVersion.equals(newestVersion))
+				this.requiresCfgUpdate = false;
+			if (currentMsgsVersion.equals(newestVersion))
+				this.requiresMsgsUpdate = false;
 		} catch (Exception e) {
 			printException(e);
 		}
