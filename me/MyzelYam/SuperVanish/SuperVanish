@@ -267,9 +267,9 @@ public class SuperVanish extends JavaPlugin {
 			this.requiresCfgUpdate = requiresUpdate(currentCfgVersion,
 					newestVersion, true);
 			// check if same
-			if (currentCfgVersion.equals(newestVersion))
+			if (newestVersion.equals(currentCfgVersion))
 				this.requiresCfgUpdate = false;
-			if (currentMsgsVersion.equals(newestVersion))
+			if (newestVersion.equals(currentMsgsVersion))
 				this.requiresMsgsUpdate = false;
 		} catch (Exception e) {
 			printException(e);
@@ -278,6 +278,8 @@ public class SuperVanish extends JavaPlugin {
 
 	private boolean requiresUpdate(String currentVersion, String newestVersion,
 			boolean checkCfg) {
+		if (currentVersion == null)
+			return true;
 		for (String s : (checkCfg ? nonRequiredConfigUpdates
 				: nonRequiredMsgsUpdates)) {
 			String[] splitted = s.split("-");
