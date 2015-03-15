@@ -358,6 +358,13 @@ public class SuperVanish extends JavaPlugin {
 			return "SV-Error occurred; more information in console";
 		}
 	}
+	
+	public String getMsg(String msg) {
+		String rn = msgs.getString("Messages." + msg);
+		if (rn == null)
+			rn = "SV: Unavailable message in messages.yml: " + msg;
+		return rn;
+	}
 
 	// override the standart config-api
 	public FileConfiguration getConfig() {
