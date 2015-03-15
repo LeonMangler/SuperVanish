@@ -89,6 +89,7 @@ public class VisibilityAdjuster extends PlayerHider {
 					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
 				ActionBarManager.getInstance(plugin).addActionBar(p);
 			}
+			// vanish msg
 			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
 				String msg1 = vanishMessage;
 				String msg2 = vanishMessageWithPermission;
@@ -99,7 +100,7 @@ public class VisibilityAdjuster extends PlayerHider {
 						}
 					} else {
 						if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers") != true) {
-							if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendDifferentMessages") == false) {
+							if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
 								ap.sendMessage(plugin.convertString(msg1, p));
 							} else {
 								if (ap.getUniqueId().toString()
@@ -114,6 +115,7 @@ public class VisibilityAdjuster extends PlayerHider {
 					}
 				}
 			}
+			// tab
 			if (cfg.getBoolean("Configuration.Tablist.ChangeTabNames")) {
 				TabManager.getInstance().adjustTabname(p,
 						SVTabAction.SET_CUSTOM_TABNAME);
