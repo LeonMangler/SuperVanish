@@ -84,6 +84,11 @@ public class VisibilityAdjuster extends PlayerHider {
 			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null) {
 				DynmapHook.adjustVisibility(p, true);
 			}
+			// action bars
+			if (plugin.getServer().getPluginManager().getPlugin("ProtocolLib") != null
+					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+				ActionBarManager.getInstance(plugin).addActionBar(p);
+			}
 			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
 				String msg1 = vanishMessage;
 				String msg2 = vanishMessageWithPermission;
@@ -198,6 +203,11 @@ public class VisibilityAdjuster extends PlayerHider {
 			// dynm
 			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null) {
 				DynmapHook.adjustVisibility(p, false);
+			}
+			// action bars
+			if (plugin.getServer().getPluginManager().getPlugin("ProtocolLib") != null
+					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+				ActionBarManager.getInstance(plugin).removeActionBar(p);
 			}
 			// join-msg
 			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear") == true) {
