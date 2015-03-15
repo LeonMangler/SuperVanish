@@ -1,6 +1,5 @@
 package me.MyzelYam.SuperVanish.hider;
 
-import me.MyzelYam.ForbiddenEarthCore.api.HideManager;
 import me.MyzelYam.SuperVanish.SVUtils;
 import me.MyzelYam.SuperVanish.api.SVAPI;
 
@@ -11,10 +10,7 @@ public class PlayerHider extends SVUtils {
 
 	protected void showToAll(Player p) {
 		for (Player ap2 : Bukkit.getOnlinePlayers()) {
-			HideManager.getInstance(plugin).removeHide(
-					HideManager.getInstance(plugin).getCombi(
-							HideManager.getInstance(plugin).new PlayerCombi(p,
-									ap2)), plugin);
+			ap2.showPlayer(p);
 		}
 	}
 
@@ -23,14 +19,7 @@ public class PlayerHider extends SVUtils {
 			if (ap2.hasPermission("sv.see")
 					&& cfg.getBoolean("Configuration.Players.EnableSeePermission")) {
 			} else {
-				HideManager
-						.getInstance(plugin)
-						.addHide(
-								HideManager
-										.getInstance(plugin)
-										.getCombi(
-												HideManager.getInstance(plugin).new PlayerCombi(
-														p, ap2)), plugin);
+				ap2.hidePlayer(p);
 			}
 		}
 	}
@@ -42,14 +31,7 @@ public class PlayerHider extends SVUtils {
 		for (Player ap2 : Bukkit.getOnlinePlayers()) {
 			if (SVAPI.getInvisiblePlayers().contains(
 					ap2.getUniqueId().toString()))
-				HideManager
-						.getInstance(plugin)
-						.addHide(
-								HideManager
-										.getInstance(plugin)
-										.getCombi(
-												HideManager.getInstance(plugin).new PlayerCombi(
-														ap2, p)), plugin);
+				p.hidePlayer(ap2);
 		}
 	}
 }
