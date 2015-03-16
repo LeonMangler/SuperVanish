@@ -83,13 +83,14 @@ public class SVAPI {
 		return plugin.pd;
 	}
 
-	@Deprecated
-	public static void recreateConfiguration() {
-	}
-
 	public static void reloadConfig() {
-		plugin.reloadConfig();
-		MessagesCfg m = new MessagesCfg();
-		m.reloadConfig();
+		// messages
+		plugin.mcfg = new MessagesCfg();
+		plugin.mcfg.saveDefaultConfig();
+		plugin.msgs = plugin.mcfg.getConfig();
+		// config
+		plugin.ccfg = new ConfigCfg();
+		plugin.ccfg.saveDefaultConfig();
+		plugin.cfg = plugin.ccfg.getConfig();
 	}
 }
