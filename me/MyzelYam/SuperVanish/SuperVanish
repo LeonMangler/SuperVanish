@@ -290,71 +290,79 @@ public class SuperVanish extends JavaPlugin {
 		return true;
 	}
 
-	public String convertString(String message, CommandSender p) {
+	public String convertString(String msg, Object unspecifiedPlayer) {
 		try {
-			if (p instanceof Player) {
-				if (getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
-					block: {
-						PermissionUser user = PermissionsEx.getUser((Player) p);
-						if (user == null)
-							break block;
-						if (user.getPrefix() != null)
-							message = message.replace("%prefix",
-									user.getPrefix());
-						if (user.getSuffix() != null)
-							message = message.replace("%suffix",
-									user.getSuffix());
+			replaceVariables: {
+				if (unspecifiedPlayer instanceof OfflinePlayer
+						&& !(unspecifiedPlayer instanceof Player)) {
+					// offline player
+					OfflinePlayer specifiedPlayer = (OfflinePlayer) unspecifiedPlayer;
+					// replace permissionsex prefix and suffix
+					if (getServer().getPluginManager().getPlugin(
+							"PermissionsEx") != null) {
+						msg = msg.replace("%prefix", "").replace("%suffix", "");
 					}
+					// replace essentials nick names
+					if (getServer().getPluginManager().getPlugin("Essentials") != null) {
+						msg = msg.replace("%nick", specifiedPlayer.getName());
+					}
+					// replace general variables
+					msg = msg.replace("%d", specifiedPlayer.getName())
+							.replace("%p", specifiedPlayer.getName())
+							.replace("%t", specifiedPlayer.getName());
+					break replaceVariables;
 				}
-				if (getServer().getPluginManager().getPlugin("Essentials") != null) {
-					Essentials ess = (Essentials) Bukkit.getServer()
-							.getPluginManager().getPlugin("Essentials");
-					User u = ess.getUser((Player) p);
-					if (u != null)
-						if (u.getNickname() != null)
-							message = message.replace("%nick", u.getNickname());
+				if (unspecifiedPlayer instanceof Player) {
+					// player
+					Player specifiedPlayer = (Player) unspecifiedPlayer;
+					// replace permissionsex prefix and suffix
+					if (getServer().getPluginManager().getPlugin(
+							"PermissionsEx") != null) {
+						PermissionUser user = PermissionsEx
+								.getUser(specifiedPlayer);
+						if (user != null) {
+							if (user.getPrefix() != null)
+								msg = msg.replace("%prefix", user.getPrefix());
+							if (user.getSuffix() != null)
+								msg = msg.replace("%suffix", user.getSuffix());
+						}
+					}
+					// replace essentials nick names
+					if (getServer().getPluginManager().getPlugin("Essentials") != null) {
+						Essentials ess = (Essentials) Bukkit.getServer()
+								.getPluginManager().getPlugin("Essentials");
+						User u = ess.getUser(specifiedPlayer);
+						if (u != null)
+							if (u.getNickname() != null)
+								msg = msg.replace("%nick", u.getNickname());
+					}
+					// replace general variables
+					msg = msg
+							.replace("%d",
+									"" + specifiedPlayer.getDisplayName())
+							.replace("%p", "" + specifiedPlayer.getName())
+							.replace("%t",
+									"" + specifiedPlayer.getPlayerListName());
+					break replaceVariables;
 				}
-				message = message.replace("%d",
-						"" + ((Player) p).getDisplayName());
-				message = message.replace("%p", "" + p.getName());
-				message = message.replace("%t",
-						"" + ((Player) p).getPlayerListName());
-			} else {
-				if (getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
-					message = message.replace("%prefix", "");
-					message = message.replace("%suffix", "");
+				if (unspecifiedPlayer instanceof CommandSender
+						&& !(unspecifiedPlayer instanceof Player)) {
+					// console
+					// replace permissionsex prefixes
+					if (getServer().getPluginManager().getPlugin(
+							"PermissionsEx") != null) {
+						msg = msg.replace("%prefix", "").replace("%suffix", "");
+					}
+					// replace general variables
+					msg = msg.replace("%d", "Console").replace("%p", "Console")
+							.replace("%t", "Console");
+					break replaceVariables;
 				}
-				message = message.replace("%d", "Console");
-				message = message.replace("%p", "Console");
-				message = message.replace("%t", "Console");
 			}
-			message = message.replace("&", "§");
-			return message;
-		} catch (Exception e) {
-			printException(e);
-			return "SV-Error occurred; more information in console";
-		}
-	}
-
-	public String convertString2(String message, OfflinePlayer p) {
-		try {
-			if (this.getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
-				message = message.replace("%prefix", "");
-				message = message.replace("%suffix", "");
-			}
-			if (this.getServer().getPluginManager().getPlugin("Essentials") != null) {
-				Essentials ess = (Essentials) Bukkit.getServer()
-						.getPluginManager().getPlugin("Essentials");
-				User u = ess.getUser(p.getPlayer());
-				if (u != null)
-					if (u.getNickname() != null)
-						message = message.replace("%nick", u.getNickname());
-			}
-			message = message.replace("%d", p.getName());
-			message = message.replace("%p", p.getName());
-			message = message.replace("%t", p.getName());
-			message = message.replace("&", "§");
-			return message;
+			// add color
+			msg = msg.replace("&", "§");
+			// return replaced message
+			return msg;
 		} catch (Exception e) {
 			printException(e);
 			return "SV-Error occurred; more information in console";
