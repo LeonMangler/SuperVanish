@@ -1,0 +1,45 @@
+name: SuperVanish
+main: me.MyzelYam.SuperVanish.SuperVanish
+author: MyzelYam
+description: Advanced vanish-plugin
+version: 5.3.0
+website: http://www.spigotmc.org/resources/supervanish.1331/
+softdepend: [BarAPI, LibsDisguises, DisguiseCraft, dynmap, Essentials, ProtocolLib]
+commands:
+  sv:
+    usage: /sv
+    description: SuperVanish's main command
+    aliases: [v, supervanish, vanish, vlist]
+  vlogin:
+    usage: /vlogin
+    description: Broadcasts a login-message
+    aliases: [svlogin]
+  vlogout:
+    usage: /vlogout
+    description: Broadcasts a logout-message
+    aliases: [svlogout]
+permissions:
+  sv.*:
+    children:
+    - sv.use
+    - sv.see
+    - sv.reload
+    - sv.login
+    - sv.logout
+    - sv.others
+    - sv.list
+    - sv.fly
+    - sv.toggleitempickups
+    - sv.updatecfg
+  supervanish.*:
+    children:
+    - sv.use
+    - sv.see
+    - sv.reload
+    - sv.logout
+    - sv.login
+    - sv.others
+    - sv.list
+    - sv.fly
+    - sv.toggleitempickups
+    - sv.updatecfg
