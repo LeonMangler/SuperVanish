@@ -1,0 +1,45 @@
+# SuperVanish v5.3.0 - Messages
+# Information:
+# You can use the & character for colorcodes. Example: '&cThe color of this text would be red!'
+# You can use %p to get the player's name. Example: '&4&l%p, you aren't allowed to execute this command!'
+# %p returns in 'HideOtherMessage', 'AlreadyInvisibleMessage',
+#'AlreadyVisibleMessage' and 'ShowOtherMessage' the name of the given player.
+# You can use %d to get the player's displayname. Example: '&6Your displayname: &c%d'
+# You can use %t to get the player's tabname (This is the name of the player in the playerlist [TAB]).
+# You can use %l to get a list of invisible players. (Only in 'ListMessage' available)
+# You can use %prefix to get the player's prefix (Requires PermissionsEx).
+# You can use %suffix to get the player's suffix (Requires PermissionsEx).
+# You can use %nick to get the player's nickname (Requires Essentials).
+# Important:
+# You must put your messages in quotes if you use colorcodes and/or special characters like colons! Example: 'Hi: &6%p'
+Messages:
+  NoPermissionMessage: '&4Denied access! You are not allowed to do this.'
+  VanishMessage: '&e%p left the game.'
+  ReappearMessage: '&e%p joined the game.'
+  VanishMessageWithPermission: '&a[SV] %p vanished.'
+  ReappearMessageWithPermission: '&a[SV] %p reappeared.'
+  OnVanish: '&aYou are now invisible!'
+  OnReappear: '&aYou are no longer invisible!'
+  OnVanishWhileInvisible: '&cYou are already invisible!'
+  OnReappearWhileVisible: '&cYou are not invisible!'
+  InvalidUsageMessage: '&cInvalid usage! /sv [reload|list|tipu|updateCfg] [Player]'
+  RememberMessage: '&aYou are still invisible!'
+  ListMessage: '&aInvisible Players:&f %l'
+  BossBarVanishMessage: '&aYou are now invisible!'
+  BossBarReappearMessage: '&aYou are no longer invisible!'
+  BossBarRememberMessage: '&aYou are still invisible!'
+  ActionBarMessage: '&aYou are invisible to other players!'
+  TabName: '%t'
+  HideOtherMessage: '&aPlayer &e%p&a is now invisible!'
+  ShowOtherMessage: '&aPlayer &e%p&a is now visible!'
+  AlreadyInvisibleMessage: '&cPlayer &e%p&c is already invisible!'
+  AlreadyVisibleMessage: '&cPlayer &e%p&c is already visible!'
+  ConfigReloadedMessage: '&aSuccessfully reloaded the configuration!'
+  InvalidSenderMessage: '&cYou must be a player to execute this command!'
+  PlayerNotOnlineMessage: '&cThat player is not online!'
+  ToggledPickingUpItemsOn: '&ePicking up items is now turned &aON&e.'
+  ToggledPickingUpItemsOff: '&ePicking up items is now turned &cOFF&e.'
+  UpdateWarningMessage: '&cWarning! Updating %updates resets %changes. Please use ''&e/sv updatecfg confirm&c'' to continue.'
+  UpdatedConfigMessage: '&aSuccessfully updated %updates! Please check %changes settings.'
+  NoConfigUpdateAvailableMessage: '&eYour SuperVanish-files are up to date!'
+MessagesVersion: 5.3.0
