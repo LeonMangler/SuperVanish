@@ -1,0 +1,115 @@
+# SuperVanish v5.3.1 - Configuration
+#
+Configuration:
+##################################################
+################ MESSAGE OPTIONS #################
+##################################################
+  Messages:
+    ####### Fake Join-/LeaveMessages #######
+    VanishReappearMessages:
+      # Should this plugin broadcast a message when a player vanishs?
+      # You can change that message in the messages.yml file.
+      BroadcastMessageOnVanish: true
+      # Should this plugin broadcast a message when a player reappears?
+      # You can change that message in the messages.yml file.
+      BroadcastMessageOnReappear: true
+      # Should players with the permission 'sv.see' get an other message when a player vanishs/reappears?
+      # You can change that message in the messages.yml file.
+      SendDifferentMessages: true
+      # Should only players with the permission 'sv.see' receive 'fake' Join-/LeaveMessages?
+      SendMessageOnlyToAdmins: false
+      # Should only players without the permission 'sv.see' receive 'fake' Join-/LeaveMessages?
+      SendMessageOnlyToUsers: false
+    ########################################
+    # Should this plugin hide the 'normal' Join- and LeaveMessages of invisible players?
+    HideNormalJoinAndLeaveMessagesWhileInvisible: true
+    # Should this plugin remember players who join the server invisible?
+    # You can change that message in the messages.yml file.
+    RememberInvisiblePlayersOnJoin: true
+    # Should this plugin use BarAPI to show invisible players awesome bossbars?
+    # Requires BarAPI.
+    # You can change the bars in the messages.yml file.
+    UseBarAPI: false
+    # Should invisible players have action bars that tell them that they're invisible?
+    # You can change the actionbar msg in the messages.yml file.
+    DisplayActionBarsToInvisiblePlayers: true
+##################################################
+################ PLAYER OPTIONS ##################
+##################################################
+  Players:
+    # Should invisible players be able to pick up items?
+    DisableItemPickUpsByDefault: true
+    # Should players with the permission 'sv.see' view invisible players as ghosts?
+    # This feature uses scoreboard teams and could break other plugins.
+    # Please disable this feature if it causes problems.
+    EnableGhostPlayers: false
+    # Should this plugin disable hunger of invisible players?
+    DisableHungerForInvisiblePlayers: true
+    ################## FLY #################
+    Fly:
+      # Should invisible players be able to fly even if they aren't in creative mode?
+      Enable: true
+      # Should invisible players WITHOUT the permission 'sv.fly' lose the ability to fly on reappear?
+      DisableOnReappear: true
+    ########################################
+    # Should invisible players not be able to trigger pressure plates and tripwire?
+    # If this feature is enabled invisible players can't trigger pressure plates and tripwire.
+    DisablePressurePlatesForInvisiblePlayers: true
+    # Should players with the permission 'sv.see' be able to see invisible players?
+    EnableSeePermission: true
+    # Should invisible players not be able to break blocks?
+    PreventBlockBreaking: false
+    # Should invisible players not be able to place blocks?
+    PreventBlockPlacing: false
+    # Should invisible players open chests without the chest animation and sounds? Requires ProtocolLib.
+    SilentOpenChest: true
+    # Should invisible players automatically reappear when they change their world?
+    ReappearOnWorldChange: false
+    # Should invisible players automatically reappear when they quit the server?
+    ReappearOnQuit: false
+##################################################
+################ TABLIST OPTIONS #################
+##################################################
+  Tablist:
+    # Should this plugin change the tabname of invisible players?
+    # Players without the permission 'sv.see' won't see this tabname.
+    # This feature changes the tabname of invisible players and could break other plugins.
+    # You can change the new tabname in the messages.yml file.
+    # Please note that tabnames can only have a length of 16 or less characters.
+    ChangeTabNames: true
+##################################################
+############## SERVERLIST OPTIONS ################
+##################################################
+  Serverlist:
+    # The ServerList-features require the plugin ProtocolLib!!
+    # Should this plugin adjust the amount of players in the serverlist?
+    AdjustAmountOfOnlinePlayers: true
+    # Should this plugin hide invisible players in the list of logged in players?
+    # You can view this list when your mouse hovers over the amount of online players.
+    AdjustListOfLoggedInPlayers: true
+##################################################
+############# COMPATIBILITY OPTIONS ##############
+##################################################
+  CompatibilityOptions:
+    # 1 second is equal to 20 ticks
+    ActionDelay:
+      # The settings below won't do anything if this is 'false'.
+      Enable: false
+      # These options may allow other players to see you for a very short time if they aren't 0
+      HideDelayOnJoinInTicks: 5
+      HideDelayOnWorldChangeInTicks: 0
+      #
+      TabNameChangeDelayOnJoinInTicks: 5
+      TabNameChangeDelayOnWorldChangeInTicks: 5
+      # If 'EnableGhostPlayers' is enabled
+      InvisibilityPotionDelayOnJoinInTicks: 3
+      InvisibilityPotionDelayOnWorldChangeInTicks: 3
+    # This section is for advanced users only!
+    # The event-priority supervanish should use for the specific event.
+    # Allowed values are: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
+    PlayerJoinEventPriority: HIGHEST
+    PlayerQuitEventPriority: HIGH
+#################################################
+################# DO NOT TOUCH ##################
+#################################################
+ConfigVersion: 5.3.1
