@@ -34,6 +34,8 @@ public class QuitEvent extends SVUtils implements EventExecutor, Listener {
 						&& vpl.contains(p.getUniqueId().toString())) {
 					e.setQuitMessage(null);
 				}
+				// remove action bar
+				ActionBarManager.getInstance(plugin).removeActionBar(p);
 			}
 		} catch (Exception er) {
 			plugin.printException(er);
