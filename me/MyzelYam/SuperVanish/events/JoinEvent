@@ -106,6 +106,9 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 									Integer.MAX_VALUE, 1));
 						}
 					}
+										// readd action bar
+					ActionBarManager.getInstance(plugin).addActionBar(p);
+					//
 					//
 				}
 				// not necessarily vanished:
