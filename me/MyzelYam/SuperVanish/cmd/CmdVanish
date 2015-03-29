@@ -25,10 +25,6 @@ public class CmdVanish extends SVUtils {
                     }
                     showPlayer(p);
                 } else if (args[0].equalsIgnoreCase("on")) {
-                    if (!(p instanceof Player)) {
-                        p.sendMessage("§cYou aren't a player!");
-                        return;
-                    }
                     if (getInvisiblePlayers().contains(
                             p.getUniqueId().toString())) {
                         p.sendMessage(convertString(
