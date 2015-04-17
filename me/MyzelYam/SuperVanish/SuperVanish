@@ -43,7 +43,7 @@ import com.earth2me.essentials.User;
 public class SuperVanish extends JavaPlugin {
 
 	private final List<String> nonRequiredConfigUpdates = Arrays.asList(
-			"5.1.0-5.2.0", "5.2.0-5.2.1", "5.1.0-5.2.1");
+			"5.1.0-5.2.0", "5.2.0-5.2.1", "5.1.0-5.2.1", "5.3.1-5.3.2");
 
 	private final List<String> nonRequiredMsgsUpdates = Arrays.asList();
 
@@ -368,7 +368,7 @@ public class SuperVanish extends JavaPlugin {
 			return "SV-Error occurred; more information in console";
 		}
 	}
-	
+
 	public String getMsg(String msg) {
 		String rn = msgs.getString("Messages." + msg);
 		if (rn == null)
