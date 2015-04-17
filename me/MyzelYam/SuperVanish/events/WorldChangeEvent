@@ -2,6 +2,8 @@ package me.MyzelYam.SuperVanish.events;
 
 import me.MyzelYam.SuperVanish.SuperVanish;
 import me.MyzelYam.SuperVanish.hider.PlayerHider;
+import me.MyzelYam.SuperVanish.hider.TabManager;
+import me.MyzelYam.SuperVanish.hider.TabManager.SVTabAction;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -35,11 +37,17 @@ public class WorldChangeEvent extends PlayerHider implements Listener {
 				.getInt("Configuration.CompatibilityOptions.ActionDelay.InvisibilityPotionDelayOnWorldChangeInTicks");
 		if (!cfg.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
 			invisDelay = 0;
+		tabDelay = cfg
+				.getInt("Configuration.CompatibilityOptions.ActionDelay.TabNameChangeDelayOnWorldChangeInTicks");
+		if (!cfg.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
+			tabDelay = 0;
 	}
 
 	private int hideDelay;
 
 	private int invisDelay;
+
+	private int tabDelay;
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onWC(PlayerChangedWorldEvent e) {
@@ -56,6 +64,7 @@ public class WorldChangeEvent extends PlayerHider implements Listener {
 			if (hideDelay > 0) {
 				Bukkit.getServer().getScheduler()
 						.scheduleSyncDelayedTask(plugin, new Runnable() {
+
 							public void run() {
 								hideToAll(p);
 							}
@@ -69,6 +78,7 @@ public class WorldChangeEvent extends PlayerHider implements Listener {
 				if (invisDelay > 0) {
 					Bukkit.getServer().getScheduler()
 							.scheduleSyncDelayedTask(plugin, new Runnable() {
+
 								public void run() {
 									p.addPotionEffect(new PotionEffect(
 											PotionEffectType.INVISIBILITY,
@@ -78,6 +88,22 @@ public class WorldChangeEvent extends PlayerHider implements Listener {
 				} else {
 					p.addPotionEffect(new PotionEffect(
 							PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+				}
+			}
+			// readjust tab name
+			if (cfg.getBoolean("Configuration.Tablist.ChangeTabNames")) {
+				if (tabDelay > 0) {
+					Bukkit.getServer().getScheduler()
+							.scheduleSyncDelayedTask(plugin, new Runnable() {
+
+								public void run() {
+									TabManager.getInstance().adjustTabname(p,
+											SVTabAction.SET_CUSTOM_TABNAME);
+								}
+							}, tabDelay);
+				} else {
+					TabManager.getInstance().adjustTabname(p,
+							SVTabAction.SET_CUSTOM_TABNAME);
 				}
 			}
 		} catch (Exception er) {
