@@ -2,6 +2,7 @@ package me.MyzelYam.SuperVanish.events;
 
 import java.util.List;
 
+import me.MyzelYam.SuperVanish.hider.ActionBarManager;
 import me.MyzelYam.SuperVanish.hider.PlayerHider;
 import me.MyzelYam.SuperVanish.hider.TabManager;
 import me.MyzelYam.SuperVanish.hider.TabManager.SVTabAction;
@@ -78,6 +79,7 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 								.getScheduler()
 								.scheduleSyncDelayedTask(plugin,
 										new Runnable() {
+
 											public void run() {
 												hideToAll(p);
 											}
@@ -86,13 +88,15 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 						hideToAll(p);
 					}
 					// readd invisibility if required
-					if (!p.getActivePotionEffects().contains(
-							PotionEffectType.INVISIBILITY)) {
+					if ((!p.getActivePotionEffects().contains(
+							PotionEffectType.INVISIBILITY))
+							&& cfg.getBoolean("Configuration.Players.EnableGhostPlayers")) {
 						if (invisDelay > 0) {
 							Bukkit.getServer()
 									.getScheduler()
 									.scheduleSyncDelayedTask(plugin,
 											new Runnable() {
+
 												public void run() {
 													p.addPotionEffect(new PotionEffect(
 															PotionEffectType.INVISIBILITY,
@@ -106,15 +110,15 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 									Integer.MAX_VALUE, 1));
 						}
 					}
-										// readd action bar
+					// readd action bar
 					ActionBarManager.getInstance(plugin).addActionBar(p);
-					//
 					//
 				}
 				// not necessarily vanished:
 				if (hideDelay > 0) {
 					Bukkit.getServer().getScheduler()
 							.scheduleSyncDelayedTask(plugin, new Runnable() {
+
 								public void run() {
 									hideAllInvisibleTo(p);
 								}
@@ -130,6 +134,7 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 								.getScheduler()
 								.scheduleSyncDelayedTask(plugin,
 										new Runnable() {
+
 											public void run() {
 												TabManager
 														.getInstance()
@@ -149,7 +154,6 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 						&& !vpl.contains(p.getUniqueId().toString())) {
 					remInvis(p);
 				}
-				//
 			}
 		} catch (Exception er) {
 			plugin.printException(er);
@@ -162,6 +166,7 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 		BarAPI.setMessage(p, plugin.convertString(bbremembermsg, p), 100f);
 		Bukkit.getServer().getScheduler()
 				.scheduleSyncDelayedTask(plugin, new Runnable() {
+
 					public void run() {
 						final List<String> vpl2 = pd
 								.getStringList("InvisiblePlayers");
