@@ -111,7 +111,11 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 						}
 					}
 					// readd action bar
-					ActionBarManager.getInstance(plugin).addActionBar(p);
+					if (plugin.getServer().getPluginManager()
+							.getPlugin("ProtocolLib") != null
+							&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+						ActionBarManager.getInstance(plugin).addActionBar(p);
+					}
 					//
 				}
 				// not necessarily vanished:
