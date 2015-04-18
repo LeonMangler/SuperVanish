@@ -19,9 +19,14 @@ import com.comphenix.protocol.wrappers.WrappedServerPing;
 public class ServerlistAdjustments extends SVUtils {
 
 	public static void setupProtocolLib() {
+		if ((!cfg
+				.getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers"))
+				&& (!cfg.getBoolean("Configuration.Serverlist.AdjustListOfLoggedInPlayers")))
+			return;
 		ProtocolLibrary.getProtocolManager().addPacketListener(
 				new PacketAdapter(plugin, ListenerPriority.NORMAL,
 						PacketType.Status.Server.OUT_SERVER_INFO) {
+
 					@Override
 					public void onPacketSending(PacketEvent e) {
 						if (e.getPacketType() == PacketType.Status.Server.OUT_SERVER_INFO) {
