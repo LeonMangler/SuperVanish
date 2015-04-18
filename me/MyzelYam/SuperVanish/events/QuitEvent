@@ -35,7 +35,11 @@ public class QuitEvent extends SVUtils implements EventExecutor, Listener {
 					e.setQuitMessage(null);
 				}
 				// remove action bar
-				ActionBarManager.getInstance(plugin).removeActionBar(p);
+				if (plugin.getServer().getPluginManager()
+						.getPlugin("ProtocolLib") != null
+						&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+					ActionBarManager.getInstance(plugin).removeActionBar(p);
+				}
 			}
 		} catch (Exception er) {
 			plugin.printException(er);
