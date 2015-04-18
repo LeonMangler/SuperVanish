@@ -95,11 +95,11 @@ public class VisibilityAdjuster extends PlayerHider {
 				String msg2 = vanishMessageWithPermission;
 				for (Player ap : Bukkit.getOnlinePlayers()) {
 					if (!ap.hasPermission("sv.see")) {
-						if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins") != true) {
+						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
 							ap.sendMessage(plugin.convertString(msg1, p));
 						}
 					} else {
-						if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers") != true) {
+						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
 							if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
 								ap.sendMessage(plugin.convertString(msg1, p));
 							} else {
@@ -187,6 +187,7 @@ public class VisibilityAdjuster extends PlayerHider {
 				BarAPI.removeBar(fp);
 				Bukkit.getServer().getScheduler()
 						.scheduleSyncDelayedTask(plugin, new Runnable() {
+
 							public void run() {
 								BarAPI.removeBar(fp);
 							}
@@ -212,17 +213,17 @@ public class VisibilityAdjuster extends PlayerHider {
 				ActionBarManager.getInstance(plugin).removeActionBar(p);
 			}
 			// join-msg
-			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear") == true) {
+			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")) {
 				String msg1 = reappearMessage;
 				String msg2 = reappearMessageWithPermission;
 				for (Player ap : Bukkit.getOnlinePlayers()) {
 					if (!ap.hasPermission("sv.see")) {
-						if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins") != true) {
+						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
 							ap.sendMessage(plugin.convertString(msg1, p));
 						}
 					} else {
-						if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers") != true) {
-							if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendDifferentMessages") == false) {
+						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
+							if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
 								ap.sendMessage(plugin.convertString(msg1, p));
 							} else {
 								if (ap.getUniqueId().toString()
@@ -238,7 +239,7 @@ public class VisibilityAdjuster extends PlayerHider {
 				}
 			}
 			// tab
-			if (cfg.getBoolean("Configuration.Tablist.ChangeTabNames") == true) {
+			if (cfg.getBoolean("Configuration.Tablist.ChangeTabNames")) {
 				TabManager.getInstance().adjustTabname(p,
 						SVTabAction.RESTORE_NORMAL_TABNAME);
 			}
