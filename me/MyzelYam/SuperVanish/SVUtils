@@ -84,8 +84,4 @@ public class SVUtils {
 	public String convertString(String message, CommandSender p) {
 		return plugin.convertString(message, p);
 	}
-
-	public String convertString2(String message, OfflinePlayer p) {
-		return plugin.convertString2(message, p);
-	}
 }
