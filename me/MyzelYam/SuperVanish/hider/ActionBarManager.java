@@ -33,6 +33,7 @@ public class ActionBarManager {
 
 	private void startTimerTask(final SuperVanish plugin) {
 		new BukkitRunnable() {
+
 			@Override
 			public void run() {
 				for (Player p : actionBars) {

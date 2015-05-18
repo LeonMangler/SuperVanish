@@ -17,9 +17,9 @@ import me.MyzelYam.SuperVanish.hider.SilentChestListeners;
 import me.MyzelYam.SuperVanish.hooks.DisguiseCraftHook;
 import me.MyzelYam.SuperVanish.hooks.LibsDisguisesHook;
 import me.confuser.barapi.BarAPI;
-import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -44,10 +44,10 @@ import com.earth2me.essentials.User;
 public class SuperVanish extends JavaPlugin {
 
 	private final List<String> nonRequiredConfigUpdates = Arrays.asList(
-			"5.3.2-5.3.4", "5.3.1-5.3.4", "5.3.3-5.3.4");
+			"5.3.2-5.3.5", "5.3.1-5.3.5", "5.3.3-5.3.5", "5.3.4-5.3.5");
 
 	private final List<String> nonRequiredMsgsUpdates = Arrays.asList(
-			"5.3.2-5.3.4", "5.3.1-5.3.4", "5.3.3-5.3.4");
+			"5.3.2-5.3.5", "5.3.1-5.3.5", "5.3.3-5.3.5", "5.3.4-5.3.5");
 
 	public boolean requiresCfgUpdate = false;
 
