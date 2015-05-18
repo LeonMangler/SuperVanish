@@ -199,17 +199,17 @@ public class PlayerControl extends SVUtils implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
-	public void afterReload(PluginEnableEvent e) {
+	public void onEssentialsEnable(PluginEnableEvent e) {
 		try {
 			final List<String> vpl = pd.getStringList("InvisiblePlayers");
 			if (e.getPlugin().getName().equalsIgnoreCase("Essentials")) {
 				Bukkit.getServer().getScheduler()
 						.scheduleSyncDelayedTask(plugin, new Runnable() {
+
 							public void run() {
 								for (Player p : Bukkit.getOnlinePlayers()) {
 									if (vpl.contains(p.getUniqueId().toString())) {
-										EssentialsHook.adjustVisibility(
-												p.getName(), true);
+										EssentialsHook.hidePlayer(p);
 									}
 								}
 							}
