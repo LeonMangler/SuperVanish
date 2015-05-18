@@ -76,7 +76,7 @@ public class VisibilityAdjuster extends PlayerHider {
 				BarAPI.setMessage(p, plugin.convertString(bossbar, p), 100f);
 			}
 			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null) {
-				EssentialsHook.adjustVisibility(p.getName(), true);
+				EssentialsHook.hidePlayer(p);
 			}
 			if (cfg.getBoolean("Configuration.Players.Fly.Enable")) {
 				p.setAllowFlight(true);
@@ -201,7 +201,7 @@ public class VisibilityAdjuster extends PlayerHider {
 			}
 			// ess
 			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null) {
-				EssentialsHook.adjustVisibility(p.getName(), false);
+				EssentialsHook.showPlayer(p);
 			}
 			// dynm
 			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null) {
