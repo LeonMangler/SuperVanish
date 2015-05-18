@@ -10,22 +10,34 @@ import com.earth2me.essentials.User;
 
 public abstract class EssentialsHook {
 
-    private static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
-            .getPlugin("SuperVanish");
+	private static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
+			.getPlugin("SuperVanish");
 
-    public static void adjustVisibility(String pn, boolean hide) {
-        try {
-            Essentials plugin = (Essentials) Bukkit.getPluginManager()
-                    .getPlugin("Essentials");
-            Player p = Bukkit.getPlayer(pn);
-            User u = plugin.getUser(p);
-            if (hide == true) {
-                if (!u.isHidden()) u.setHidden(true);
-            } else {
-                if (u.isHidden()) u.setHidden(false);
-            }
-        } catch (Exception e) {
-            plugin.printException(e);
-        }
-    }
+	public static void hidePlayer(Player p) {
+		try {
+			Essentials essentials = (Essentials) Bukkit.getPluginManager()
+					.getPlugin("Essentials");
+			User u = essentials.getUser(p);
+			if (u == null)
+				return;
+			if (!u.isHidden())
+				u.setHidden(true);
+		} catch (Exception e) {
+			plugin.printException(e);
+		}
+	}
+
+	public static void showPlayer(Player p) {
+		try {
+			Essentials essentials = (Essentials) Bukkit.getPluginManager()
+					.getPlugin("Essentials");
+			User u = essentials.getUser(p);
+			if (u == null)
+				return;
+			if (u.isHidden())
+				u.setHidden(false);
+		} catch (Exception e) {
+			plugin.printException(e);
+		}
+	}
 }
