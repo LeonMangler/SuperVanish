@@ -60,7 +60,7 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 					// Essentials
 					if (plugin.getServer().getPluginManager()
 							.getPlugin("Essentials") != null) {
-						EssentialsHook.adjustVisibility(p.getName(), true);
+						EssentialsHook.hidePlayer(p);
 					}
 					// remember message
 					if (cfg.getBoolean("Configuration.Messages.RememberInvisiblePlayersOnJoin")) {
