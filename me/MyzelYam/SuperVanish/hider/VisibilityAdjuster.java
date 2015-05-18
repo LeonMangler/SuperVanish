@@ -196,7 +196,8 @@ public class VisibilityAdjuster extends PlayerHider {
 			// fly
 			if (cfg.getBoolean("Configuration.Players.Fly.DisableOnReappear")
 					&& !p.hasPermission("sv.fly")
-					&& p.getGameMode() != GameMode.CREATIVE) {
+					&& p.getGameMode() != GameMode.CREATIVE
+					&& p.getGameMode() != GameMode.SPECTATOR) {
 				p.setAllowFlight(false);
 			}
 			// ess
