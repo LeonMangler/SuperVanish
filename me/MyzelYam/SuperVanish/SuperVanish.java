@@ -17,6 +17,7 @@ import me.MyzelYam.SuperVanish.hider.SilentChestListeners;
 import me.MyzelYam.SuperVanish.hooks.DisguiseCraftHook;
 import me.MyzelYam.SuperVanish.hooks.LibsDisguisesHook;
 import me.confuser.barapi.BarAPI;
+import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -43,10 +44,10 @@ import com.earth2me.essentials.User;
 public class SuperVanish extends JavaPlugin {
 
 	private final List<String> nonRequiredConfigUpdates = Arrays.asList(
-			"5.3.2-5.3.3", "5.3.1-5.3.3");
+			"5.3.2-5.3.4", "5.3.1-5.3.4", "5.3.3-5.3.4");
 
 	private final List<String> nonRequiredMsgsUpdates = Arrays.asList(
-			"5.3.2-5.3.3", "5.3.1-5.3.3");
+			"5.3.2-5.3.4", "5.3.1-5.3.4", "5.3.3-5.3.4");
 
 	public boolean requiresCfgUpdate = false;
 
@@ -218,20 +219,18 @@ public class SuperVanish extends JavaPlugin {
 				System.err
 						.println("[SuperVanish] You have an outdated configuration,");
 				System.err
-						.println("[SuperVanish] regenerating it might fix this problem.");
-			}
-			System.err.println("[SuperVanish] Please report this issue!");
+						.println("[SuperVanish] regenerating it by using '/sv updatecfg' might fix this problem.");
+			} else
+				System.err.println("[SuperVanish] Please report this issue!");
 			System.err.println("Message: ");
 			System.err.println("  " + e.getMessage());
 			System.err.println("General information: ");
 			String plugins = "";
-			for (Plugin s : Bukkit.getServer().getPluginManager().getPlugins()) {
-				if (s.getName().equalsIgnoreCase("SuperVanish"))
+			for (Plugin pl : Bukkit.getServer().getPluginManager().getPlugins()) {
+				if (pl.getName().equalsIgnoreCase("SuperVanish"))
 					continue;
-				plugins = plugins + s.getName();
-				plugins = plugins + " v"
-						+ s.getDescription().getVersion().toString();
-				plugins = plugins + ", ";
+				plugins = plugins + pl.getName() + " v"
+						+ pl.getDescription().getVersion().toString() + ", ";
 			}
 			System.err.println("  ServerVersion: "
 					+ this.getServer().getVersion().toString());
@@ -361,7 +360,7 @@ public class SuperVanish extends JavaPlugin {
 				}
 			}
 			// add color
-			msg = msg.replace("&", "§");
+			msg = ChatColor.translateAlternateColorCodes('&', msg);
 			// return replaced message
 			return msg;
 		} catch (Exception e) {

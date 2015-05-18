@@ -5,7 +5,6 @@ import java.util.List;
 import me.MyzelYam.SuperVanish.hider.VisibilityAdjuster;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -60,7 +59,9 @@ public class SVUtils {
 				"sv.list", true), LOGIN("sv.login", false), LOGOUT("sv.logout",
 				false), TOGGLE_ITEM_PICKUPS("sv.toggleitempickups", false), UPDATE_CFG(
 				"sv.updatecfg", true), RELOAD("sv.reload", true);
+
 		private String perm;
+
 		private boolean console;
 
 		CommandAction(String perm, boolean console) {

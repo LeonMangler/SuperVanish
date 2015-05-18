@@ -8,7 +8,7 @@ import org.dynmap.bukkit.DynmapPlugin;
 
 public abstract class DynmapHook {
 
-	private static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
+	public static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
 			.getPlugin("SuperVanish");
 
 	public static void adjustVisibility(Player p, boolean hide) {

@@ -23,13 +23,15 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 
 public class SilentChestListeners extends SVUtils {
-	static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
+
+	private static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
 			.getPlugin("SuperVanish");
 
 	public static void setupAnimationListener() {
 		ProtocolLibrary.getProtocolManager().addPacketListener(
 				new PacketAdapter(plugin, ListenerPriority.HIGH,
 						PacketType.Play.Server.BLOCK_ACTION) {
+
 					@Override
 					public void onPacketSending(PacketEvent e) {
 						if (e.getPacketType() == PacketType.Play.Server.BLOCK_ACTION) {
@@ -67,6 +69,7 @@ public class SilentChestListeners extends SVUtils {
 		ProtocolLibrary.getProtocolManager().addPacketListener(
 				new PacketAdapter(plugin, ListenerPriority.HIGH,
 						PacketType.Play.Server.NAMED_SOUND_EFFECT) {
+
 					@Override
 					public void onPacketSending(PacketEvent e) {
 						if (e.getPacketType() == PacketType.Play.Server.NAMED_SOUND_EFFECT) {
@@ -99,7 +102,8 @@ public class SilentChestListeners extends SVUtils {
 								}
 								return;
 							}
-							// use this code since a closed chest has no viewers
+							// use this code if it's a closed chest since a
+							// closed chest has no viewers
 							if (e.getPacket().getStrings().read(0)
 									.equalsIgnoreCase("random.chestclosed")) {
 								for (Player p : listener.getWorld()
@@ -131,20 +135,20 @@ public class SilentChestListeners extends SVUtils {
 				});
 	}
 
-	private static Location add(Location l, int x, int z) {
+	private static Location addToLocation(Location l, int x, int z) {
 		return new Location(l.getWorld(), l.getX() + x, l.getY(), l.getZ() + z);
 	}
 
 	private static List<Location> getAdjacentBlockLocations(Location loc) {
 		List<Location> adjacentBlockLocations = new ArrayList<>();
-		adjacentBlockLocations.add(add(loc, 1, 0));
-		adjacentBlockLocations.add(add(loc, -1, 0));
-		adjacentBlockLocations.add(add(loc, 0, -1));
-		adjacentBlockLocations.add(add(loc, 0, 1));
-		adjacentBlockLocations.add(add(loc, 1, 1));
-		adjacentBlockLocations.add(add(loc, -1, -1));
-		adjacentBlockLocations.add(add(loc, 1, -1));
-		adjacentBlockLocations.add(add(loc, -1, 1));
+		adjacentBlockLocations.add(addToLocation(loc, 1, 0));
+		adjacentBlockLocations.add(addToLocation(loc, -1, 0));
+		adjacentBlockLocations.add(addToLocation(loc, 0, -1));
+		adjacentBlockLocations.add(addToLocation(loc, 0, 1));
+		adjacentBlockLocations.add(addToLocation(loc, 1, 1));
+		adjacentBlockLocations.add(addToLocation(loc, -1, -1));
+		adjacentBlockLocations.add(addToLocation(loc, 1, -1));
+		adjacentBlockLocations.add(addToLocation(loc, -1, 1));
 		return adjacentBlockLocations;
 	}
 }

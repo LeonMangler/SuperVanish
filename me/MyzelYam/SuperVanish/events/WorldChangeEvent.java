@@ -74,8 +74,8 @@ public class WorldChangeEvent extends PlayerHider implements Listener {
 			}
 			// readd invis
 			if ((!p.getActivePotionEffects().contains(
-						PotionEffectType.INVISIBILITY))
-						&& cfg.getBoolean("Configuration.Players.EnableGhostPlayers")) {
+					PotionEffectType.INVISIBILITY))
+					&& cfg.getBoolean("Configuration.Players.EnableGhostPlayers")) {
 				if (invisDelay > 0) {
 					Bukkit.getServer().getScheduler()
 							.scheduleSyncDelayedTask(plugin, new Runnable() {

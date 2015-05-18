@@ -3,6 +3,7 @@ package me.MyzelYam.SuperVanish.events;
 import java.util.List;
 
 import me.MyzelYam.SuperVanish.SVUtils;
+import me.MyzelYam.SuperVanish.hider.ActionBarManager;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;

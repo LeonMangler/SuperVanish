@@ -4,6 +4,7 @@ import java.util.List;
 
 import me.MyzelYam.SuperVanish.SVUtils;
 import me.MyzelYam.SuperVanish.SuperVanish;
+import me.MyzelYam.SuperVanish.config.ConfigCfg;
 import me.MyzelYam.SuperVanish.config.MessagesCfg;
 
 import org.bukkit.Bukkit;
@@ -20,13 +21,13 @@ public class SVAPI {
 		if (bplugin == null || !(bplugin instanceof SuperVanish)) {
 			Bukkit.getConsoleSender()
 					.sendMessage(
-							"Â§c[SuperVanish] A plugin will fail to use the api, since SuperVanish isn't loaded!");
+							"§c[SuperVanish] A plugin will fail to use the api, since SuperVanish isn't loaded!");
 			Bukkit.getConsoleSender()
 					.sendMessage(
-							"Â§c[SuperVanish] The author should add SuperVanish as a (soft-)dependency to the plugin.yml file");
+							"§c[SuperVanish] The author should add SuperVanish as a (soft-)dependency to the plugin.yml file");
 			Bukkit.getConsoleSender()
 					.sendMessage(
-							"Â§c[SuperVanish] to make sure SuperVanish is loaded when trying to use the api!");
+							"§c[SuperVanish] to make sure SuperVanish is loaded when trying to use the api!");
 			throw new RuntimeException("API is unavailable!");
 		}
 		plugin = (SuperVanish) bplugin;

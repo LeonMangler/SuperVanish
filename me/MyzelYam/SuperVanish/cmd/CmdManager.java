@@ -24,6 +24,10 @@ public class CmdManager extends SVUtils {
 								getMsg("InvalidUsageMessage"), sender));
 					return;
 				}
+				if (args[0].equalsIgnoreCase("updateCfg")) {
+					new CmdUpdateCfg(sender, args, label);
+					return;
+				}
 				if (args.length == 1) {
 					if (args[0].equalsIgnoreCase("reload")) {
 						new CmdReload(sender, args, label);

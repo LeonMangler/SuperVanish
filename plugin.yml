@@ -2,7 +2,7 @@ name: SuperVanish
 main: me.MyzelYam.SuperVanish.SuperVanish
 author: MyzelYam
 description: Advanced vanish-plugin
-version: 5.3.3
+version: 5.3.4
 website: http://www.spigotmc.org/resources/supervanish.1331/
 softdepend: [BarAPI, LibsDisguises, DisguiseCraft, dynmap, Essentials, ProtocolLib]
 commands:

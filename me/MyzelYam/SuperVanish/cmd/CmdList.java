@@ -21,11 +21,11 @@ public class CmdList extends SVUtils {
 				UUID s2 = UUID.fromString(s);
 				String pn = Bukkit.getOfflinePlayer(s2).getName();
 				if (Bukkit.getPlayer(s2) == null) {
-					pn = pn + "Â§c[offline]Â§f";
+					pn = pn + "§c[offline]§f";
 				}
 				sb = sb.append(pn);
 				if (i != (getInvisiblePlayers().size() - 1))
-					sb = sb.append("Â§a,Â§f ");
+					sb = sb.append("§a,§f ");
 			}
 			listMessage = listMessage.replaceAll("%l", sb.toString());
 			p.sendMessage(convertString(listMessage, p));

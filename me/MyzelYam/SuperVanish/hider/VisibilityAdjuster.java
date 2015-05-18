@@ -60,14 +60,14 @@ public class VisibilityAdjuster extends PlayerHider {
 					.getPlugin("DisguiseCraft") != null) {
 				DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
 				if (dcAPI.isDisguised(p)) {
-					p.sendMessage("Â§c[SV] Please undisguise yourself.");
+					p.sendMessage("§c[SV] Please undisguise yourself.");
 					return;
 				}
 			}
 			if (plugin.getServer().getPluginManager()
 					.getPlugin("LibsDisguises") != null) {
 				if (DisguiseAPI.isDisguised(p)) {
-					p.sendMessage("Â§c[SV] Please undisguise yourself.");
+					p.sendMessage("§c[SV] Please undisguise yourself.");
 					return;
 				}
 			}

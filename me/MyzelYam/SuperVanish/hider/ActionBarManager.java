@@ -46,7 +46,7 @@ public class ActionBarManager {
 	}
 
 	private void sendActionBar(Player p, String bar) {
-		String json = "{\"text\": \"" + bar.replaceAll("&", "ยง") + "\"}";
+		String json = "{\"text\": \"" + bar.replaceAll("&", "ง") + "\"}";
 		WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
 		PacketContainer chatMsg = new PacketContainer(
 				PacketType.Play.Server.CHAT);
