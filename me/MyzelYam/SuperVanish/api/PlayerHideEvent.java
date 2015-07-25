@@ -24,14 +24,17 @@ public class PlayerHideEvent extends Event implements Cancellable {
 		return p;
 	}
 
+	@Override
 	public boolean isCancelled() {
 		return this.isCancelled;
 	}
 
+	@Override
 	public void setCancelled(boolean cancel) {
 		this.isCancelled = cancel;
 	}
 
+	@Override
 	public HandlerList getHandlers() {
 		return handlers;
 	}

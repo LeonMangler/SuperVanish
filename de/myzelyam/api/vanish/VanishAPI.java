@@ -1,4 +1,4 @@
-package me.MyzelYam.SuperVanish.api;
+package de.myzelyam.api.vanish;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.ConfigCfg;
 import de.myzelyam.supervanish.config.MessagesCfg;
 
-public class SVAPI {
+public class VanishAPI {
 
 	private static SuperVanish plugin;
 

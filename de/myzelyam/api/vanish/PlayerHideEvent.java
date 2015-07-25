@@ -1,11 +1,11 @@
-package me.MyzelYam.SuperVanish.api;
+package de.myzelyam.api.vanish;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class PlayerShowEvent extends Event implements Cancellable {
+public class PlayerHideEvent extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
@@ -13,7 +13,7 @@ public class PlayerShowEvent extends Event implements Cancellable {
 
 	private Player p = null;
 
-	public PlayerShowEvent(Player p) {
+	public PlayerHideEvent(Player p) {
 		this.p = p;
 	}
 

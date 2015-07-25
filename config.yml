@@ -1,4 +1,4 @@
-# SuperVanish v5.3.5 - Configuration
+# SuperVanish v5.4.0 - Configuration
 #
 Configuration:
 ##################################################
@@ -43,6 +43,8 @@ Configuration:
     # This feature uses scoreboard teams and could break other plugins.
     # Please disable this feature if it causes problems.
     EnableGhostPlayers: false
+    # Should invisible players have the night vision effect?
+    AddNightVision: true
     # Should this plugin disable hunger of invisible players?
     DisableHungerForInvisiblePlayers: true
     ################## FLY #################
@@ -112,4 +114,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.3.5
+ConfigVersion: 5.4.0
