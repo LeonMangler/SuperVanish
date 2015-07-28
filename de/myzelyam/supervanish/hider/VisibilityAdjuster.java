@@ -21,6 +21,7 @@ import de.myzelyam.supervanish.hider.TabManager.SVTabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 
+@SuppressWarnings("deprecation")
 public class VisibilityAdjuster extends PlayerHider {
 
 	private static VisibilityAdjuster instance;

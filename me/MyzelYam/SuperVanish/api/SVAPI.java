@@ -12,6 +12,7 @@ import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.ConfigCfg;
 import de.myzelyam.supervanish.config.MessagesCfg;
 
+@Deprecated
 public class SVAPI {
 
 	private static SuperVanish plugin;

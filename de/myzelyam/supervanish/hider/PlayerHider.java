@@ -1,10 +1,9 @@
 package de.myzelyam.supervanish.hider;
 
-import me.MyzelYam.SuperVanish.api.SVAPI;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SVUtils;
 
 public class PlayerHider extends SVUtils {
@@ -30,7 +29,7 @@ public class PlayerHider extends SVUtils {
 				&& cfg.getBoolean("Configuration.Players.EnableSeePermission"))
 			return;
 		for (Player ap2 : Bukkit.getOnlinePlayers()) {
-			if (SVAPI.getInvisiblePlayers().contains(
+			if (VanishAPI.getInvisiblePlayers().contains(
 					ap2.getUniqueId().toString()))
 				p.hidePlayer(ap2);
 		}

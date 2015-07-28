@@ -3,8 +3,6 @@ package de.myzelyam.supervanish.hider;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.MyzelYam.SuperVanish.api.SVAPI;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -20,6 +18,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 
+import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SVUtils;
 import de.myzelyam.supervanish.SuperVanish;
 
@@ -55,7 +54,7 @@ public class SilentChestListeners extends SVUtils {
 							List<HumanEntity> humanViewers = inv.getViewers();
 							for (HumanEntity entity : humanViewers) {
 								if (entity instanceof Player)
-									if (SVAPI.isInvisible((Player) entity)) {
+									if (VanishAPI.isInvisible((Player) entity)) {
 										// cancel it since one of the viewers is
 										// invisible
 										e.setCancelled(true);
@@ -109,7 +108,7 @@ public class SilentChestListeners extends SVUtils {
 									.equalsIgnoreCase("random.chestclosed")) {
 								for (Player p : listener.getWorld()
 										.getPlayers()) {
-									if (SVAPI.isInvisible(p)
+									if (VanishAPI.isInvisible(p)
 											&& p.getLocation().distance(loc) < 6) {
 										// cancel it since an invisible player
 										// is
@@ -125,7 +124,7 @@ public class SilentChestListeners extends SVUtils {
 							List<HumanEntity> humanViewers = inv.getViewers();
 							for (HumanEntity entity : humanViewers) {
 								if (entity instanceof Player)
-									if (SVAPI.isInvisible((Player) entity)) {
+									if (VanishAPI.isInvisible((Player) entity)) {
 										// cancel it since one of the viewers is
 										// invisible
 										e.setCancelled(true);

@@ -225,6 +225,7 @@ public class PlayerControl extends SVUtils implements Listener {
 				Bukkit.getServer().getScheduler()
 						.scheduleSyncDelayedTask(plugin, new Runnable() {
 
+							@Override
 							public void run() {
 								for (Player p : Bukkit.getOnlinePlayers()) {
 									if (vpl.contains(p.getUniqueId().toString())) {
