@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
 import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
+
 import de.myzelyam.supervanish.config.MessagesCfg;
 import de.myzelyam.supervanish.hider.TabManager.SVTabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
@@ -99,7 +100,8 @@ public class VisibilityAdjuster extends PlayerHider {
 				String msg1 = vanishMessage;
 				String msg2 = vanishMessageWithPermission;
 				for (Player ap : Bukkit.getOnlinePlayers()) {
-					if (!ap.hasPermission("sv.see")) {
+					if (!(ap.hasPermission("sv.see") && cfg
+							.getBoolean("Configuration.Players.EnableSeePermission"))) {
 						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
 							ap.sendMessage(plugin.convertString(msg1, p));
 						}
@@ -232,7 +234,8 @@ public class VisibilityAdjuster extends PlayerHider {
 				String msg1 = reappearMessage;
 				String msg2 = reappearMessageWithPermission;
 				for (Player ap : Bukkit.getOnlinePlayers()) {
-					if (!ap.hasPermission("sv.see")) {
+					if (!(ap.hasPermission("sv.see") && cfg
+							.getBoolean("Configuration.Players.EnableSeePermission"))) {
 						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
 							ap.sendMessage(plugin.convertString(msg1, p));
 						}

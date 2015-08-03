@@ -44,13 +44,12 @@ import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 
 public class SuperVanish extends JavaPlugin {
 
-	private final List<String> nonRequiredConfigUpdates = Arrays.asList(
-			"5.3.1-5.4.0", "5.3.2-5.4.0", "5.3.3-5.4.0", "5.3.4-5.4.0",
-			"5.3.5-5.4.0");
+	private final List<String> nonRequiredConfigUpdates = Arrays
+			.asList("5.4.0-5.4.1");
 
 	private final List<String> nonRequiredMsgsUpdates = Arrays.asList(
-			"5.3.1-5.4.0", "5.3.2-5.4.0", "5.3.3-5.4.0", "5.3.4-5.4.0",
-			"5.3.5-5.4.0");
+			"5.3.1-5.4.1", "5.3.2-5.4.1", "5.3.3-5.4.1", "5.3.4-5.4.1",
+			"5.3.5-5.4.1", "5.4.0-5.4.1");
 
 	public boolean requiresCfgUpdate = false;
 

@@ -46,12 +46,16 @@ public class CmdUpdateCfg extends SVUtils {
 							+ File.separator + "config.yml");
 					file.delete();
 					plugin.ccfg.saveDefaultConfig();
+					plugin.ccfg.reloadConfig();
+					plugin.cfg = plugin.ccfg.getConfig();
 				}
 				if (plugin.requiresMsgsUpdate) {
 					File file2 = new File(plugin.getDataFolder().getPath()
 							+ File.separator + "messages.yml");
 					file2.delete();
 					plugin.mcfg.saveDefaultConfig();
+					plugin.mcfg.reloadConfig();
+					plugin.msgs = plugin.mcfg.getConfig();
 				}
 				p.sendMessage(convertString(getMsg("UpdatedConfigMessage"), p)
 						.replace("%changes", changes).replace("%updates",

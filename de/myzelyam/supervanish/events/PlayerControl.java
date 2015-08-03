@@ -32,14 +32,14 @@ import de.myzelyam.supervanish.hooks.EssentialsHook;
 
 public class PlayerControl extends SVUtils implements Listener {
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onTp(PlayerTeleportEvent e) {
 		// remove potion effects
 		Player p = e.getPlayer();
 		if (!isHidden(p))
 			return;
-		if (!(e.getFrom().getWorld().getName().equals(e.getTo().getWorld()
-				.getName())))
+		if (e.getFrom().getWorld().getName()
+				.equals(e.getTo().getWorld().getName()))
 			return;
 		// remove night vision (readded in WC-Event)
 		if (cfg.getBoolean("Configuration.Players.AddNightVision"))
@@ -176,7 +176,7 @@ public class PlayerControl extends SVUtils implements Listener {
 			for (Player p : b.getWorld().getPlayers()) {
 				if (!vpl.contains(p.getUniqueId().toString()))
 					continue;
-				if (p.getLocation().distance(blockloc) < 1)
+				if (p.getLocation().distance(blockloc) < 2)
 					e.setBuildable(true);
 			}
 		} catch (Exception er) {

@@ -109,7 +109,8 @@ public class SilentChestListeners extends SVUtils {
 								for (Player p : listener.getWorld()
 										.getPlayers()) {
 									if (VanishAPI.isInvisible(p)
-											&& p.getLocation().distance(loc) < 6) {
+											&& p.getLocation().distanceSquared(
+													loc) < 8.5) {
 										// cancel it since an invisible player
 										// is
 										// nearby
