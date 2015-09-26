@@ -27,11 +27,7 @@ public class QuitEvent extends SVUtils implements EventExecutor, Listener {
 				// check auto-reappear-option
 				if (cfg.getBoolean("Configuration.Players.ReappearOnQuit")
 						&& isHidden(p)) {
-					// remove from vanished list
-					vpl.remove(p.getUniqueId().toString());
-					plugin.pd.set("InvisiblePlayers", vpl);
-					plugin.spd();
-					// remove leave msg?
+					showPlayer(p, true);
 					if (cfg.getBoolean("Configuration.Players.ReappearOnQuitHandleLeaveMsg")
 							&& config
 									.getBoolean("Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible")) {

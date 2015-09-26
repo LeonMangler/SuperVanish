@@ -165,6 +165,12 @@ public class VisibilityAdjuster extends PlayerHider {
 
 	@Override
 	public void showPlayer(Player p) {
+		showPlayer(p, false);
+
+	}
+
+	@Override
+	public void showPlayer(Player p, boolean hideJoinMsg) {
 		try {
 			// check
 			if (p == null)
@@ -239,7 +245,8 @@ public class VisibilityAdjuster extends PlayerHider {
 				ActionBarManager.getInstance(plugin).removeActionBar(p);
 			}
 			// join-msg
-			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")) {
+			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")
+					&& !hideJoinMsg) {
 				String msg1 = reappearMessage;
 				String msg2 = reappearMessageWithPermission;
 				for (Player ap : Bukkit.getOnlinePlayers()) {

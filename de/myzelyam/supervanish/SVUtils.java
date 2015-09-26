@@ -30,6 +30,10 @@ public class SVUtils {
 		VisibilityAdjuster.getInstance().showPlayer(p);
 	}
 
+	public void showPlayer(Player p, boolean hideJoinMsg) {
+		VisibilityAdjuster.getInstance().showPlayer(p, hideJoinMsg);
+	}
+
 	protected boolean isHidden(Player p) {
 		return getInvisiblePlayers().contains(p.getUniqueId().toString());
 	}
