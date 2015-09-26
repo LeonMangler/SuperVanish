@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
 import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
 
+import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesCfg;
 import de.myzelyam.supervanish.hider.TabManager.SVTabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
@@ -63,7 +64,8 @@ public class VisibilityAdjuster extends PlayerHider {
 			}
 			// /////
 			if (plugin.getServer().getPluginManager()
-					.getPlugin("DisguiseCraft") != null) {
+					.getPlugin("DisguiseCraft") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableDisguiseCraftHook")) {
 				DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
 				if (dcAPI.isDisguised(p)) {
 					p.sendMessage("§c[SV] Please undisguise yourself.");
@@ -71,7 +73,8 @@ public class VisibilityAdjuster extends PlayerHider {
 				}
 			}
 			if (plugin.getServer().getPluginManager()
-					.getPlugin("LibsDisguises") != null) {
+					.getPlugin("LibsDisguises") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableLibsDisguisesHook")) {
 				if (DisguiseAPI.isDisguised(p)) {
 					p.sendMessage("§c[SV] Please undisguise yourself.");
 					return;
@@ -81,18 +84,21 @@ public class VisibilityAdjuster extends PlayerHider {
 					&& cfg.getBoolean("Configuration.Messages.UseBarAPI")) {
 				BarAPI.setMessage(p, plugin.convertString(bossbar, p), 100f);
 			}
-			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null) {
+			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
 				EssentialsHook.hidePlayer(p);
 			}
 			if (cfg.getBoolean("Configuration.Players.Fly.Enable")) {
 				p.setAllowFlight(true);
 			}
-			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null) {
+			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
 				DynmapHook.adjustVisibility(p, true);
 			}
 			// action bars
 			if (plugin.getServer().getPluginManager().getPlugin("ProtocolLib") != null
-					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+					&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
 				ActionBarManager.getInstance(plugin).addActionBar(p);
 			}
 			// vanish msg
@@ -217,16 +223,19 @@ public class VisibilityAdjuster extends PlayerHider {
 				p.setAllowFlight(false);
 			}
 			// ess
-			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null) {
+			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
 				EssentialsHook.showPlayer(p);
 			}
 			// dynm
-			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null) {
+			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
 				DynmapHook.adjustVisibility(p, false);
 			}
 			// action bars
 			if (plugin.getServer().getPluginManager().getPlugin("ProtocolLib") != null
-					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+					&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
 				ActionBarManager.getInstance(plugin).removeActionBar(p);
 			}
 			// join-msg

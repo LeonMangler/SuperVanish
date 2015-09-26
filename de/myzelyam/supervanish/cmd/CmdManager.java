@@ -29,7 +29,8 @@ public class CmdManager extends SVUtils {
 					return;
 				}
 				if (args.length == 1) {
-					if (args[0].equalsIgnoreCase("reload")) {
+					if (args[0].equalsIgnoreCase("reload")
+							|| args[0].equalsIgnoreCase("rl")) {
 						new CmdReload(sender, args, label);
 						return;
 					}

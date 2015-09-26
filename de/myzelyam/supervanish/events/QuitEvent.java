@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.EventExecutor;
 
 import de.myzelyam.supervanish.SVUtils;
+import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.hider.ActionBarManager;
 
 public class QuitEvent extends SVUtils implements EventExecutor, Listener {
@@ -27,6 +28,11 @@ public class QuitEvent extends SVUtils implements EventExecutor, Listener {
 				if (cfg.getBoolean("Configuration.Players.ReappearOnQuit")
 						&& isHidden(p)) {
 					showPlayer(p);
+					if (cfg.getBoolean("Configuration.Players.ReappearOnQuitHandleLeaveMsg")
+							&& config
+									.getBoolean("Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible")) {
+						e.setQuitMessage(null);
+					}
 					return;
 				}
 				// check remove-quit-msg-option
@@ -38,7 +44,8 @@ public class QuitEvent extends SVUtils implements EventExecutor, Listener {
 				// remove action bar
 				if (plugin.getServer().getPluginManager()
 						.getPlugin("ProtocolLib") != null
-						&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+						&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+						&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
 					ActionBarManager.getInstance(plugin).removeActionBar(p);
 				}
 			}

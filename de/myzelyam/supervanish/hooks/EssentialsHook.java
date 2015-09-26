@@ -17,6 +17,8 @@ public abstract class EssentialsHook {
 		try {
 			Essentials essentials = (Essentials) Bukkit.getPluginManager()
 					.getPlugin("Essentials");
+			if (essentials == null)
+				return;
 			User u = essentials.getUser(p);
 			if (u == null)
 				return;
@@ -31,6 +33,8 @@ public abstract class EssentialsHook {
 		try {
 			Essentials essentials = (Essentials) Bukkit.getPluginManager()
 					.getPlugin("Essentials");
+			if (essentials == null)
+				return;
 			User u = essentials.getUser(p);
 			if (u == null)
 				return;

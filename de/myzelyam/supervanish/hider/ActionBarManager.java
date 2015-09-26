@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,7 +19,7 @@ public class ActionBarManager {
 
 	private static ActionBarManager instance;
 
-	public ActionBarManager(SuperVanish plugin) {
+	private ActionBarManager(SuperVanish plugin) {
 		startTimerTask(plugin);
 	}
 
@@ -47,7 +48,8 @@ public class ActionBarManager {
 	}
 
 	private void sendActionBar(Player p, String bar) {
-		String json = "{\"text\": \"" + bar.replaceAll("&", "§") + "\"}";
+		String json = "{\"text\": \""
+				+ ChatColor.translateAlternateColorCodes('&', bar) + "\"}";
 		WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
 		PacketContainer chatMsg = new PacketContainer(
 				PacketType.Play.Server.CHAT);
@@ -61,7 +63,8 @@ public class ActionBarManager {
 	}
 
 	public void addActionBar(Player p) {
-		actionBars.add(p);
+		if (!actionBars.contains(p))
+			actionBars.add(p);
 	}
 
 	public void removeActionBar(Player p) {

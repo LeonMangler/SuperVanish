@@ -13,6 +13,7 @@ import org.bukkit.plugin.EventExecutor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.hider.ActionBarManager;
 import de.myzelyam.supervanish.hider.PlayerHider;
 import de.myzelyam.supervanish.hider.TabManager;
@@ -42,14 +43,12 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 				if (!cfg.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
 					invisDelay = 0;
 				// ghost players
-				if (cfg.getBoolean("Configuration.Players.EnableGhostPlayers")) {
-					if (plugin.ghostTeam != null
-							&& !plugin.ghostTeam.hasPlayer(p)) {
-						if (p.hasPermission("sv.see")
-								|| p.hasPermission("sv.use")
-								|| vpl.contains(p.getUniqueId().toString()))
-							plugin.ghostTeam.addPlayer(p);
-					}
+				if (cfg.getBoolean("Configuration.Players.EnableGhostPlayers")
+						&& plugin.ghostTeam != null
+						&& !plugin.ghostTeam.hasPlayer(p)) {
+					if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
+							|| vpl.contains(p.getUniqueId().toString()))
+						plugin.ghostTeam.addPlayer(p);
 				}
 				// Join-Message
 				if (cfg.getBoolean(
@@ -62,7 +61,8 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 				if (vpl.contains(p.getUniqueId().toString())) {
 					// Essentials
 					if (plugin.getServer().getPluginManager()
-							.getPlugin("Essentials") != null) {
+							.getPlugin("Essentials") != null
+							&& cfg.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
 						EssentialsHook.hidePlayer(p);
 					}
 					// remember message
@@ -118,7 +118,8 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 					// readd action bar
 					if (plugin.getServer().getPluginManager()
 							.getPlugin("ProtocolLib") != null
-							&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+							&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+							&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
 						ActionBarManager.getInstance(plugin).addActionBar(p);
 					}
 					//

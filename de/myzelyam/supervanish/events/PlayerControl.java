@@ -167,6 +167,27 @@ public class PlayerControl extends SVUtils implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onHit(EntityDamageByEntityEvent e) {
+		try {
+			if (!(e.getDamager() instanceof Player))
+				return;
+			if (e.getEntity() == null)
+				return;
+			Player p = (Player) e.getDamager();
+			List<String> vpl = getInvisiblePlayers();
+			if (vpl == null)
+				return;
+			if (vpl.contains(p.getUniqueId().toString())) {
+				if (cfg.getBoolean("Configuration.Players.PreventHittingEntities")) {
+					e.setCancelled(true);
+				}
+			}
+		} catch (Exception er) {
+			plugin.printException(er);
+		}
+	}
+
 	@EventHandler
 	public void onBlockBlock(BlockCanBuildEvent e) {
 		try {
@@ -176,7 +197,7 @@ public class PlayerControl extends SVUtils implements Listener {
 			for (Player p : b.getWorld().getPlayers()) {
 				if (!vpl.contains(p.getUniqueId().toString()))
 					continue;
-				if (p.getLocation().distance(blockloc) < 2)
+				if (p.getLocation().distanceSquared(blockloc) <= 2.0)
 					e.setBuildable(true);
 			}
 		} catch (Exception er) {
@@ -217,11 +238,12 @@ public class PlayerControl extends SVUtils implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onEssentialsEnable(PluginEnableEvent e) {
 		try {
 			final List<String> vpl = pd.getStringList("InvisiblePlayers");
-			if (e.getPlugin().getName().equalsIgnoreCase("Essentials")) {
+			if (e.getPlugin().getName().equalsIgnoreCase("Essentials")
+					&& cfg.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
 				Bukkit.getServer().getScheduler()
 						.scheduleSyncDelayedTask(plugin, new Runnable() {
 

@@ -18,6 +18,7 @@ public class CmdReload extends SVUtils {
 			plugin.ccfg = new ConfigCfg();
 			plugin.ccfg.saveDefaultConfig();
 			plugin.cfg = plugin.ccfg.getConfig();
+			cfg = plugin.cfg;
 			p.sendMessage(convertString(getMsg("ConfigReloadedMessage"), p));
 		}
 	}

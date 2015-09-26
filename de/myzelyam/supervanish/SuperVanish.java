@@ -37,6 +37,7 @@ import de.myzelyam.supervanish.events.JoinEvent;
 import de.myzelyam.supervanish.events.PlayerControl;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
+import de.myzelyam.supervanish.hider.ActionBarManager;
 import de.myzelyam.supervanish.hider.ServerlistAdjustments;
 import de.myzelyam.supervanish.hider.SilentChestListeners;
 import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
@@ -44,12 +45,14 @@ import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 
 public class SuperVanish extends JavaPlugin {
 
-	private final List<String> nonRequiredConfigUpdates = Arrays
-			.asList("5.4.0-5.4.1");
+	private final List<String> nonRequiredConfigUpdates = Arrays.asList();
 
 	private final List<String> nonRequiredMsgsUpdates = Arrays.asList(
-			"5.3.1-5.4.1", "5.3.2-5.4.1", "5.3.3-5.4.1", "5.3.4-5.4.1",
-			"5.3.5-5.4.1", "5.4.0-5.4.1");
+			"5.3.1-5.4.2", "5.3.2-5.4.2", "5.3.3-5.4.2", "5.3.4-5.4.2",
+			"5.3.5-5.4.2", "5.4.0-5.4.2", "5.4.1-5.4.2");
+
+	public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
+			.contains("(MC: 1.7");
 
 	public boolean requiresCfgUpdate = false;
 
@@ -128,8 +131,8 @@ public class SuperVanish extends JavaPlugin {
 
 	private void checkGhostPlayers() {
 		try {
-			List<String> vpl = pd.getStringList("InvisiblePlayers");
 			if (cfg.getBoolean("Configuration.Players.EnableGhostPlayers")) {
+				List<String> vpl = pd.getStringList("InvisiblePlayers");
 				ghostTeam = Bukkit.getServer().getScoreboardManager()
 						.getMainScoreboard().getTeam("SuperVanishGT");
 				if (ghostTeam == null) {
@@ -161,12 +164,23 @@ public class SuperVanish extends JavaPlugin {
 	private void checkForReload() {
 		try {
 			List<String> vpl = pd.getStringList("InvisiblePlayers");
-			if (this.getServer().getPluginManager().getPlugin("BarAPI") != null
-					&& cfg.getBoolean("Configuration.Messages.UseBarAPI") == true) {
+			// boss bars
+			if (getServer().getPluginManager().getPlugin("BarAPI") != null
+					&& cfg.getBoolean("Configuration.Messages.UseBarAPI")) {
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (vpl.contains(p.getUniqueId().toString())) {
 						String onVanish = msgs.getString("Messages.OnVanish");
 						BarAPI.setMessage(p, convertString(onVanish, p), 100f);
+					}
+				}
+			}
+			// action bars
+			if (getServer().getPluginManager().getPlugin("ProtocolLib") != null
+					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+					&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
+				for (Player p : Bukkit.getOnlinePlayers()) {
+					if (vpl.contains(p.getUniqueId().toString())) {
+						ActionBarManager.getInstance(this).addActionBar(p);
 					}
 				}
 			}
@@ -197,9 +211,11 @@ public class SuperVanish extends JavaPlugin {
 			pm.registerEvents(new PlayerControl(), this);
 			pm.registerEvents(WorldChangeEvent.getInstance(), this);
 			// hooks
-			if (pm.getPlugin("LibsDisguises") != null)
+			if (pm.getPlugin("LibsDisguises") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableLibsDisguisesHook"))
 				pm.registerEvents(new LibsDisguisesHook(), this);
-			if (pm.getPlugin("DisguiseCraft") != null)
+			if (pm.getPlugin("DisguiseCraft") != null
+					&& cfg.getBoolean("Configuration.Hooks.EnableDisguiseCraftHook"))
 				pm.registerEvents(new DisguiseCraftHook(), this);
 			// join
 			JoinEvent jevent = new JoinEvent();
