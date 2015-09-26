@@ -45,11 +45,12 @@ import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 
 public class SuperVanish extends JavaPlugin {
 
-	private final List<String> nonRequiredConfigUpdates = Arrays.asList();
+	private final List<String> nonRequiredConfigUpdates = Arrays
+			.asList("5.4.2-5.4.3");
 
 	private final List<String> nonRequiredMsgsUpdates = Arrays.asList(
-			"5.3.1-5.4.2", "5.3.2-5.4.2", "5.3.3-5.4.2", "5.3.4-5.4.2",
-			"5.3.5-5.4.2", "5.4.0-5.4.2", "5.4.1-5.4.2");
+			"5.3.1-5.4.3", "5.3.2-5.4.3", "5.3.3-5.4.3", "5.3.4-5.4.3",
+			"5.3.5-5.4.3", "5.4.0-5.4.3", "5.4.1-5.4.3", "5.4.2-5.4.3");
 
 	public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
 			.contains("(MC: 1.7");
