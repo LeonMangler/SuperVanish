@@ -1,5 +1,5 @@
 # SuperVanish
-Website: http://www.spigotmc.org/resources/supervanish.1331/
+Website: https://www.spigotmc.org/resources/supervanish.1331/
 
 Source of my Bukkit-Plugin SuperVanish for the spigot/craftbukkit minecraft server-software.
 
