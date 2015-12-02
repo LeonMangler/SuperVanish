@@ -1,4 +1,4 @@
-# SuperVanish v5.4.3 - Configuration
+# SuperVanish v5.4.4 - Configuration
 #
 Configuration:
 ##################################################
@@ -111,6 +111,10 @@ Configuration:
     # Should SV prevent players from being invisible and disguised at the same time? (DisguiseCraft commands)
     # It's recommended to keep this turned on to prevent incompatibility.
     EnableDisguiseCraftHook: true
+    # Should SV hook into TraiGUI and disable trails for vanished players?
+    EnableTrailGUIHook: true
+    # Should SV hook into SuperTrails and disable trails for vanished players?
+    EnableSuperTrailsHook: true
 ##################################################
 ############# COMPATIBILITY OPTIONS ##############
 ##################################################
@@ -137,4 +141,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.4.3
+ConfigVersion: 5.4.4

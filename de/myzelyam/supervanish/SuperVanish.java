@@ -5,11 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import me.confuser.barapi.BarAPI;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,33 +20,28 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
 
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
-
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
 
 import de.myzelyam.supervanish.cmd.CmdManager;
 import de.myzelyam.supervanish.config.ConfigCfg;
 import de.myzelyam.supervanish.config.MessagesCfg;
-import de.myzelyam.supervanish.events.JoinEvent;
-import de.myzelyam.supervanish.events.PlayerControl;
-import de.myzelyam.supervanish.events.QuitEvent;
-import de.myzelyam.supervanish.events.WorldChangeEvent;
-import de.myzelyam.supervanish.hider.ActionBarManager;
-import de.myzelyam.supervanish.hider.ServerlistAdjustments;
-import de.myzelyam.supervanish.hider.SilentChestListeners;
-import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
-import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
+import de.myzelyam.supervanish.events.*;
+import de.myzelyam.supervanish.hider.*;
+import de.myzelyam.supervanish.hooks.*;
+
+import me.confuser.barapi.BarAPI;
+import ru.tehkode.permissions.PermissionUser;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class SuperVanish extends JavaPlugin {
 
-	private final List<String> nonRequiredConfigUpdates = Arrays
-			.asList("5.4.2-5.4.3");
+	private final List<String> nonRequiredConfigUpdates = Arrays.asList();
 
 	private final List<String> nonRequiredMsgsUpdates = Arrays.asList(
-			"5.3.1-5.4.3", "5.3.2-5.4.3", "5.3.3-5.4.3", "5.3.4-5.4.3",
-			"5.3.5-5.4.3", "5.4.0-5.4.3", "5.4.1-5.4.3", "5.4.2-5.4.3");
+			"5.3.1-5.4.5", "5.3.2-5.4.5", "5.3.3-5.4.5", "5.3.4-5.4.5",
+			"5.3.5-5.4.5", "5.4.0-5.4.5", "5.4.1-5.4.5", "5.4.2-5.4.5",
+			"5.4.3-5.4.5", "5.4.4-5.4.5");
 
 	public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
 			.contains("(MC: 1.7");
@@ -65,8 +56,8 @@ public class SuperVanish extends JavaPlugin {
 
 	public FileConfiguration cfg;
 
-	public File pdf = new File(this.getDataFolder().getPath() + File.separator
-			+ "playerdata.yml");
+	public File pdf = new File(
+			this.getDataFolder().getPath() + File.separator + "playerdata.yml");
 
 	public void spd() {
 		try {
@@ -89,7 +80,8 @@ public class SuperVanish extends JavaPlugin {
 			registerEvents();
 			checkForReload();
 			checkGhostPlayers();
-			if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
+			if (getServer().getPluginManager()
+					.getPlugin("ProtocolLib") != null) {
 				ServerlistAdjustments.setupProtocolLib();
 				if (cfg.getBoolean("Configuration.Players.SilentOpenChest")) {
 					SilentChestListeners.setupAnimationListener();
@@ -118,9 +110,8 @@ public class SuperVanish extends JavaPlugin {
 			ccfg.saveDefaultConfig();
 			this.cfg = ccfg.getConfig();
 			// playerdata
-			pd.options().header(
-					"SuperVanish v" + getDescription().getVersion()
-							+ " - Playerdata");
+			pd.options().header("SuperVanish v" + getDescription().getVersion()
+					+ " - Playerdata");
 			pd.options().copyHeader(true);
 			spd();
 			// check for updates
@@ -177,7 +168,8 @@ public class SuperVanish extends JavaPlugin {
 			}
 			// action bars
 			if (getServer().getPluginManager().getPlugin("ProtocolLib") != null
-					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+					&& cfg.getBoolean(
+							"Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
 					&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (vpl.contains(p.getUniqueId().toString())) {
@@ -212,12 +204,18 @@ public class SuperVanish extends JavaPlugin {
 			pm.registerEvents(new PlayerControl(), this);
 			pm.registerEvents(WorldChangeEvent.getInstance(), this);
 			// hooks
-			if (pm.getPlugin("LibsDisguises") != null
-					&& cfg.getBoolean("Configuration.Hooks.EnableLibsDisguisesHook"))
+			if (pm.isPluginEnabled("LibsDisguises") && cfg
+					.getBoolean("Configuration.Hooks.EnableLibsDisguisesHook"))
 				pm.registerEvents(new LibsDisguisesHook(), this);
-			if (pm.getPlugin("DisguiseCraft") != null
-					&& cfg.getBoolean("Configuration.Hooks.EnableDisguiseCraftHook"))
+			if (pm.isPluginEnabled("DisguiseCraft") && cfg
+					.getBoolean("Configuration.Hooks.EnableDisguiseCraftHook"))
 				pm.registerEvents(new DisguiseCraftHook(), this);
+			if (pm.isPluginEnabled("TrailGUI") && cfg
+					.getBoolean("Configuration.Hooks.EnableTrailGUIHook", true))
+				TrailGUIHook.replaceMoveListener();
+			if (pm.isPluginEnabled("SuperTrails") && cfg.getBoolean(
+					"Configuration.Hooks.EnableSuperTrailsHook", true))
+				new SuperTrailsHook(this);
 			// join
 			JoinEvent jevent = new JoinEvent();
 			pm.registerEvent(PlayerJoinEvent.class, jevent,
@@ -237,17 +235,18 @@ public class SuperVanish extends JavaPlugin {
 		try {
 			System.err.println("[SuperVanish] Unknown Exception occurred!");
 			if (requiresCfgUpdate || requiresMsgsUpdate) {
-				System.err
-						.println("[SuperVanish] You have an outdated configuration,");
-				System.err
-						.println("[SuperVanish] regenerating it by using '/sv updatecfg' might fix this problem.");
+				System.err.println(
+						"[SuperVanish] You have an outdated configuration,");
+				System.err.println(
+						"[SuperVanish] regenerating it by using '/sv updatecfg' might fix this problem.");
 			} else
 				System.err.println("[SuperVanish] Please report this issue!");
 			System.err.println("Message: ");
 			System.err.println("  " + e.getMessage());
 			System.err.println("General information: ");
 			String plugins = "";
-			for (Plugin pl : Bukkit.getServer().getPluginManager().getPlugins()) {
+			for (Plugin pl : Bukkit.getServer().getPluginManager()
+					.getPlugins()) {
 				if (pl.getName().equalsIgnoreCase("SuperVanish"))
 					continue;
 				plugins = plugins + pl.getName() + " v"
@@ -263,8 +262,8 @@ public class SuperVanish extends JavaPlugin {
 			System.err.println("[SuperVanish] Please include this information");
 			System.err.println("[SuperVanish] if you report the issue.");
 		} catch (Exception e2) {
-			System.err
-					.println("[SuperVanish] An exception occurred while trying to print a detailed stacktrace, printing an undetailed stacktrace of both exceptions:");
+			System.err.println(
+					"[SuperVanish] An exception occurred while trying to print a detailed stacktrace, printing an undetailed stacktrace of both exceptions:");
 			System.err.println("ORIGINAL EXCEPTION:");
 			e.printStackTrace();
 			System.err.println("SECOND EXCEPTION:");
@@ -273,8 +272,8 @@ public class SuperVanish extends JavaPlugin {
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd,
-			String cmdLabel, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel,
+			String[] args) {
 		new CmdManager(cmd, sender, args, cmdLabel);
 		return true;
 	}
@@ -320,12 +319,13 @@ public class SuperVanish extends JavaPlugin {
 					// offline player
 					OfflinePlayer specifiedPlayer = (OfflinePlayer) unspecifiedPlayer;
 					// replace permissionsex prefix and suffix
-					if (getServer().getPluginManager().getPlugin(
-							"PermissionsEx") != null) {
+					if (getServer().getPluginManager()
+							.getPlugin("PermissionsEx") != null) {
 						msg = msg.replace("%prefix", "").replace("%suffix", "");
 					}
 					// replace essentials nick names
-					if (getServer().getPluginManager().getPlugin("Essentials") != null) {
+					if (getServer().getPluginManager()
+							.getPlugin("Essentials") != null) {
 						msg = msg.replace("%nick", specifiedPlayer.getName());
 					}
 					// replace general variables
@@ -338,8 +338,8 @@ public class SuperVanish extends JavaPlugin {
 					// player
 					Player specifiedPlayer = (Player) unspecifiedPlayer;
 					// replace permissionsex prefix and suffix
-					if (getServer().getPluginManager().getPlugin(
-							"PermissionsEx") != null) {
+					if (getServer().getPluginManager()
+							.getPlugin("PermissionsEx") != null) {
 						PermissionUser user = PermissionsEx
 								.getUser(specifiedPlayer);
 						if (user != null) {
@@ -350,7 +350,8 @@ public class SuperVanish extends JavaPlugin {
 						}
 					}
 					// replace essentials nick names
-					if (getServer().getPluginManager().getPlugin("Essentials") != null) {
+					if (getServer().getPluginManager()
+							.getPlugin("Essentials") != null) {
 						Essentials ess = (Essentials) Bukkit.getServer()
 								.getPluginManager().getPlugin("Essentials");
 						User u = ess.getUser(specifiedPlayer);
@@ -371,8 +372,8 @@ public class SuperVanish extends JavaPlugin {
 						&& !(unspecifiedPlayer instanceof Player)) {
 					// console
 					// replace permissionsex prefixes
-					if (getServer().getPluginManager().getPlugin(
-							"PermissionsEx") != null) {
+					if (getServer().getPluginManager()
+							.getPlugin("PermissionsEx") != null) {
 						msg = msg.replace("%prefix", "").replace("%suffix", "");
 					}
 					// replace general variables

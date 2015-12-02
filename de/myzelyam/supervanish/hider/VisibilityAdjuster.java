@@ -166,7 +166,6 @@ public class VisibilityAdjuster extends PlayerHider {
 	@Override
 	public void showPlayer(Player p) {
 		showPlayer(p, false);
-
 	}
 
 	@Override
@@ -209,7 +208,6 @@ public class VisibilityAdjuster extends PlayerHider {
 			// bar-api
 			if (plugin.getServer().getPluginManager().getPlugin("BarAPI") != null
 					&& cfg.getBoolean("Configuration.Messages.UseBarAPI")) {
-
 				BarAPI.setMessage(p, plugin.convertString(bossbar, p), 100f);
 				BarAPI.removeBar(fp);
 				Bukkit.getServer().getScheduler()
