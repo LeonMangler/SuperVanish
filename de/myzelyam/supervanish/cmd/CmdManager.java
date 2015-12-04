@@ -70,8 +70,8 @@ public class CmdManager extends SVUtils {
 							getMsg("InvalidUsageMessage"), sender));
 					return;
 				}
-				sender.sendMessage(convertString(getMsg("InvalidUsageMessage"),
-						sender));
+				sender.sendMessage(
+						convertString(getMsg("InvalidUsageMessage"), sender));
 				return;
 			}
 			if (cmd.getName().equalsIgnoreCase("vlogin")) {

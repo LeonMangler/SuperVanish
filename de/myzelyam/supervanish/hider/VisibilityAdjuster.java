@@ -2,26 +2,24 @@ package de.myzelyam.supervanish.hider;
 
 import java.util.List;
 
-import me.MyzelYam.SuperVanish.api.PlayerHideEvent;
-import me.MyzelYam.SuperVanish.api.PlayerShowEvent;
-import me.confuser.barapi.BarAPI;
-import me.libraryaddict.disguise.DisguiseAPI;
-
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
-import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesCfg;
 import de.myzelyam.supervanish.hider.TabManager.SVTabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
+
+import me.MyzelYam.SuperVanish.api.PlayerHideEvent;
+import me.MyzelYam.SuperVanish.api.PlayerShowEvent;
+import me.confuser.barapi.BarAPI;
+import me.libraryaddict.disguise.DisguiseAPI;
+import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
+import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
 
 @SuppressWarnings("deprecation")
 public class VisibilityAdjuster extends PlayerHider {
@@ -48,9 +46,8 @@ public class VisibilityAdjuster extends PlayerHider {
 					.getString("Messages.VanishMessageWithPermission");
 			String onVanishMessage = messages.getString("Messages.OnVanish");
 			if (getInvisiblePlayers().contains(p.getUniqueId().toString())) {
-				System.err
-						.println("[SuperVanish] Error: Could not hide player "
-								+ p.getName() + ", he is already invisible!");
+				System.err.println("[SuperVanish] Error: Could not hide player "
+						+ p.getName() + ", he is already invisible!");
 				return;
 			}
 			// /////////////////////////////////////////////////////////
@@ -65,64 +62,78 @@ public class VisibilityAdjuster extends PlayerHider {
 			// /////
 			if (plugin.getServer().getPluginManager()
 					.getPlugin("DisguiseCraft") != null
-					&& cfg.getBoolean("Configuration.Hooks.EnableDisguiseCraftHook")) {
+					&& cfg.getBoolean(
+							"Configuration.Hooks.EnableDisguiseCraftHook")) {
 				DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
 				if (dcAPI.isDisguised(p)) {
-					p.sendMessage("§c[SV] Please undisguise yourself.");
+					p.sendMessage(
+							ChatColor.RED + "[SV] Please undisguise yourself.");
 					return;
 				}
 			}
 			if (plugin.getServer().getPluginManager()
 					.getPlugin("LibsDisguises") != null
-					&& cfg.getBoolean("Configuration.Hooks.EnableLibsDisguisesHook")) {
+					&& cfg.getBoolean(
+							"Configuration.Hooks.EnableLibsDisguisesHook")) {
 				if (DisguiseAPI.isDisguised(p)) {
-					p.sendMessage("§c[SV] Please undisguise yourself.");
+					p.sendMessage(
+							ChatColor.RED + "[SV] Please undisguise yourself.");
 					return;
 				}
 			}
-			if (plugin.getServer().getPluginManager().getPlugin("BarAPI") != null
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("BarAPI") != null
 					&& cfg.getBoolean("Configuration.Messages.UseBarAPI")) {
 				BarAPI.setMessage(p, plugin.convertString(bossbar, p), 100f);
 			}
-			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null
-					&& cfg.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("Essentials") != null
+					&& cfg.getBoolean(
+							"Configuration.Hooks.EnableEssentialsHook")) {
 				EssentialsHook.hidePlayer(p);
 			}
 			if (cfg.getBoolean("Configuration.Players.Fly.Enable")) {
 				p.setAllowFlight(true);
 			}
-			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("dynmap") != null
 					&& cfg.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
 				DynmapHook.adjustVisibility(p, true);
 			}
 			// action bars
-			if (plugin.getServer().getPluginManager().getPlugin("ProtocolLib") != null
-					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("ProtocolLib") != null
+					&& cfg.getBoolean(
+							"Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
 					&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
 				ActionBarManager.getInstance(plugin).addActionBar(p);
 			}
 			// vanish msg
-			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
+			if (cfg.getBoolean(
+					"Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
 				String msg1 = vanishMessage;
 				String msg2 = vanishMessageWithPermission;
 				for (Player ap : Bukkit.getOnlinePlayers()) {
-					if (!(ap.hasPermission("sv.see") && cfg
-							.getBoolean("Configuration.Players.EnableSeePermission"))) {
-						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
+					if (!(ap.hasPermission("sv.see") && cfg.getBoolean(
+							"Configuration.Players.EnableSeePermission"))) {
+						if (!cfg.getBoolean(
+								"Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
 							ap.sendMessage(plugin.convertString(msg1, p));
 						}
 					} else {
-						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
-							if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
+						if (!cfg.getBoolean(
+								"Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
+							if (!cfg.getBoolean(
+									"Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
 								ap.sendMessage(plugin.convertString(msg1, p));
 							} else {
 								if (ap.getUniqueId().toString()
 										.equals(p.getUniqueId().toString()))
-									ap.sendMessage(plugin
-											.convertString(msg1, p));
+									ap.sendMessage(
+											plugin.convertString(msg1, p));
 								else
-									ap.sendMessage(plugin
-											.convertString(msg2, p));
+									ap.sendMessage(
+											plugin.convertString(msg2, p));
 							}
 						}
 					}
@@ -142,10 +153,9 @@ public class VisibilityAdjuster extends PlayerHider {
 			if (cfg.getBoolean("Configuration.Players.EnableGhostPlayers")
 					&& plugin.ghostTeam != null) {
 				if (!plugin.ghostTeam.hasPlayer(p)) {
-					if (p.hasPermission("sv.see")
-							|| p.hasPermission("sv.use")
-							|| getInvisiblePlayers().contains(
-									p.getUniqueId().toString()))
+					if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
+							|| getInvisiblePlayers()
+									.contains(p.getUniqueId().toString()))
 						plugin.ghostTeam.addPlayer(p);
 				}
 				// invis
@@ -187,9 +197,8 @@ public class VisibilityAdjuster extends PlayerHider {
 			String onReappearMessage = messages
 					.getString("Messages.OnReappear");
 			if (!getInvisiblePlayers().contains(p.getUniqueId().toString())) {
-				System.err
-						.println("[SuperVanish] Error: Could not show player "
-								+ p.getName() + ", he is already visible!");
+				System.err.println("[SuperVanish] Error: Could not show player "
+						+ p.getName() + ", he is already visible!");
 				return;
 			}
 			// event
@@ -206,7 +215,8 @@ public class VisibilityAdjuster extends PlayerHider {
 					&& p.hasPotionEffect(PotionEffectType.INVISIBILITY))
 				p.removePotionEffect(PotionEffectType.INVISIBILITY);
 			// bar-api
-			if (plugin.getServer().getPluginManager().getPlugin("BarAPI") != null
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("BarAPI") != null
 					&& cfg.getBoolean("Configuration.Messages.UseBarAPI")) {
 				BarAPI.setMessage(p, plugin.convertString(bossbar, p), 100f);
 				BarAPI.removeBar(fp);
@@ -227,44 +237,53 @@ public class VisibilityAdjuster extends PlayerHider {
 				p.setAllowFlight(false);
 			}
 			// ess
-			if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null
-					&& cfg.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("Essentials") != null
+					&& cfg.getBoolean(
+							"Configuration.Hooks.EnableEssentialsHook")) {
 				EssentialsHook.showPlayer(p);
 			}
 			// dynm
-			if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("dynmap") != null
 					&& cfg.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
 				DynmapHook.adjustVisibility(p, false);
 			}
 			// action bars
-			if (plugin.getServer().getPluginManager().getPlugin("ProtocolLib") != null
-					&& cfg.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+			if (plugin.getServer().getPluginManager()
+					.getPlugin("ProtocolLib") != null
+					&& cfg.getBoolean(
+							"Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
 					&& !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
 				ActionBarManager.getInstance(plugin).removeActionBar(p);
 			}
 			// join-msg
-			if (cfg.getBoolean("Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")
+			if (cfg.getBoolean(
+					"Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")
 					&& !hideJoinMsg) {
 				String msg1 = reappearMessage;
 				String msg2 = reappearMessageWithPermission;
 				for (Player ap : Bukkit.getOnlinePlayers()) {
-					if (!(ap.hasPermission("sv.see") && cfg
-							.getBoolean("Configuration.Players.EnableSeePermission"))) {
-						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
+					if (!(ap.hasPermission("sv.see") && cfg.getBoolean(
+							"Configuration.Players.EnableSeePermission"))) {
+						if (!cfg.getBoolean(
+								"Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
 							ap.sendMessage(plugin.convertString(msg1, p));
 						}
 					} else {
-						if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
-							if (!cfg.getBoolean("Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
+						if (!cfg.getBoolean(
+								"Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
+							if (!cfg.getBoolean(
+									"Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
 								ap.sendMessage(plugin.convertString(msg1, p));
 							} else {
 								if (ap.getUniqueId().toString()
 										.equals(p.getUniqueId().toString()))
-									ap.sendMessage(plugin
-											.convertString(msg1, p));
+									ap.sendMessage(
+											plugin.convertString(msg1, p));
 								else
-									ap.sendMessage(plugin
-											.convertString(msg2, p));
+									ap.sendMessage(
+											plugin.convertString(msg2, p));
 							}
 						}
 					}

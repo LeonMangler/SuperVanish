@@ -3,6 +3,7 @@ package de.myzelyam.supervanish.cmd;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import de.myzelyam.supervanish.SVUtils;
@@ -21,11 +22,11 @@ public class CmdList extends SVUtils {
 				UUID s2 = UUID.fromString(s);
 				String pn = Bukkit.getOfflinePlayer(s2).getName();
 				if (Bukkit.getPlayer(s2) == null) {
-					pn = pn + "§c[offline]§f";
+					pn = pn + ChatColor.RED + "[offline]" + ChatColor.WHITE;
 				}
 				sb = sb.append(pn);
 				if (i != (getInvisiblePlayers().size() - 1))
-					sb = sb.append("§a,§f ");
+					sb = sb.append(ChatColor.GREEN + ", " + ChatColor.WHITE);
 			}
 			listMessage = listMessage.replaceAll("%l", sb.toString());
 			p.sendMessage(convertString(listMessage, p));

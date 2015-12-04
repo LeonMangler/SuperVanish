@@ -21,20 +21,20 @@ public class CmdVanishOther extends SVUtils {
 			}
 			Player p = Bukkit.getPlayer(args[1]);
 			if (p == null) {
-				s.sendMessage(convertString(getMsg("PlayerNotOnlineMessage"), s));
+				s.sendMessage(
+						convertString(getMsg("PlayerNotOnlineMessage"), s));
 				return;
 			}
 			// check
-			if (hide
-					&& getInvisiblePlayers().contains(
-							p.getUniqueId().toString())) {
-				s.sendMessage(convertString(getMsg("AlreadyInvisibleMessage"),
-						p));
+			if (hide && getInvisiblePlayers()
+					.contains(p.getUniqueId().toString())) {
+				s.sendMessage(
+						convertString(getMsg("AlreadyInvisibleMessage"), p));
 				return;
-			} else if (!hide
-					&& !getInvisiblePlayers().contains(
-							p.getUniqueId().toString())) {
-				s.sendMessage(convertString(getMsg("AlreadyVisibleMessage"), p));
+			} else if (!hide && !getInvisiblePlayers()
+					.contains(p.getUniqueId().toString())) {
+				s.sendMessage(
+						convertString(getMsg("AlreadyVisibleMessage"), p));
 				return;
 			}
 			// hide

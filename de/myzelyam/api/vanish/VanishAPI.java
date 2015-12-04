@@ -3,6 +3,7 @@ package de.myzelyam.api.vanish;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -19,15 +20,12 @@ public class VanishAPI {
 	static {
 		Plugin bplugin = Bukkit.getPluginManager().getPlugin("SuperVanish");
 		if (bplugin == null || !(bplugin instanceof SuperVanish)) {
-			Bukkit.getConsoleSender()
-					.sendMessage(
-							"§c[SuperVanish] A plugin will fail to use the api, since SuperVanish isn't loaded!");
-			Bukkit.getConsoleSender()
-					.sendMessage(
-							"§c[SuperVanish] The author should add SuperVanish as a (soft-)dependency to the plugin.yml file");
-			Bukkit.getConsoleSender()
-					.sendMessage(
-							"§c[SuperVanish] to make sure SuperVanish is loaded when trying to use the api!");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED
+					+ "[SuperVanish] A plugin will fail to use the api, since SuperVanish isn't loaded!");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED
+					+ "[SuperVanish] The author should add SuperVanish as a (soft-)dependency to the plugin.yml file");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED
+					+ "[SuperVanish] to make sure SuperVanish is loaded when trying to use the api!");
 			throw new RuntimeException("API is unavailable!");
 		}
 		plugin = (SuperVanish) bplugin;
@@ -48,8 +46,8 @@ public class VanishAPI {
 	public static boolean isInvisible(Player p) {
 		if (p == null)
 			return false;
-		return plugin.pd.getStringList("InvisiblePlayers").contains(
-				p.getUniqueId().toString());
+		return plugin.pd.getStringList("InvisiblePlayers")
+				.contains(p.getUniqueId().toString());
 	}
 
 	/**
