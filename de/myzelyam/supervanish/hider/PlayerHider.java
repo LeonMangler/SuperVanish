@@ -16,9 +16,8 @@ public class PlayerHider extends SVUtils {
 
 	protected void hideToAll(Player p) {
 		for (Player ap2 : Bukkit.getOnlinePlayers()) {
-			if (ap2.hasPermission("sv.see")
-					&& cfg.getBoolean("Configuration.Players.EnableSeePermission")) {
-			} else {
+			if (!(ap2.hasPermission("sv.see")
+					&& cfg.getBoolean("Configuration.Players.EnableSeePermission"))) {
 				ap2.hidePlayer(p);
 			}
 		}
