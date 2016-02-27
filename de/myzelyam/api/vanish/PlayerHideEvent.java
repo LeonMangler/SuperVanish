@@ -7,40 +7,40 @@ import org.bukkit.event.HandlerList;
 
 public class PlayerHideEvent extends Event implements Cancellable {
 
-	private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
 
-	private boolean isCancelled = false;
+    private boolean isCancelled = false;
 
-	private Player p = null;
+    private Player player;
 
-	public PlayerHideEvent(Player p) {
-		this.p = p;
-	}
+    public PlayerHideEvent(Player player) {
+        this.player = player;
+    }
 
-	/**
-	 * @return The player
-	 */
-	public Player getPlayer() {
-		return p;
-	}
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 
-	@Override
-	public boolean isCancelled() {
-		return this.isCancelled;
-	}
+    /**
+     * @return The player
+     */
+    public Player getPlayer() {
+        return player;
+    }
 
-	@Override
-	public void setCancelled(boolean cancel) {
-		this.isCancelled = cancel;
-	}
+    @Override
+    public boolean isCancelled() {
+        return this.isCancelled;
+    }
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
+    @Override
+    public void setCancelled(boolean cancel) {
+        this.isCancelled = cancel;
+    }
 
-	public static HandlerList getHandlerList() {
-		return handlers;
-	}
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 
 }

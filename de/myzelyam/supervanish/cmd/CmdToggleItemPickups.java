@@ -1,26 +1,25 @@
 package de.myzelyam.supervanish.cmd;
 
+import de.myzelyam.supervanish.SVUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import de.myzelyam.supervanish.SVUtils;
-
 public class CmdToggleItemPickups extends SVUtils {
 
-	public CmdToggleItemPickups(CommandSender s, String[] args, String label) {
-		if (canDo(s, CommandAction.TOGGLE_ITEM_PICKUPS)) {
-			Player p = (Player) s;
-			p.sendMessage(convertString(getMsg("ToggledPickingUpItems"
-					+ (toggleState(p) ? "On" : "Off")), p));
-		}
-	}
+    public CmdToggleItemPickups(CommandSender sender, String[] args, String label) {
+        if (canDo(sender, CommandAction.TOGGLE_ITEM_PICKUPS)) {
+            Player p = (Player) sender;
+            p.sendMessage(convertString(getMsg("ToggledPickingUpItems"
+                    + (toggleState(p) ? "On" : "Off")), p));
+        }
+    }
 
-	private boolean toggleState(Player p) {
-		boolean hasEnabled = pd.getBoolean("PlayerData."
-				+ p.getUniqueId().toString() + ".itemPickUps");
-		pd.set("PlayerData." + p.getUniqueId().toString() + ".itemPickUps",
-				!hasEnabled);
-		plugin.spd();
-		return !hasEnabled;
-	}
+    private boolean toggleState(Player player) {
+        boolean hasEnabled = playerData.getBoolean("PlayerData."
+                + player.getUniqueId().toString() + ".itemPickUps");
+        playerData.set("PlayerData." + player.getUniqueId().toString() + ".itemPickUps",
+                !hasEnabled);
+        plugin.savePlayerData();
+        return !hasEnabled;
+    }
 }

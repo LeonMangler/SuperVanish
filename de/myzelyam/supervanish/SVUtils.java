@@ -1,92 +1,91 @@
 package de.myzelyam.supervanish;
 
-import java.util.List;
-
+import de.myzelyam.supervanish.hider.VisibilityAdjuster;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import de.myzelyam.supervanish.hider.VisibilityAdjuster;
+import java.util.List;
 
 public class SVUtils {
 
-	protected static SuperVanish plugin = (SuperVanish) Bukkit.getServer()
-			.getPluginManager().getPlugin("SuperVanish");
+    protected static SuperVanish plugin = (SuperVanish) Bukkit.getServer()
+            .getPluginManager().getPlugin("SuperVanish");
 
-	protected static FileConfiguration cfg;
+    protected static FileConfiguration settings;
 
-	protected static FileConfiguration pd;
+    protected static FileConfiguration playerData;
 
-	protected List<String> getInvisiblePlayers() {
-		return pd.getStringList("InvisiblePlayers");
-	}
+    public SVUtils() {
+        if (plugin == null)
+            throw new RuntimeException("Plugin cannot be null!");
+        settings = plugin.settings;
+        playerData = plugin.playerData;
+    }
 
-	public void hidePlayer(Player p) {
-		VisibilityAdjuster.getInstance().hidePlayer(p);
-	}
+    protected List<String> getInvisiblePlayers() {
+        return playerData.getStringList("InvisiblePlayers");
+    }
 
-	public void showPlayer(Player p) {
-		VisibilityAdjuster.getInstance().showPlayer(p);
-	}
+    public void hidePlayer(Player p) {
+        VisibilityAdjuster.getInstance().hidePlayer(p);
+    }
 
-	public void showPlayer(Player p, boolean hideJoinMsg) {
-		VisibilityAdjuster.getInstance().showPlayer(p, hideJoinMsg);
-	}
+    public void showPlayer(Player p) {
+        VisibilityAdjuster.getInstance().showPlayer(p);
+    }
 
-	protected boolean isHidden(Player p) {
-		return getInvisiblePlayers().contains(p.getUniqueId().toString());
-	}
+    public void showPlayer(Player p, boolean hideJoinMsg) {
+        VisibilityAdjuster.getInstance().showPlayer(p, hideJoinMsg);
+    }
 
-	public SVUtils() {
-		if (plugin == null)
-			throw new RuntimeException("Plugin cannot be null!");
-		cfg = plugin.cfg;
-		pd = plugin.pd;
-	}
+    protected boolean isHidden(Player p) {
+        return getInvisiblePlayers().contains(p.getUniqueId().toString());
+    }
 
-	protected boolean canDo(CommandSender p, CommandAction cmd) {
-		if (!(p instanceof Player))
-			if (!cmd.canConsole()) {
-				p.sendMessage(convertString(getMsg("InvalidSenderMessage"), p));
-				return false;
-			}
-		if (!p.hasPermission(cmd.getPerm())) {
-			p.sendMessage(convertString(getMsg("NoPermissionMessage"), p));
-			return false;
-		}
-		return true;
-	}
+    protected boolean canDo(CommandSender p, CommandAction cmd) {
+        if (!(p instanceof Player))
+            if (!cmd.canConsole()) {
+                p.sendMessage(convertString(getMsg("InvalidSenderMessage"), p));
+                return false;
+            }
+        if (!p.hasPermission(cmd.getPerm())) {
+            p.sendMessage(convertString(getMsg("NoPermissionMessage"), p));
+            return false;
+        }
+        return true;
+    }
 
-	protected enum CommandAction {
-		VANISH_SELF("sv.use", false), VANISH_OTHER("sv.others", true), LIST(
-				"sv.list", true), LOGIN("sv.login", false), LOGOUT("sv.logout",
-				false), TOGGLE_ITEM_PICKUPS("sv.toggleitempickups", false), UPDATE_CFG(
-				"sv.updatecfg", true), RELOAD("sv.reload", true);
+    protected String getMsg(String msg) {
+        return plugin.getMsg(msg);
+    }
 
-		private String perm;
+    public String convertString(String message, CommandSender p) {
+        return plugin.convertString(message, p);
+    }
 
-		private boolean console;
+    protected enum CommandAction {
+        VANISH_SELF("sv.use", false), VANISH_OTHER("sv.others", true), LIST(
+                "sv.list", true), LOGIN("sv.login", false), LOGOUT("sv.logout",
+                false), TOGGLE_ITEM_PICKUPS("sv.toggleitempickups", false), UPDATE_CFG(
+                "sv.updatecfg", true), RELOAD("sv.reload", true);
 
-		CommandAction(String perm, boolean console) {
-			this.perm = perm;
-			this.console = console;
-		}
+        private String perm;
 
-		String getPerm() {
-			return perm;
-		}
+        private boolean console;
 
-		boolean canConsole() {
-			return console;
-		}
-	}
+        CommandAction(String perm, boolean console) {
+            this.perm = perm;
+            this.console = console;
+        }
 
-	protected String getMsg(String msg) {
-		return plugin.getMsg(msg);
-	}
+        String getPerm() {
+            return perm;
+        }
 
-	public String convertString(String message, CommandSender p) {
-		return plugin.convertString(message, p);
-	}
+        boolean canConsole() {
+            return console;
+        }
+    }
 }

@@ -136,7 +136,7 @@ Configuration:
     # The event-priority supervanish should use for the specific event.
     # If another plugin overrides supervanish's join/leave settings, setting the priorities to MONITOR can help.
     # Allowed values are: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
-    PlayerJoinEventPriority: HIGHEST
+    PlayerJoinEventPriority: HIGH # <- Set this to "HIGH" if you use Essentials to modify join messages
     PlayerQuitEventPriority: HIGHEST
 #################################################
 ################# DO NOT TOUCH ##################
