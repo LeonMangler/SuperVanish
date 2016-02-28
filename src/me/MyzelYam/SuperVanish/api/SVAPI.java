@@ -2,8 +2,8 @@ package me.MyzelYam.SuperVanish.api;
 
 import de.myzelyam.supervanish.SVUtils;
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.config.SettingsFile;
 import de.myzelyam.supervanish.config.MessagesFile;
+import de.myzelyam.supervanish.config.SettingsFile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -43,10 +43,7 @@ public class SVAPI {
      * @return TRUE if the player is invisible, FALSE otherwise.
      */
     public static boolean isInvisible(Player p) {
-        if (p == null)
-            return false;
-        return plugin.playerData.getStringList("InvisiblePlayers")
-                .contains(p.getUniqueId().toString());
+        return p != null && plugin.playerData.getStringList("InvisiblePlayers").contains(p.getUniqueId().toString());
     }
 
     /**

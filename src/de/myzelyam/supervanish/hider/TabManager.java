@@ -48,7 +48,7 @@ public class TabManager extends SVUtils {
     }
 
     public enum SVTabAction {
-        RESTORE_NORMAL_TABNAME, SET_CUSTOM_TABNAME;
+        RESTORE_NORMAL_TABNAME, SET_CUSTOM_TABNAME
     }
 
     private static class TabData extends SVUtils {
