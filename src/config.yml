@@ -1,4 +1,4 @@
-# SuperVanish v5.4.5 - Configuration
+# SuperVanish v5.5.0 - Configuration
 #
 Configuration:
 ##################################################
@@ -124,10 +124,6 @@ Configuration:
     ActionDelay:
       # The settings below won't do anything if this is 'false'.
       Enable: false
-      # These options may allow other players to see you for a very short time if they aren't 0
-      HideDelayOnJoinInTicks: 5
-      HideDelayOnWorldChangeInTicks: 0
-      #
       TabNameChangeDelayOnJoinInTicks: 5
       TabNameChangeDelayOnWorldChangeInTicks: 5
       # If 'EnableGhostPlayers' is enabled
@@ -141,4 +137,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.4.5
+ConfigVersion: 5.5.0

@@ -1,7 +1,7 @@
 package de.myzelyam.supervanish.hooks;
 
 import ca.jamiesinn.trailgui.Listeners;
-import ca.jamiesinn.trailgui.Main;
+import ca.jamiesinn.trailgui.TrailGUI;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -15,13 +15,13 @@ public abstract class TrailGUIHook {
 
     public static void replaceMoveListener() {
         final Plugin trailGUI = Bukkit.getPluginManager().getPlugin("TrailGUI");
-        if (trailGUI == null || !(trailGUI instanceof Main)) {
+        if (trailGUI == null || !(trailGUI instanceof TrailGUI)) {
             Bukkit.getLogger().log(Level.WARNING,
                     "[SuperVanish] Failed to hook into TrailGUI. (PluginNotFound)");
             return;
         }
         PlayerMoveEvent.getHandlerList().unregister(trailGUI);
-        final Listeners trailGUIListeners = new Listeners((Main) trailGUI);
+        final Listeners trailGUIListeners = new Listeners((TrailGUI) trailGUI);
         trailGUI.getServer().getPluginManager().registerEvents(new Listener() {
 
             @EventHandler

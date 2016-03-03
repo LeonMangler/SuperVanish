@@ -1,13 +1,11 @@
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.hider.ActionBarManager;
-import de.myzelyam.supervanish.hider.PlayerHider;
-import de.myzelyam.supervanish.hider.TabManager;
-import de.myzelyam.supervanish.hider.TabManager.SVTabAction;
+import de.myzelyam.supervanish.hider.TabMgr.TabAction;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import me.confuser.barapi.BarAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -18,21 +16,25 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
-public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
+public class JoinEvent implements EventExecutor, Listener {
+    private final SuperVanish plugin;
+    private final FileConfiguration settings, playerData;
+
+    public JoinEvent(SuperVanish plugin) {
+        this.plugin = plugin;
+        this.settings = plugin.settings;
+        this.playerData = plugin.playerData;
+    }
 
     @SuppressWarnings("deprecation")
     @Override
-    public void execute(Listener l, Event event) {
+    public void execute(Listener listener, Event event) {
         try {
             if (event instanceof PlayerJoinEvent) {
                 PlayerJoinEvent e = (PlayerJoinEvent) event;
                 final Player p = e.getPlayer();
-                final List<String> vpl = playerData.getStringList("InvisiblePlayers");
+                final List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
                 // compatibility delays
-                int hideDelay = settings
-                        .getInt("Configuration.CompatibilityOptions.ActionDelay.HideDelayOnJoinInTicks");
-                if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
-                    hideDelay = 0;
                 int tabDelay = settings
                         .getInt("Configuration.CompatibilityOptions.ActionDelay.TabNameChangeDelayOnJoinInTicks");
                 if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
@@ -46,18 +48,18 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
                         && plugin.ghostTeam != null
                         && !plugin.ghostTeam.hasPlayer(p)) {
                     if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
-                            || vpl.contains(p.getUniqueId().toString()))
+                            || invisiblePlayers.contains(p.getUniqueId().toString()))
                         plugin.ghostTeam.addPlayer(p);
                 }
                 // Join-Message
                 if (settings.getBoolean(
                         "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible",
                         true)
-                        && vpl.contains(p.getUniqueId().toString())) {
+                        && invisiblePlayers.contains(p.getUniqueId().toString())) {
                     e.setJoinMessage(null);
                 }
                 // vanished:
-                if (vpl.contains(p.getUniqueId().toString())) {
+                if (invisiblePlayers.contains(p.getUniqueId().toString())) {
                     // Essentials
                     if (plugin.getServer().getPluginManager()
                             .getPlugin("Essentials") != null
@@ -67,7 +69,7 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
                     // remember message
                     if (settings.getBoolean("Configuration.Messages.RememberInvisiblePlayersOnJoin")) {
                         p.sendMessage(plugin.convertString(
-                                getMsg("RememberMessage"), p));
+                                plugin.getMsg("RememberMessage"), p));
                     }
                     // BAR-API
                     if (plugin.getServer().getPluginManager()
@@ -75,21 +77,8 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
                             && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
                         displayBossBar(p);
                     }
-                    // HIDE/SHOW
-                    if (hideDelay > 0) {
-                        Bukkit.getServer()
-                                .getScheduler()
-                                .scheduleSyncDelayedTask(plugin,
-                                        new Runnable() {
-
-                                            @Override
-                                            public void run() {
-                                                hideToAll(p);
-                                            }
-                                        }, hideDelay);
-                    } else {
-                        hideToAll(p);
-                    }
+                    // hide
+                    plugin.getVisibilityAdjuster().getHider().hideToAll(p);
                     // re-add invisibility
                     if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")) {
                         boolean isInvisible = false;
@@ -118,26 +107,17 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
                             .getPlugin("ProtocolLib") != null
                             && settings.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
                             && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
-                        ActionBarManager.getInstance(plugin).addActionBar(p);
+                        plugin.getActionBarMgr().addActionBar(p);
                     }
                     //
                 }
                 // not necessarily vanished:
-                if (hideDelay > 0) {
-                    Bukkit.getServer().getScheduler()
-                            .scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    hideAllInvisibleTo(p);
-                                }
-                            }, hideDelay);
-                } else {
-                    hideAllInvisibleTo(p);
-                }
+                //
+                // hide vanished players to player
+                plugin.getVisibilityAdjuster().getHider().hideAllInvisibleTo(p);
                 // TAB //
                 if (settings.getBoolean("Configuration.Tablist.ChangeTabNames")
-                        && vpl.contains(p.getUniqueId().toString())) {
+                        && invisiblePlayers.contains(p.getUniqueId().toString())) {
                     if (tabDelay > 0) {
                         Bukkit.getServer()
                                 .getScheduler()
@@ -146,23 +126,22 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
 
                                             @Override
                                             public void run() {
-                                                TabManager
-                                                        .getInstance()
+                                                plugin.getTabMgr()
                                                         .adjustTabname(
                                                                 p,
-                                                                SVTabAction.SET_CUSTOM_TABNAME);
+                                                                TabAction.SET_CUSTOM_TABNAME);
                                             }
                                         }, tabDelay);
                     } else {
-                        TabManager.getInstance().adjustTabname(p,
-                                SVTabAction.SET_CUSTOM_TABNAME);
+                        plugin.getTabMgr().adjustTabname(p,
+                                TabAction.SET_CUSTOM_TABNAME);
                     }
                 }
                 // remove invisibility if required
                 if (playerData.getBoolean("PlayerData.Player."
                         + p.getUniqueId().toString() + ".remInvis")
-                        && !vpl.contains(p.getUniqueId().toString())) {
-                    remInvis(p);
+                        && !invisiblePlayers.contains(p.getUniqueId().toString())) {
+                    removeInvisibility(p);
                 }
             }
         } catch (Exception er) {
@@ -171,24 +150,24 @@ public class JoinEvent extends PlayerHider implements EventExecutor, Listener {
     }
 
     private void displayBossBar(final Player p) {
-        final String bbvm = getMsg("Messages.BossBarVanishMessage");
-        String bbremembermsg = getMsg("Messages.BossBarRememberMessage");
-        BarAPI.setMessage(p, plugin.convertString(bbremembermsg, p), 100f);
+        final String bossBarVanishMessage = plugin.getMsg("Messages.BossBarVanishMessage");
+        String bossBarRememberMessage = plugin.getMsg("Messages.BossBarRememberMessage");
+        BarAPI.setMessage(p, plugin.convertString(bossBarRememberMessage, p), 100f);
         Bukkit.getServer().getScheduler()
                 .scheduleSyncDelayedTask(plugin, new Runnable() {
 
                     @Override
                     public void run() {
-                        final List<String> vpl2 = playerData
+                        final List<String> invisiblePlayers = playerData
                                 .getStringList("InvisiblePlayers");
-                        if (vpl2.contains(p.getUniqueId().toString()))
-                            BarAPI.setMessage(p, plugin.convertString(bbvm, p),
+                        if (invisiblePlayers.contains(p.getUniqueId().toString()))
+                            BarAPI.setMessage(p, plugin.convertString(bossBarVanishMessage, p),
                                     100f);
                     }
                 }, 100);
     }
 
-    private void remInvis(Player p) {
+    private void removeInvisibility(Player p) {
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
         playerData.set("PlayerData.Player." + p.getUniqueId().toString() + ".remInvis",
                 null);

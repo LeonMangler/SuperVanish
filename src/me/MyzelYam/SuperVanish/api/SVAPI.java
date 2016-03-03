@@ -1,14 +1,10 @@
 package me.MyzelYam.SuperVanish.api;
 
-import de.myzelyam.supervanish.SVUtils;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
 import de.myzelyam.supervanish.config.SettingsFile;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 
@@ -16,20 +12,6 @@ import java.util.List;
 public class SVAPI {
 
     private static SuperVanish plugin;
-
-    static {
-        Plugin bplugin = Bukkit.getPluginManager().getPlugin("SuperVanish");
-        if (bplugin == null || !(bplugin instanceof SuperVanish)) {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED
-                    + "[SuperVanish] A plugin will fail to use the api, since SuperVanish isn't loaded!");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED
-                    + "[SuperVanish] The author should add SuperVanish as a (soft-)dependency to the plugin.yml file");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED
-                    + "[SuperVanish] to make sure SuperVanish is loaded when trying to use the api!");
-            throw new RuntimeException("API is unavailable!");
-        }
-        plugin = (SuperVanish) bplugin;
-    }
 
     /**
      * @return A Stringlist of the UUID's of all hidden players
@@ -52,7 +34,7 @@ public class SVAPI {
      * @param p - the player.
      */
     public static void hidePlayer(Player p) {
-        new SVUtils().hidePlayer(p);
+        plugin.getVisibilityAdjuster().hidePlayer(p);
     }
 
     /**
@@ -61,7 +43,7 @@ public class SVAPI {
      * @param p - the player.
      */
     public static void showPlayer(Player p) {
-        new SVUtils().showPlayer(p);
+        plugin.getVisibilityAdjuster().showPlayer(p);
     }
 
     public static FileConfiguration getConfiguration() {
@@ -85,5 +67,13 @@ public class SVAPI {
         plugin.settingsFile = new SettingsFile();
         plugin.settingsFile.saveDefaultConfig();
         plugin.settings = plugin.settingsFile.getConfig();
+    }
+
+    public static SuperVanish getPlugin() {
+        return plugin;
+    }
+
+    public static void setPlugin(SuperVanish plugin) {
+        SVAPI.plugin = plugin;
     }
 }

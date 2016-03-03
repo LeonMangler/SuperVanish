@@ -1,10 +1,9 @@
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.hider.PlayerHider;
-import de.myzelyam.supervanish.hider.TabManager;
-import de.myzelyam.supervanish.hider.TabManager.SVTabAction;
+import de.myzelyam.supervanish.hider.TabMgr.TabAction;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,21 +12,17 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class WorldChangeEvent extends PlayerHider implements Listener {
+import java.util.Collection;
 
-    private static WorldChangeEvent instance;
-    private SuperVanish plugin = (SuperVanish) Bukkit.getServer()
-            .getPluginManager().getPlugin("SuperVanish");
-    private int hideDelay;
-    private int invisibilityDelay;
-    private int tabDelay;
+public class WorldChangeEvent implements Listener {
 
-    private WorldChangeEvent() {
+    private final SuperVanish plugin;
+    private final FileConfiguration settings;
+
+    public WorldChangeEvent(SuperVanish plugin) {
+        this.plugin = plugin;
+        this.settings = plugin.settings;
         // init compatibility delays
-        hideDelay = settings
-                .getInt("Configuration.CompatibilityOptions.ActionDelay.HideDelayOnWorldChangeInTicks");
-        if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
-            hideDelay = 0;
         invisibilityDelay = settings
                 .getInt("Configuration.CompatibilityOptions.ActionDelay.InvisibilityPotionDelayOnWorldChangeInTicks");
         if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
@@ -38,36 +33,23 @@ public class WorldChangeEvent extends PlayerHider implements Listener {
             tabDelay = 0;
     }
 
-    public static WorldChangeEvent getInstance() {
-        if (instance == null)
-            instance = new WorldChangeEvent();
-        return instance;
-    }
+    private int invisibilityDelay;
+    private int tabDelay;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldChange(PlayerChangedWorldEvent e) {
         try {
             final Player p = e.getPlayer();
-            if (!isHidden(p))
+            Collection<Player> onlineInvisiblePlayers = plugin.getOnlineInvisiblePlayers();
+            if (!onlineInvisiblePlayers.contains(p))
                 return;
             // check auto-reappear-option
             if (settings.getBoolean("Configuration.Players.ReappearOnWorldChange")) {
-                showPlayer(p);
+                plugin.getVisibilityAdjuster().showPlayer(p);
                 return;
             }
             // re-hide
-            if (hideDelay > 0) {
-                Bukkit.getServer().getScheduler()
-                        .scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                            @Override
-                            public void run() {
-                                hideToAll(p);
-                            }
-                        }, hideDelay);
-            } else {
-                hideToAll(p);
-            }
+            plugin.getVisibilityAdjuster().getHider().hideToAll(p);
             // re-add invisibility
             if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")) {
                 boolean isInvisible = false;
@@ -103,13 +85,13 @@ public class WorldChangeEvent extends PlayerHider implements Listener {
 
                                 @Override
                                 public void run() {
-                                    TabManager.getInstance().adjustTabname(p,
-                                            SVTabAction.SET_CUSTOM_TABNAME);
+                                    plugin.getTabMgr().adjustTabname(p,
+                                            TabAction.SET_CUSTOM_TABNAME);
                                 }
                             }, tabDelay);
                 } else {
-                    TabManager.getInstance().adjustTabname(p,
-                            SVTabAction.SET_CUSTOM_TABNAME);
+                    plugin.getTabMgr().adjustTabname(p,
+                            TabAction.SET_CUSTOM_TABNAME);
                 }
             }
         } catch (Exception er) {

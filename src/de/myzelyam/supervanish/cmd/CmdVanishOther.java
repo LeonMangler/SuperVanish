@@ -1,18 +1,22 @@
 package de.myzelyam.supervanish.cmd;
 
-import de.myzelyam.supervanish.SVUtils;
+import de.myzelyam.supervanish.SuperVanish;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CmdVanishOther extends SVUtils {
+import java.util.Collection;
 
-    public CmdVanishOther(CommandSender s, String[] args, String label) {
-        if (canDo(s, CommandAction.VANISH_OTHER)) {
+public class CmdVanishOther extends SubCommand {
+
+    public CmdVanishOther(SuperVanish plugin, CommandSender sender, String[] args, String label) {
+        super(plugin);
+        if (canDo(sender, CommandAction.VANISH_OTHER)) {
             if (args.length < 2) {
-                s.sendMessage(convertString(getMsg("InvalidUsageMessage"), s));
+                sender.sendMessage(convertString(getMsg("InvalidUsageMessage"), sender));
                 return;
             }
+            Collection<Player> onlineInvisiblePlayers = getOnlineInvisiblePlayers();
             boolean hide = false;
             switch (args[0]) {
                 case "on":
@@ -20,30 +24,28 @@ public class CmdVanishOther extends SVUtils {
             }
             Player p = Bukkit.getPlayer(args[1]);
             if (p == null) {
-                s.sendMessage(
-                        convertString(getMsg("PlayerNotOnlineMessage"), s));
+                sender.sendMessage(
+                        convertString(getMsg("PlayerNotOnlineMessage"), sender));
                 return;
             }
             // check
-            if (hide && getInvisiblePlayers()
-                    .contains(p.getUniqueId().toString())) {
-                s.sendMessage(
+            if (hide && onlineInvisiblePlayers.contains(p)) {
+                sender.sendMessage(
                         convertString(getMsg("AlreadyInvisibleMessage"), p));
                 return;
-            } else if (!hide && !getInvisiblePlayers()
-                    .contains(p.getUniqueId().toString())) {
-                s.sendMessage(
+            } else if (!hide && !onlineInvisiblePlayers.contains(p)) {
+                sender.sendMessage(
                         convertString(getMsg("AlreadyVisibleMessage"), p));
                 return;
             }
             // hide
             if (hide) {
                 hidePlayer(p);
-                s.sendMessage(convertString(getMsg("HideOtherMessage"), p));
+                sender.sendMessage(convertString(getMsg("HideOtherMessage"), p));
                 // show
             } else {
                 showPlayer(p);
-                s.sendMessage(convertString(getMsg("ShowOtherMessage"), p));
+                sender.sendMessage(convertString(getMsg("ShowOtherMessage"), p));
             }
         }
     }

@@ -1,45 +1,45 @@
 package de.myzelyam.supervanish.cmd;
 
-import de.myzelyam.supervanish.SVUtils;
+import de.myzelyam.supervanish.SuperVanish;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CmdManager extends SVUtils {
+public class CommandMgr {
 
-    public CmdManager(Command cmd, CommandSender sender, String[] args,
+    public CommandMgr(SuperVanish plugin, Command cmd, CommandSender sender, String[] args,
                       String label) {
         try {
             if (label.equalsIgnoreCase("vlist")) {
-                new CmdList(sender, args, label);
+                new CmdList(plugin, sender, args, label);
                 return;
             }
             if (cmd.getName().equalsIgnoreCase("sv")) {
                 if (args.length == 0) {
                     if (sender instanceof Player)
-                        new CmdVanish(sender, args, label);
+                        new CmdVanish(plugin, sender, args, label);
                     else
-                        sender.sendMessage(convertString(
-                                getMsg("InvalidUsageMessage"), sender));
+                        sender.sendMessage(plugin.convertString(
+                                plugin.getMsg("InvalidUsageMessage"), sender));
                     return;
                 }
                 if (args[0].equalsIgnoreCase("updateCfg")) {
-                    new CmdUpdateCfg(sender, args, label);
+                    new CmdUpdateCfg(plugin, sender, args, label);
                     return;
                 }
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("reload")
                             || args[0].equalsIgnoreCase("rl")) {
-                        new CmdReload(sender, args, label);
+                        new CmdReload(plugin, sender, args, label);
                         return;
                     }
                     if (args[0].equalsIgnoreCase("list")) {
-                        new CmdList(sender, args, label);
+                        new CmdList(plugin, sender, args, label);
                         return;
                     }
                     if (args[0].equalsIgnoreCase("on")
                             || args[0].equalsIgnoreCase("off")) {
-                        new CmdVanish(sender, args, label);
+                        new CmdVanish(plugin, sender, args, label);
                         return;
                     }
                     if (args[0].equalsIgnoreCase("toggleitempickups")
@@ -52,33 +52,33 @@ public class CmdManager extends SVUtils {
                             || args[0].equalsIgnoreCase("pickups")
                             || args[0].equalsIgnoreCase("tipu")
                             || args[0].equalsIgnoreCase("tip")) {
-                        new CmdToggleItemPickups(sender, args, label);
+                        new CmdToggleItemPickups(plugin, sender, args, label);
                         return;
                     }
-                    sender.sendMessage(convertString(
-                            getMsg("InvalidUsageMessage"), sender));
+                    sender.sendMessage(plugin.convertString(
+                            plugin.getMsg("InvalidUsageMessage"), sender));
                     return;
                 }
                 if (args.length == 2) {
                     if (args[0].equalsIgnoreCase("on")
                             || args[0].equalsIgnoreCase("off")) {
-                        new CmdVanishOther(sender, args, label);
+                        new CmdVanishOther(plugin, sender, args, label);
                         return;
                     }
-                    sender.sendMessage(convertString(
-                            getMsg("InvalidUsageMessage"), sender));
+                    sender.sendMessage(plugin.convertString(
+                            plugin.getMsg("InvalidUsageMessage"), sender));
                     return;
                 }
                 sender.sendMessage(
-                        convertString(getMsg("InvalidUsageMessage"), sender));
+                        plugin.convertString(plugin.getMsg("InvalidUsageMessage"), sender));
                 return;
             }
             if (cmd.getName().equalsIgnoreCase("vlogin")) {
-                new CmdLogin(sender, args, label);
+                new CmdLogin(plugin, sender, args, label);
                 return;
             }
             if (cmd.getName().equalsIgnoreCase("vlogout")) {
-                new CmdLogout(sender, args, label);
+                new CmdLogout(plugin, sender, args, label);
             }
         } catch (Exception e) {
             plugin.printException(e);

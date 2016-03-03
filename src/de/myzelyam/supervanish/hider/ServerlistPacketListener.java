@@ -7,16 +7,27 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedServerPing;
-import de.myzelyam.supervanish.SVUtils;
+import de.myzelyam.supervanish.SuperVanish;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class ServerlistAdjustments extends SVUtils {
+public class ServerlistPacketListener {
 
-    public static void setupProtocolLib() {
+    private final SuperVanish plugin;
+
+    private final FileConfiguration settings;
+
+    public ServerlistPacketListener(SuperVanish plugin) {
+        this.plugin = plugin;
+        settings = plugin.settings;
+    }
+
+    public void registerListener() {
         if ((!settings
                 .getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers"))
                 && (!settings.getBoolean("Configuration.Serverlist.AdjustListOfLoggedInPlayers")))
@@ -31,15 +42,10 @@ public class ServerlistAdjustments extends SVUtils {
                             if (e.getPacketType() == PacketType.Status.Server.OUT_SERVER_INFO) {
                                 WrappedServerPing ping = e.getPacket()
                                         .getServerPings().read(0);
-                                List<String> invisiblePlayers = playerData
-                                        .getStringList("InvisiblePlayers");
-                                int invisiblePlayersCount = 0;
+                                Collection<Player> invisiblePlayers = ServerlistPacketListener.this.
+                                        plugin.getOnlineInvisiblePlayers();
+                                int invisiblePlayersCount = invisiblePlayers.size();
                                 int onlinePlayersCount = Bukkit.getOnlinePlayers().size();
-                                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                                    if (invisiblePlayers.contains(onlinePlayer.getUniqueId().toString())) {
-                                        invisiblePlayersCount++;
-                                    }
-                                }
                                 if (settings.getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers")) {
                                     ping.setPlayersOnline(onlinePlayersCount - invisiblePlayersCount);
                                 }
@@ -48,15 +54,14 @@ public class ServerlistAdjustments extends SVUtils {
                                     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                                         WrappedGameProfile profile = WrappedGameProfile
                                                 .fromPlayer(onlinePlayer);
-                                        if (!invisiblePlayers.contains(onlinePlayer.getUniqueId()
-                                                .toString()))
+                                        if (!invisiblePlayers.contains(onlinePlayer))
                                             wrappedGameProfiles.add(profile);
                                     }
                                     ping.setPlayers(wrappedGameProfiles);
                                 }
                             }
                         } catch (Exception er) {
-                            ServerlistAdjustments.plugin.printException(er);
+                            ServerlistPacketListener.this.plugin.printException(er);
                         }
                     }
                 });

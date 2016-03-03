@@ -1,14 +1,15 @@
 package de.myzelyam.supervanish.cmd;
 
-import de.myzelyam.supervanish.SVUtils;
+import de.myzelyam.supervanish.SuperVanish;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
 
-public class CmdUpdateCfg extends SVUtils {
+public class CmdUpdateCfg extends SubCommand {
 
-    public CmdUpdateCfg(CommandSender player, String[] args, String label) {
+    public CmdUpdateCfg(SuperVanish plugin, CommandSender player, String[] args, String label) {
+        super(plugin);
         if (canDo(player, CommandAction.UPDATE_CFG)) {
             // get changes and updates
             String updates;

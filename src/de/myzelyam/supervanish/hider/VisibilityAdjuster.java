@@ -2,7 +2,7 @@ package de.myzelyam.supervanish.hider;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
-import de.myzelyam.supervanish.hider.TabManager.SVTabAction;
+import de.myzelyam.supervanish.hider.TabMgr.TabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
@@ -24,21 +24,26 @@ import java.util.List;
 import java.util.logging.Level;
 
 @SuppressWarnings("deprecation")
-public class VisibilityAdjuster extends PlayerHider {
+public class VisibilityAdjuster {
 
-    private static VisibilityAdjuster instance;
+    private final SuperVanish plugin;
 
-    public static VisibilityAdjuster getInstance() {
-        if (instance == null)
-            instance = new VisibilityAdjuster();
-        return instance;
+    private final PlayerHider hider;
+
+    private final FileConfiguration settings;
+
+    public VisibilityAdjuster(SuperVanish plugin) {
+        this.plugin = plugin;
+        this.settings = plugin.settings;
+        hider = new PlayerHider(plugin);
     }
 
-    @Override
     public void hidePlayer(Player p) {
         try {
+            // check p
             if (p == null)
                 throw new NullPointerException("The player cannot be null!");
+            // preparations
             MessagesFile messagesCfg = new MessagesFile();
             FileConfiguration messages = messagesCfg.getConfig();
             String bossBar = messages
@@ -47,12 +52,13 @@ public class VisibilityAdjuster extends PlayerHider {
             String vanishBroadcastWithPermission = messages
                     .getString("Messages.VanishMessageWithPermission");
             String onVanishMessage = messages.getString("Messages.OnVanish");
-            if (getInvisiblePlayers().contains(p.getUniqueId().toString())) {
+            // check state
+            if (plugin.getAllInvisiblePlayers().contains(p.getUniqueId().toString())) {
                 Bukkit.getLogger().log(Level.WARNING, "[SuperVanish] Error: Could not hide player "
                         + p.getName() + ", he is already invisible!");
                 return;
             }
-            // /////////////////////////////////////////////////////////
+            //call event
             PlayerHideEvent event = new PlayerHideEvent(p);
             de.myzelyam.api.vanish.PlayerHideEvent deprecatedEvent = new de.myzelyam.api.vanish.PlayerHideEvent(
                     p);
@@ -62,6 +68,7 @@ public class VisibilityAdjuster extends PlayerHider {
                 return;
             }
             // /////
+            // DisguiseCraft hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("DisguiseCraft") != null
                     && settings.getBoolean(
@@ -73,6 +80,7 @@ public class VisibilityAdjuster extends PlayerHider {
                     return;
                 }
             }
+            // LibsDisguises hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("LibsDisguises") != null
                     && settings.getBoolean(
@@ -83,20 +91,24 @@ public class VisibilityAdjuster extends PlayerHider {
                     return;
                 }
             }
+            // BarAPI hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("BarAPI") != null
                     && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
                 BarAPI.setMessage(p, plugin.convertString(bossBar, p), 100f);
             }
+            // Essentials hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("Essentials") != null
                     && settings.getBoolean(
                     "Configuration.Hooks.EnableEssentialsHook")) {
                 EssentialsHook.hidePlayer(p);
             }
+            // fly check
             if (settings.getBoolean("Configuration.Players.Fly.Enable")) {
                 p.setAllowFlight(true);
             }
+            // dynmap hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("dynmap") != null
                     && settings.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
@@ -108,9 +120,9 @@ public class VisibilityAdjuster extends PlayerHider {
                     && settings.getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
                     && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
-                ActionBarManager.getInstance(plugin).addActionBar(p);
+                plugin.getActionBarMgr().addActionBar(p);
             }
-            // vanish msg
+            // vanish broadcast
             if (settings.getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
                 for (Player ap : Bukkit.getOnlinePlayers()) {
@@ -139,56 +151,55 @@ public class VisibilityAdjuster extends PlayerHider {
                     }
                 }
             }
-            // tab
+            // adjust tablist
             if (settings.getBoolean("Configuration.Tablist.ChangeTabNames")) {
-                TabManager.getInstance().adjustTabname(p,
-                        SVTabAction.SET_CUSTOM_TABNAME);
+                plugin.getTabMgr().adjustTabname(p,
+                        TabAction.SET_CUSTOM_TABNAME);
             }
-            p.sendMessage(convertString(onVanishMessage, p));
-            List<String> vpl = getInvisiblePlayers();
-            vpl.add(p.getUniqueId().toString());
-            plugin.playerData.set("InvisiblePlayers", vpl);
+            // send message
+            p.sendMessage(plugin.convertString(onVanishMessage, p));
+            // adjust playerdata.yml file
+            List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
+            invisiblePlayers.add(p.getUniqueId().toString());
+            plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
             plugin.savePlayerData();
             // ghost team
             if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")
                     && plugin.ghostTeam != null) {
                 if (!plugin.ghostTeam.hasPlayer(p)) {
                     if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
-                            || getInvisiblePlayers()
+                            || plugin.getAllInvisiblePlayers()
                             .contains(p.getUniqueId().toString()))
                         plugin.ghostTeam.addPlayer(p);
                 }
-                // invis
+                // add invisibility potion
                 p.addPotionEffect(new PotionEffect(
                         PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
             }
-            // night vision
+            // add night vision potion
             if (settings.getBoolean("Configuration.Players.AddNightVision"))
                 p.addPotionEffect(new PotionEffect(
                         PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
-            // hide
-            hideToAll(p);
+            // hide player
+            hider.hideToAll(p);
         } catch (Exception e) {
             plugin.printException(e);
         }
     }
 
-    @Override
     public void showPlayer(Player p) {
         showPlayer(p, false);
     }
 
-    @Override
-    public void showPlayer(Player p, boolean hideJoinMsg) {
+    public void showPlayer(final Player p, boolean hideJoinMsg) {
         try {
-            // check
+            // check p
             if (p == null)
                 throw new NullPointerException("The player cannot be null!");
             // preparations
-            final Player fp = p;
             MessagesFile messagesCfg = new MessagesFile();
             FileConfiguration messages = messagesCfg.getConfig();
-            String bossbar = messages
+            String bossBar = messages
                     .getString("Messages.BossBarReappearMessage");
             String reappearBroadcast = messages
                     .getString("Messages.ReappearMessage");
@@ -196,12 +207,13 @@ public class VisibilityAdjuster extends PlayerHider {
                     .getString("Messages.ReappearMessageWithPermission");
             String onReappearMessage = messages
                     .getString("Messages.OnReappear");
-            if (!getInvisiblePlayers().contains(p.getUniqueId().toString())) {
+            // check state
+            if (!plugin.getAllInvisiblePlayers().contains(p.getUniqueId().toString())) {
                 Bukkit.getLogger().log(Level.WARNING, "[SuperVanish] Error: Could not show player "
                         + p.getName() + ", he is already visible!");
                 return;
             }
-            // event
+            // call event
             PlayerShowEvent event = new PlayerShowEvent(p);
             de.myzelyam.api.vanish.PlayerShowEvent deprecatedEvent = new de.myzelyam.api.vanish.PlayerShowEvent(
                     p);
@@ -210,22 +222,22 @@ public class VisibilityAdjuster extends PlayerHider {
             if (event.isCancelled() || deprecatedEvent.isCancelled()) {
                 return;
             }
-            // ghost
+            // remove invisibility potion effect
             if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")
                     && p.hasPotionEffect(PotionEffectType.INVISIBILITY))
                 p.removePotionEffect(PotionEffectType.INVISIBILITY);
-            // bar-api
+            // BarAPI hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("BarAPI") != null
                     && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
-                BarAPI.setMessage(p, plugin.convertString(bossbar, p), 100f);
-                BarAPI.removeBar(fp);
+                BarAPI.setMessage(p, plugin.convertString(bossBar, p), 100f);
+                BarAPI.removeBar(p);
                 Bukkit.getServer().getScheduler()
                         .scheduleSyncDelayedTask(plugin, new Runnable() {
 
                             @Override
                             public void run() {
-                                BarAPI.removeBar(fp);
+                                BarAPI.removeBar(p);
                             }
                         }, 20);
             }
@@ -236,14 +248,14 @@ public class VisibilityAdjuster extends PlayerHider {
                     && (SuperVanish.SERVER_IS_ONE_DOT_SEVEN || !OneDotEightUtils.isSpectator(p))) {
                 p.setAllowFlight(false);
             }
-            // essentials
+            // essentials hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("Essentials") != null
                     && settings.getBoolean(
                     "Configuration.Hooks.EnableEssentialsHook")) {
                 EssentialsHook.showPlayer(p);
             }
-            // dynmap
+            // dynmap hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("dynmap") != null
                     && settings.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
@@ -255,57 +267,61 @@ public class VisibilityAdjuster extends PlayerHider {
                     && settings.getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
                     && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
-                ActionBarManager.getInstance(plugin).removeActionBar(p);
+                plugin.getActionBarMgr().removeActionBar(p);
             }
-            // join msg
+            // reappear broadcast
             if (settings.getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")
                     && !hideJoinMsg) {
-                for (Player ap : Bukkit.getOnlinePlayers()) {
-                    if (!(ap.hasPermission("sv.see") && settings.getBoolean(
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    if (!(onlinePlayer.hasPermission("sv.see") && settings.getBoolean(
                             "Configuration.Players.EnableSeePermission"))) {
                         if (!settings.getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
-                            ap.sendMessage(plugin.convertString(reappearBroadcast, p));
+                            onlinePlayer.sendMessage(plugin.convertString(reappearBroadcast, p));
                         }
                     } else {
                         if (!settings.getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
                             if (!settings.getBoolean(
                                     "Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
-                                ap.sendMessage(plugin.convertString(reappearBroadcast, p));
+                                onlinePlayer.sendMessage(plugin.convertString(reappearBroadcast, p));
                             } else {
-                                if (ap.getUniqueId().toString()
+                                if (onlinePlayer.getUniqueId().toString()
                                         .equals(p.getUniqueId().toString()))
-                                    ap.sendMessage(
+                                    onlinePlayer.sendMessage(
                                             plugin.convertString(reappearBroadcast, p));
                                 else
-                                    ap.sendMessage(
+                                    onlinePlayer.sendMessage(
                                             plugin.convertString(reappearBroadcastWithPermission, p));
                             }
                         }
                     }
                 }
             }
-            // tab
+            // adjust tablist
             if (settings.getBoolean("Configuration.Tablist.ChangeTabNames")) {
-                TabManager.getInstance().adjustTabname(p,
-                        SVTabAction.RESTORE_NORMAL_TABNAME);
+                plugin.getTabMgr().adjustTabname(p,
+                        TabAction.RESTORE_NORMAL_TABNAME);
             }
-            // chat msg
+            // chat message
             p.sendMessage(plugin.convertString(onReappearMessage, p));
-            // lists
-            List<String> vpl = getInvisiblePlayers();
-            vpl.remove(p.getUniqueId().toString());
-            plugin.playerData.set("InvisiblePlayers", vpl);
+            // adjust playerdata.yml file
+            List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
+            invisiblePlayers.remove(p.getUniqueId().toString());
+            plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
             plugin.savePlayerData();
-            // night vision
+            // remove night vision
             if (settings.getBoolean("Configuration.Players.AddNightVision"))
                 p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-            // show
-            showToAll(p);
+            // show player
+            hider.showToAll(p);
         } catch (Exception e) {
             plugin.printException(e);
         }
+    }
+
+    public PlayerHider getHider() {
+        return hider;
     }
 }

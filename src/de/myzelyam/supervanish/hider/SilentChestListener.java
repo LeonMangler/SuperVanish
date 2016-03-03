@@ -7,9 +7,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import de.myzelyam.api.vanish.VanishAPI;
-import de.myzelyam.supervanish.SVUtils;
 import de.myzelyam.supervanish.SuperVanish;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -20,12 +18,15 @@ import org.bukkit.inventory.Inventory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SilentChestListeners extends SVUtils {
+public class SilentChestListener {
 
-    private static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
-            .getPlugin("SuperVanish");
+    private final SuperVanish plugin;
 
-    public static void setupAnimationListener() {
+    public SilentChestListener(SuperVanish plugin) {
+        this.plugin = plugin;
+    }
+
+    public void setupAnimationListener() {
         ProtocolLibrary.getProtocolManager().addPacketListener(
                 new PacketAdapter(plugin, ListenerPriority.HIGH,
                         PacketType.Play.Server.BLOCK_ACTION) {
@@ -64,13 +65,13 @@ public class SilentChestListeners extends SVUtils {
                                 }
                             }
                         } catch (Exception er) {
-                            SilentChestListeners.plugin.printException(er);
+                            SilentChestListener.this.plugin.printException(er);
                         }
                     }
                 });
     }
 
-    public static void setupSoundListener() {
+    public void setupSoundListener() {
         ProtocolLibrary.getProtocolManager().addPacketListener(
                 new PacketAdapter(plugin, ListenerPriority.HIGH,
                         PacketType.Play.Server.NAMED_SOUND_EFFECT) {
@@ -147,17 +148,17 @@ public class SilentChestListeners extends SVUtils {
                                 }
                             }
                         } catch (Exception er) {
-                            SilentChestListeners.plugin.printException(er);
+                            SilentChestListener.this.plugin.printException(er);
                         }
                     }
                 });
     }
 
-    private static Location addToLocation(Location l, int x, int z) {
+    private Location addToLocation(Location l, int x, int z) {
         return new Location(l.getWorld(), l.getX() + x, l.getY(), l.getZ() + z);
     }
 
-    private static List<Location> getAdjacentBlockLocations(Location loc) {
+    private List<Location> getAdjacentBlockLocations(Location loc) {
         List<Location> adjacentBlockLocations = new ArrayList<>();
         adjacentBlockLocations.add(addToLocation(loc, 1, 0));
         adjacentBlockLocations.add(addToLocation(loc, -1, 0));

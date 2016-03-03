@@ -2,20 +2,20 @@ package de.myzelyam.supervanish;
 
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
-import de.myzelyam.supervanish.cmd.CmdManager;
+import de.myzelyam.api.vanish.VanishAPI;
+import de.myzelyam.supervanish.cmd.CommandMgr;
 import de.myzelyam.supervanish.config.MessagesFile;
 import de.myzelyam.supervanish.config.SettingsFile;
+import de.myzelyam.supervanish.events.GeneralEventListener;
 import de.myzelyam.supervanish.events.JoinEvent;
-import de.myzelyam.supervanish.events.PlayerControl;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
-import de.myzelyam.supervanish.hider.ActionBarManager;
-import de.myzelyam.supervanish.hider.ServerlistAdjustments;
-import de.myzelyam.supervanish.hider.SilentChestListeners;
+import de.myzelyam.supervanish.hider.*;
 import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
 import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 import de.myzelyam.supervanish.hooks.SuperTrailsHook;
 import de.myzelyam.supervanish.hooks.TrailGUIHook;
+import me.MyzelYam.SuperVanish.api.SVAPI;
 import me.confuser.barapi.BarAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -39,8 +39,10 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
@@ -50,11 +52,11 @@ public class SuperVanish extends JavaPlugin {
     public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
             .contains("(MC: 1.7");
 
-    private final List<String> nonRequiredConfigUpdates = Collections.singletonList("5.4.4-5.4.5");
+    private final List<String> nonRequiredConfigUpdates = Arrays.asList("5.4.4-5.5.0", "5.4.5-5.5.0");
     private final List<String> nonRequiredMsgUpdates = Arrays.asList(
-            "5.3.1-5.4.5", "5.3.2-5.4.5", "5.3.3-5.4.5", "5.3.4-5.4.5",
-            "5.3.5-5.4.5", "5.4.0-5.4.5", "5.4.1-5.4.5", "5.4.2-5.4.5",
-            "5.4.3-5.4.5", "5.4.4-5.4.5");
+            "5.3.1-5.5.0", "5.3.2-5.5.0", "5.3.3-5.5.0", "5.3.4-5.5.0",
+            "5.3.5-5.5.0", "5.4.0-5.5.0", "5.4.1-5.5.0", "5.4.2-5.5.0",
+            "5.4.3-5.5.0", "5.4.4-5.5.0", "5.4.5-5.5.0");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
 
@@ -70,6 +72,13 @@ public class SuperVanish extends JavaPlugin {
             this.getDataFolder().getPath() + File.separator + "playerdata.yml");
     public FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerDataFile);
 
+    private VisibilityAdjuster visibilityAdjuster;
+    private ActionBarMgr actionBarMgr;
+    private TabMgr tabMgr;
+    private ServerlistPacketListener serverlistPacketListener;
+    private SilentChestListener silentChestListener;
+    private ForcedInvisibilityTask forcedInvisibilityTask;
+
 
     public void savePlayerData() {
         try {
@@ -79,30 +88,40 @@ public class SuperVanish extends JavaPlugin {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onEnable() {
         try {
             prepareConfig();
             registerEvents();
+            visibilityAdjuster = new VisibilityAdjuster(this);
+            tabMgr = new TabMgr(this);
             checkForReload();
             checkGhostPlayers();
             if (getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null) {
-                ServerlistAdjustments.setupProtocolLib();
-                if (settings.getBoolean("Configuration.Players.SilentOpenChest")) {
-                    SilentChestListeners.setupAnimationListener();
-                    SilentChestListeners.setupSoundListener();
+                actionBarMgr = new ActionBarMgr(this);
+                serverlistPacketListener = new ServerlistPacketListener(this);
+                serverlistPacketListener.registerListener();
+                if (settings.getBoolean("Configuration.Players.SilentOpenChest") && false/*TODO*/) {
+                    silentChestListener = new SilentChestListener(this);
+                    silentChestListener.setupAnimationListener();
+                    silentChestListener.setupSoundListener();
                 }
             }
+            forcedInvisibilityTask = new ForcedInvisibilityTask(this);
+            VanishAPI.setPlugin(this);
+            SVAPI.setPlugin(null);
         } catch (Exception e) {
             printException(e);
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onDisable() {
-        SVUtils.settings = null;
-        SVUtils.playerData = null;
+        VanishAPI.setPlugin(null);
+        SVAPI.setPlugin(null);
     }
 
     private void prepareConfig() {
@@ -180,7 +199,7 @@ public class SuperVanish extends JavaPlugin {
                     && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (invisiblePlayers.contains(p.getUniqueId().toString())) {
-                        ActionBarManager.getInstance(this).addActionBar(p);
+                        actionBarMgr.addActionBar(p);
                     }
                 }
             }
@@ -208,28 +227,44 @@ public class SuperVanish extends JavaPlugin {
         try {
             PluginManager pluginManager = this.getServer().getPluginManager();
             // general
-            pluginManager.registerEvents(new PlayerControl(), this);
-            pluginManager.registerEvents(WorldChangeEvent.getInstance(), this);
-            // hooks
-            if (pluginManager.isPluginEnabled("LibsDisguises") && settings
-                    .getBoolean("Configuration.Hooks.EnableLibsDisguisesHook"))
-                pluginManager.registerEvents(new LibsDisguisesHook(), this);
-            if (pluginManager.isPluginEnabled("DisguiseCraft") && settings
-                    .getBoolean("Configuration.Hooks.EnableDisguiseCraftHook"))
-                pluginManager.registerEvents(new DisguiseCraftHook(), this);
-            if (pluginManager.isPluginEnabled("TrailGUI") && settings
-                    .getBoolean("Configuration.Hooks.EnableTrailGUIHook", true))
-                TrailGUIHook.replaceMoveListener();
-            if (pluginManager.isPluginEnabled("SuperTrails") && settings.getBoolean(
-                    "Configuration.Hooks.EnableSuperTrailsHook", true))
-                new SuperTrailsHook(this);
-            // join
-            JoinEvent joinEvent = new JoinEvent();
+            pluginManager.registerEvents(new GeneralEventListener(this), this);
+            // world change event
+            pluginManager.registerEvents(new WorldChangeEvent(this), this);
+            // plugin hooks
+            String currentHook = "Unknown";
+            try {
+                if (pluginManager.isPluginEnabled("LibsDisguises") && settings
+                        .getBoolean("Configuration.Hooks.EnableLibsDisguisesHook")) {
+                    currentHook = "LibsDisguises";
+                    pluginManager.registerEvents(new LibsDisguisesHook(), this);
+                }
+                if (pluginManager.isPluginEnabled("DisguiseCraft") && settings
+                        .getBoolean("Configuration.Hooks.EnableDisguiseCraftHook")) {
+                    currentHook = "DisguiseCraft";
+                    pluginManager.registerEvents(new DisguiseCraftHook(), this);
+                }
+                if (pluginManager.isPluginEnabled("TrailGUI") && settings
+                        .getBoolean("Configuration.Hooks.EnableTrailGUIHook", true)) {
+                    currentHook = "TrailGUI";
+                    TrailGUIHook.replaceMoveListener();
+                }
+                if (pluginManager.isPluginEnabled("SuperTrails") && settings.getBoolean(
+                        "Configuration.Hooks.EnableSuperTrailsHook", true)) {
+                    currentHook = "SuperTrails";
+                    new SuperTrailsHook(this);
+                }
+            } catch (Throwable throwable) {
+                getLogger().log(Level.WARNING, "[SuperVanish] Failed to hook into " + currentHook
+                        + ", please report this!");
+                // just continue normally, don't let another plugin break SV!
+            }
+            // join event
+            JoinEvent joinEvent = new JoinEvent(this);
             pluginManager.registerEvent(PlayerJoinEvent.class, joinEvent,
                     getEventPriority(PlayerJoinEvent.class), joinEvent, this,
                     false);
-            // quit
-            QuitEvent quitEvent = new QuitEvent();
+            // quit event
+            QuitEvent quitEvent = new QuitEvent(this);
             pluginManager.registerEvent(PlayerQuitEvent.class, quitEvent,
                     getEventPriority(PlayerQuitEvent.class), quitEvent, this,
                     false);
@@ -239,7 +274,7 @@ public class SuperVanish extends JavaPlugin {
     }
 
     public void printException(Exception e) {
-        Logger logger = Bukkit.getLogger();
+        Logger logger = getLogger();
         try {
             logger.log(SEVERE, "[SuperVanish] Unknown Exception occurred!");
             if (requiresCfgUpdate || requiresMsgUpdate) {
@@ -282,7 +317,7 @@ public class SuperVanish extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel,
                              String[] args) {
-        new CmdManager(cmd, sender, args, cmdLabel);
+        new CommandMgr(this, cmd, sender, args, cmdLabel);
         return true;
     }
 
@@ -415,5 +450,31 @@ public class SuperVanish extends JavaPlugin {
     @Override
     public void saveDefaultConfig() {
         settingsFile.saveDefaultConfig();
+    }
+
+    public List<String> getAllInvisiblePlayers() {
+        return playerData.getStringList("InvisiblePlayers");
+    }
+
+    public Collection<Player> getOnlineInvisiblePlayers() {
+        Collection<Player> onlineInvisiblePlayers = new HashSet<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (getAllInvisiblePlayers().contains(player.getUniqueId().toString())) {
+                onlineInvisiblePlayers.add(player);
+            }
+        }
+        return onlineInvisiblePlayers;
+    }
+
+    public ActionBarMgr getActionBarMgr() {
+        return actionBarMgr;
+    }
+
+    public VisibilityAdjuster getVisibilityAdjuster() {
+        return visibilityAdjuster;
+    }
+
+    public TabMgr getTabMgr() {
+        return tabMgr;
     }
 }

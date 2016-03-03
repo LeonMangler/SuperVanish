@@ -1,6 +1,5 @@
 package de.myzelyam.supervanish.events;
 
-import de.myzelyam.supervanish.SVUtils;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
@@ -8,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -29,16 +29,27 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 
-public class PlayerControl extends SVUtils implements Listener {
+public class GeneralEventListener implements Listener {
+
+    private final SuperVanish plugin;
+    private final FileConfiguration settings;
+    private final FileConfiguration playerData;
+
+    public GeneralEventListener(SuperVanish plugin) {
+        this.plugin = plugin;
+        this.playerData = plugin.playerData;
+        this.settings = plugin.settings;
+    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent e) {
         // remove potion effects
         Player p = e.getPlayer();
-        if (!isHidden(p))
-            return;
+        Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+        if (!invisiblePlayers.contains(p)) return;
         if (e.getFrom().getWorld().getName()
                 .equals(e.getTo().getWorld().getName()))
             return;
@@ -53,11 +64,11 @@ public class PlayerControl extends SVUtils implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onFoodLevelChangeEvent(FoodLevelChangeEvent e) {
         try {
-            List<String> vpl = playerData.getStringList("InvisiblePlayers");
             if (e.getEntity() instanceof Player
                     && !settings.getBoolean("Configuration.Players.DisableHungerForInvisiblePlayers")) {
                 Player p = (Player) e.getEntity();
-                if (vpl.contains(p.getUniqueId().toString()))
+                Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+                if (invisiblePlayers.contains(p))
                     e.setCancelled(true);
             }
         } catch (Exception er) {
@@ -72,8 +83,8 @@ public class PlayerControl extends SVUtils implements Listener {
                 return;
             }
             Player p = (Player) e.getEntity();
-            List<String> vpl = playerData.getStringList("InvisiblePlayers");
-            if (vpl.contains(p.getUniqueId().toString())) {
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+            if (invisiblePlayers.contains(p)) {
                 e.setCancelled(true);
             }
         } catch (Exception er) {
@@ -100,7 +111,7 @@ public class PlayerControl extends SVUtils implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent e) {
         try {
-            List<String> invisiblePlayers = playerData.getStringList("InvisiblePlayers");
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             if (!settings.getBoolean("Configuration.Players.DisablePressurePlatesForInvisiblePlayers")) {
                 return;
             }
@@ -109,7 +120,7 @@ public class PlayerControl extends SVUtils implements Listener {
                         || e.getClickedBlock().getType() == Material.WOOD_PLATE
                         || e.getClickedBlock().getType() == Material.TRIPWIRE || (!SuperVanish.SERVER_IS_ONE_DOT_SEVEN &&
                         OneDotEightUtils.isPressurePlate(e.getClickedBlock().getType()))) {
-                    if (invisiblePlayers.contains(e.getPlayer().getUniqueId().toString()))
+                    if (invisiblePlayers.contains(e.getPlayer()))
                         e.setCancelled(true);
                 }
             }
@@ -122,8 +133,8 @@ public class PlayerControl extends SVUtils implements Listener {
     public void onPickupItem(PlayerPickupItemEvent e) {
         try {
             Player p = e.getPlayer();
-            List<String> invisiblePlayers = playerData.getStringList("InvisiblePlayers");
-            if (invisiblePlayers.contains(p.getUniqueId().toString())) {
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+            if (invisiblePlayers.contains(p)) {
                 if (playerData.get("PlayerData." + p.getUniqueId().toString()
                         + ".itemPickUps") == null)
                     if (settings.getBoolean("Configuration.Players.DisableItemPickUpsByDefault"))
@@ -143,8 +154,8 @@ public class PlayerControl extends SVUtils implements Listener {
     public void onBlockPlace(BlockPlaceEvent e) {
         try {
             Player p = e.getPlayer();
-            List<String> invisiblePlayers = getInvisiblePlayers();
-            if (invisiblePlayers.contains(p.getUniqueId().toString())) {
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+            if (invisiblePlayers.contains(p)) {
                 if (settings.getBoolean("Configuration.Players.PreventBlockPlacing")) {
                     e.setCancelled(true);
                 }
@@ -158,8 +169,8 @@ public class PlayerControl extends SVUtils implements Listener {
     public void onBlockBreak(BlockBreakEvent e) {
         try {
             Player p = e.getPlayer();
-            List<String> invisiblePlayers = getInvisiblePlayers();
-            if (invisiblePlayers.contains(p.getUniqueId().toString())) {
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+            if (invisiblePlayers.contains(p)) {
                 if (settings.getBoolean("Configuration.Players.PreventBlockBreaking")) {
                     e.setCancelled(true);
                 }
@@ -177,10 +188,10 @@ public class PlayerControl extends SVUtils implements Listener {
             if (e.getEntity() == null)
                 return;
             Player p = (Player) e.getDamager();
-            List<String> invisiblePlayers = getInvisiblePlayers();
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             if (invisiblePlayers == null)
                 return;
-            if (invisiblePlayers.contains(p.getUniqueId().toString())) {
+            if (invisiblePlayers.contains(p)) {
                 if (settings.getBoolean("Configuration.Players.PreventHittingEntities")) {
                     e.setCancelled(true);
                 }
@@ -193,11 +204,11 @@ public class PlayerControl extends SVUtils implements Listener {
     @EventHandler
     public void onBlockCanBuild(BlockCanBuildEvent e) {
         try {
-            List<String> invisiblePlayers = playerData.getStringList("InvisiblePlayers");
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             Block block = e.getBlock();
             Location bLocation = block.getLocation();
             for (Player p : block.getWorld().getPlayers()) {
-                if (!invisiblePlayers.contains(p.getUniqueId().toString()))
+                if (!invisiblePlayers.contains(p))
                     continue;
                 if (p.getLocation().distanceSquared(bLocation) <= 2.0)
                     e.setBuildable(true);
@@ -210,7 +221,6 @@ public class PlayerControl extends SVUtils implements Listener {
     @EventHandler
     public void onPlayerArrowBlock(EntityDamageByEntityEvent e) {
         try {
-            List<String> invisiblePlayers = playerData.getStringList("InvisiblePlayers");
             Entity entityDamager = e.getDamager();
             Entity entityDamaged = e.getEntity();
             if (entityDamager instanceof Arrow) {
@@ -218,7 +228,8 @@ public class PlayerControl extends SVUtils implements Listener {
                 if (entityDamaged instanceof Player
                         && arrow.getShooter() instanceof Player) {
                     Player damaged = (Player) entityDamaged;
-                    if (invisiblePlayers.contains(damaged.getUniqueId().toString())) {
+                    Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+                    if (invisiblePlayers.contains(damaged)) {
                         Vector velocity = arrow.getVelocity();
                         damaged.teleport(damaged.getLocation().add(0, 2, 0));
                         Arrow nextArrow = arrow.getShooter().launchProjectile(
@@ -243,7 +254,7 @@ public class PlayerControl extends SVUtils implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEssentialsEnable(PluginEnableEvent e) {
         try {
-            final List<String> invisiblePlayers = playerData.getStringList("InvisiblePlayers");
+            final Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             if (e.getPlugin().getName().equalsIgnoreCase("Essentials")
                     && settings.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
                 Bukkit.getServer().getScheduler()
@@ -252,7 +263,7 @@ public class PlayerControl extends SVUtils implements Listener {
                             @Override
                             public void run() {
                                 for (Player player : Bukkit.getOnlinePlayers()) {
-                                    if (invisiblePlayers.contains(player.getUniqueId().toString())) {
+                                    if (invisiblePlayers.contains(player)) {
                                         EssentialsHook.hidePlayer(player);
                                     }
                                 }

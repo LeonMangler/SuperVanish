@@ -13,20 +13,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ActionBarManager {
+public class ActionBarMgr {
 
-    private static ActionBarManager instance;
     private List<Player> actionBars = new LinkedList<>();
 
-    private ActionBarManager(SuperVanish plugin) {
+    public ActionBarMgr(SuperVanish plugin) {
         startTimerTask(plugin);
-    }
-
-    public static ActionBarManager getInstance(SuperVanish plugin) {
-        if (instance == null) {
-            instance = new ActionBarManager(plugin);
-        }
-        return instance;
     }
 
     private void startTimerTask(final SuperVanish plugin) {

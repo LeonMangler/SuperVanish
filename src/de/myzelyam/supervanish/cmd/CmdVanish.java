@@ -1,31 +1,33 @@
 package de.myzelyam.supervanish.cmd;
 
-import de.myzelyam.supervanish.SVUtils;
+import de.myzelyam.supervanish.SuperVanish;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CmdVanish extends SVUtils {
+import java.util.Collection;
 
-    public CmdVanish(CommandSender s, String[] args, String label) {
-        if (canDo(s, CommandAction.VANISH_SELF)) {
-            Player p = (Player) s;
+public class CmdVanish extends SubCommand {
+
+    public CmdVanish(SuperVanish plugin, CommandSender sender, String[] args, String label) {
+        super(plugin);
+        if (canDo(sender, CommandAction.VANISH_SELF)) {
+            Player p = (Player) sender;
+            Collection<Player> onlineInvisiblePlayers = getOnlineInvisiblePlayers();
             if (args.length == 0) {
-                if (getInvisiblePlayers().contains(p.getUniqueId().toString()))
+                if (onlineInvisiblePlayers.contains(p))
                     showPlayer(p);
                 else
                     hidePlayer(p);
             } else if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("off")) {
-                    if (!getInvisiblePlayers().contains(
-                            p.getUniqueId().toString())) {
+                    if (!onlineInvisiblePlayers.contains(p)) {
                         p.sendMessage(convertString(
                                 getMsg("OnReappearWhileVisible"), p));
                         return;
                     }
                     showPlayer(p);
                 } else if (args[0].equalsIgnoreCase("on")) {
-                    if (getInvisiblePlayers().contains(
-                            p.getUniqueId().toString())) {
+                    if (onlineInvisiblePlayers.contains(p)) {
                         p.sendMessage(convertString(
                                 getMsg("OnVanishWhileInvisible"), p));
                         return;

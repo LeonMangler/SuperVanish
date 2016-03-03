@@ -1,13 +1,14 @@
 package de.myzelyam.supervanish.cmd;
 
-import de.myzelyam.supervanish.SVUtils;
-import de.myzelyam.supervanish.config.SettingsFile;
+import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
+import de.myzelyam.supervanish.config.SettingsFile;
 import org.bukkit.command.CommandSender;
 
-public class CmdReload extends SVUtils {
+public class CmdReload extends SubCommand {
 
-    public CmdReload(CommandSender p, String[] args, String label) {
+    public CmdReload(SuperVanish plugin, CommandSender p, String[] args, String label) {
+        super(plugin);
         if (canDo(p, CommandAction.RELOAD)) {
             // messages
             plugin.messagesFile = new MessagesFile();
@@ -17,7 +18,6 @@ public class CmdReload extends SVUtils {
             plugin.settingsFile = new SettingsFile();
             plugin.settingsFile.saveDefaultConfig();
             plugin.settings = plugin.settingsFile.getConfig();
-            settings = plugin.settings;
             p.sendMessage(convertString(getMsg("ConfigReloadedMessage"), p));
         }
     }
