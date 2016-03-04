@@ -1,3 +1,9 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *   License, v. 2.0. If a copy of the MPL was not distributed with this
+ *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package de.myzelyam.supervanish.hider;
 
 import com.comphenix.protocol.PacketType;
@@ -16,13 +22,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ServerlistPacketListener {
+public class ServerListPacketListener {
 
     private final SuperVanish plugin;
 
     private final FileConfiguration settings;
 
-    public ServerlistPacketListener(SuperVanish plugin) {
+    public ServerListPacketListener(SuperVanish plugin) {
         this.plugin = plugin;
         settings = plugin.settings;
     }
@@ -42,7 +48,7 @@ public class ServerlistPacketListener {
                             if (e.getPacketType() == PacketType.Status.Server.OUT_SERVER_INFO) {
                                 WrappedServerPing ping = e.getPacket()
                                         .getServerPings().read(0);
-                                Collection<Player> invisiblePlayers = ServerlistPacketListener.this.
+                                Collection<Player> invisiblePlayers = ServerListPacketListener.this.
                                         plugin.getOnlineInvisiblePlayers();
                                 int invisiblePlayersCount = invisiblePlayers.size();
                                 int onlinePlayersCount = Bukkit.getOnlinePlayers().size();
@@ -60,8 +66,8 @@ public class ServerlistPacketListener {
                                     ping.setPlayers(wrappedGameProfiles);
                                 }
                             }
-                        } catch (Exception er) {
-                            ServerlistPacketListener.this.plugin.printException(er);
+                        } catch (Exception ex) {
+                            ServerListPacketListener.this.plugin.printException(ex);
                         }
                     }
                 });
