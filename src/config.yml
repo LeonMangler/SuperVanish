@@ -88,10 +88,10 @@ Configuration:
 ##################################################
   Serverlist:
     # !! PLEASE TURN THE NEXT TWO SETTINGS OFF IF YOU ARE RUNNING BUNGEECORD !!
-    # The ServerList-features require the plugin ProtocolLib and don't support BungeeCord!
-    # Should this plugin adjust the amount of players in the serverlist?
+    # The server list features require the plugin ProtocolLib and don't support BungeeCord!
+    # Should this plugin adjust the amount of players in the server list?
     AdjustAmountOfOnlinePlayers: true
-    # Should this plugin hide invisible players in the list of logged in players?
+    # Should this plugin hide invisible players in the list of logged-in players?
     # You can view this list when your mouse hovers over the amount of online players.
     AdjustListOfLoggedInPlayers: true
 ##################################################
@@ -100,7 +100,7 @@ Configuration:
   Hooks:
     # Should SV hide invisible players in /who, /list, /online
     # and all other commands of Essentials?
-    # Note: Players with a specific essentials-permission can still see invisible players in those commands
+    # Note: Players with a specific Essentials permission can still see invisible players in those commands
     # Important: You have to reload both Essentials and SuperVanish if you change this setting.
     EnableEssentialsHook: true
     # Should SV hide invisible players on your dynamic map and broadcast join/leave messages if you use Dynmap?

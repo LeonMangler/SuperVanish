@@ -1,3 +1,9 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *   License, v. 2.0. If a copy of the MPL was not distributed with this
+ *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package de.myzelyam.supervanish;
 
 import com.earth2me.essentials.Essentials;
@@ -75,7 +81,7 @@ public class SuperVanish extends JavaPlugin {
     private VisibilityAdjuster visibilityAdjuster;
     private ActionBarMgr actionBarMgr;
     private TabMgr tabMgr;
-    private ServerlistPacketListener serverlistPacketListener;
+    private ServerListPacketListener serverListPacketListener;
     private SilentChestListener silentChestListener;
     private ForcedInvisibilityTask forcedInvisibilityTask;
 
@@ -101,8 +107,8 @@ public class SuperVanish extends JavaPlugin {
             if (getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null) {
                 actionBarMgr = new ActionBarMgr(this);
-                serverlistPacketListener = new ServerlistPacketListener(this);
-                serverlistPacketListener.registerListener();
+                serverListPacketListener = new ServerListPacketListener(this);
+                serverListPacketListener.registerListener();
                 if (settings.getBoolean("Configuration.Players.SilentOpenChest") && false/*TODO*/) {
                     silentChestListener = new SilentChestListener(this);
                     silentChestListener.setupAnimationListener();

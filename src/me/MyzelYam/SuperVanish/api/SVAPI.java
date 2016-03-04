@@ -1,3 +1,9 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *   License, v. 2.0. If a copy of the MPL was not distributed with this
+ *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package me.MyzelYam.SuperVanish.api;
 
 import de.myzelyam.supervanish.SuperVanish;
@@ -73,7 +79,9 @@ public class SVAPI {
         return plugin;
     }
 
+    @SuppressWarnings("deprecation")
     public static void setPlugin(SuperVanish plugin) {
         SVAPI.plugin = plugin;
     }
+
 }
