@@ -6,14 +6,14 @@
 
 package de.myzelyam.supervanish.hider;
 
+import de.myzelyam.api.vanish.PlayerHideEvent;
+import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
 import de.myzelyam.supervanish.hider.TabMgr.TabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
-import me.MyzelYam.SuperVanish.api.PlayerHideEvent;
-import me.MyzelYam.SuperVanish.api.PlayerShowEvent;
 import me.confuser.barapi.BarAPI;
 import me.libraryaddict.disguise.DisguiseAPI;
 import org.bukkit.Bukkit;
@@ -29,7 +29,6 @@ import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
 import java.util.List;
 import java.util.logging.Level;
 
-@SuppressWarnings("deprecation")
 public class VisibilityAdjuster {
 
     private final SuperVanish plugin;
@@ -66,8 +65,9 @@ public class VisibilityAdjuster {
             }
             //call event
             PlayerHideEvent event = new PlayerHideEvent(p);
-            de.myzelyam.api.vanish.PlayerHideEvent deprecatedEvent = new de.myzelyam.api.vanish.PlayerHideEvent(
-                    p);
+            @SuppressWarnings("deprecation")
+            me.MyzelYam.SuperVanish.api.PlayerHideEvent deprecatedEvent =
+                    new me.MyzelYam.SuperVanish.api.PlayerHideEvent(p);
             plugin.getServer().getPluginManager().callEvent(event);
             plugin.getServer().getPluginManager().callEvent(deprecatedEvent);
             if (event.isCancelled() || deprecatedEvent.isCancelled()) {
@@ -172,10 +172,12 @@ public class VisibilityAdjuster {
             // ghost team
             if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")
                     && plugin.ghostTeam != null) {
+                //noinspection deprecation
                 if (!plugin.ghostTeam.hasPlayer(p)) {
                     if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
                             || plugin.getAllInvisiblePlayers()
                             .contains(p.getUniqueId().toString()))
+                        //noinspection deprecation
                         plugin.ghostTeam.addPlayer(p);
                 }
                 // add invisibility potion
@@ -221,8 +223,9 @@ public class VisibilityAdjuster {
             }
             // call event
             PlayerShowEvent event = new PlayerShowEvent(p);
-            de.myzelyam.api.vanish.PlayerShowEvent deprecatedEvent = new de.myzelyam.api.vanish.PlayerShowEvent(
-                    p);
+            @SuppressWarnings("deprecation")
+            me.MyzelYam.SuperVanish.api.PlayerShowEvent deprecatedEvent =
+                    new me.MyzelYam.SuperVanish.api.PlayerShowEvent(p);
             plugin.getServer().getPluginManager().callEvent(event);
             plugin.getServer().getPluginManager().callEvent(deprecatedEvent);
             if (event.isCancelled() || deprecatedEvent.isCancelled()) {
