@@ -4,7 +4,7 @@
  *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package de.myzelyam.supervanish.hider;
+package de.myzelyam.supervanish.visibility;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;

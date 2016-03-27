@@ -16,11 +16,11 @@ import de.myzelyam.supervanish.events.GeneralEventListener;
 import de.myzelyam.supervanish.events.JoinEvent;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
-import de.myzelyam.supervanish.hider.*;
 import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
 import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 import de.myzelyam.supervanish.hooks.SuperTrailsHook;
 import de.myzelyam.supervanish.hooks.TrailGUIHook;
+import de.myzelyam.supervanish.visibility.*;
 import me.MyzelYam.SuperVanish.api.SVAPI;
 import me.confuser.barapi.BarAPI;
 import org.bukkit.Bukkit;
@@ -59,11 +59,11 @@ public class SuperVanish extends JavaPlugin {
             .contains("(MC: 1.7");
 
     private final List<String> nonRequiredConfigUpdates = Arrays.asList(
-            "5.4.4-5.6.1", "5.4.5-5.6.1", "5.5.0-5.6.1", "5.6.0-5.6.1");
+            "5.4.4-5.6.2", "5.4.5-5.6.2", "5.5.0-5.6.2", "5.6.0-5.6.2", "5.6.1-5.6.2");
     private final List<String> nonRequiredMsgUpdates = Arrays.asList(
-            "5.3.1-5.6.1", "5.3.2-5.6.1", "5.3.3-5.6.1", "5.3.4-5.6.1",
-            "5.3.5-5.6.1", "5.4.0-5.6.1", "5.4.1-5.6.1", "5.4.2-5.6.1",
-            "5.4.3-5.6.1", "5.4.4-5.6.1", "5.4.5-5.6.1", "5.5.0-5.6.1", "5.6.0-5.6.1");
+            "5.3.1-5.6.2", "5.3.2-5.6.2", "5.3.3-5.6.2", "5.3.4-5.6.2",
+            "5.3.5-5.6.2", "5.4.0-5.6.2", "5.4.1-5.6.2", "5.4.2-5.6.2",
+            "5.4.3-5.6.2", "5.4.4-5.6.2", "5.4.5-5.6.2", "5.5.0-5.6.2", "5.6.0-5.6.2", "5.6.1-5.6.2");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
 

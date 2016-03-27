@@ -7,7 +7,7 @@
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.hider.TabMgr.TabAction;
+import de.myzelyam.supervanish.visibility.TabMgr.TabAction;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;

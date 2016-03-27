@@ -7,7 +7,7 @@
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.hider.TabMgr.TabAction;
+import de.myzelyam.supervanish.visibility.TabMgr.TabAction;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import me.confuser.barapi.BarAPI;
 import org.bukkit.Bukkit;

@@ -4,13 +4,13 @@
  *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package de.myzelyam.supervanish.hider;
+package de.myzelyam.supervanish.visibility;
 
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
-import de.myzelyam.supervanish.hider.TabMgr.TabAction;
+import de.myzelyam.supervanish.visibility.TabMgr.TabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
