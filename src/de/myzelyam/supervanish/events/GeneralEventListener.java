@@ -36,7 +36,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.List;
 
 public class GeneralEventListener implements Listener {
 
@@ -98,15 +97,15 @@ public class GeneralEventListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityTarget(EntityTargetEvent e) {
         try {
-            if (!(e.getTarget() instanceof Player)) {
+            if (!(e.getTarget() instanceof Player) || e.getTarget() == null) {
                 return;
             }
             Player p = (Player) e.getTarget();
-            List<String> vpl = playerData.getStringList("InvisiblePlayers");
-            if (vpl.contains(p.getUniqueId().toString())) {
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+            if (invisiblePlayers.contains(p)) {
                 e.setCancelled(true);
             }
         } catch (Exception er) {
