@@ -58,11 +58,11 @@ public class SuperVanish extends JavaPlugin {
     public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
             .contains("(MC: 1.7");
 
-    private final List<String> nonRequiredConfigUpdates = Arrays.asList("5.4.4-5.5.0", "5.4.5-5.5.0");
+    private final List<String> nonRequiredConfigUpdates = Arrays.asList("5.4.4-5.6.0", "5.4.5-5.6.0", "5.5.0-5.6.0");
     private final List<String> nonRequiredMsgUpdates = Arrays.asList(
-            "5.3.1-5.5.0", "5.3.2-5.5.0", "5.3.3-5.5.0", "5.3.4-5.5.0",
-            "5.3.5-5.5.0", "5.4.0-5.5.0", "5.4.1-5.5.0", "5.4.2-5.5.0",
-            "5.4.3-5.5.0", "5.4.4-5.5.0", "5.4.5-5.5.0");
+            "5.3.1-5.6.0", "5.3.2-5.6.0", "5.3.3-5.6.0", "5.3.4-5.6.0",
+            "5.3.5-5.6.0", "5.4.0-5.6.0", "5.4.1-5.6.0", "5.4.2-5.6.0",
+            "5.4.3-5.6.0", "5.4.4-5.6.0", "5.4.5-5.6.0", "5.5.0-5.6.0");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
 
@@ -74,16 +74,13 @@ public class SuperVanish extends JavaPlugin {
     public SettingsFile settingsFile;
     public FileConfiguration settings;
 
-    public File playerDataFile = new File(
+    private File playerDataFile = new File(
             this.getDataFolder().getPath() + File.separator + "playerdata.yml");
     public FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerDataFile);
 
     private VisibilityAdjuster visibilityAdjuster;
     private ActionBarMgr actionBarMgr;
     private TabMgr tabMgr;
-    private ServerListPacketListener serverListPacketListener;
-    private SilentChestListener silentChestListener;
-    private ForcedInvisibilityTask forcedInvisibilityTask;
 
 
     public void savePlayerData() {
@@ -101,23 +98,23 @@ public class SuperVanish extends JavaPlugin {
             prepareConfig();
             registerEvents();
             visibilityAdjuster = new VisibilityAdjuster(this);
+            VanishAPI.setPlugin(this);
+            SVAPI.setPlugin(this);
             tabMgr = new TabMgr(this);
-            checkForReload();
             checkGhostPlayers();
             if (getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null) {
                 actionBarMgr = new ActionBarMgr(this);
-                serverListPacketListener = new ServerListPacketListener(this);
-                serverListPacketListener.registerListener();
-                if (settings.getBoolean("Configuration.Players.SilentOpenChest") && false/*TODO*/) {
-                    silentChestListener = new SilentChestListener(this);
-                    silentChestListener.setupAnimationListener();
-                    silentChestListener.setupSoundListener();
+                new ServerListPacketListener(this).registerListener();
+                if (settings.getBoolean("Configuration.Players.SilentOpenChest")) {
+                    SilentChestListeners listeners = new SilentChestListeners(this);
+                    listeners.setupAnimationListener();
+                    listeners.setupSoundListener();
+                    listeners.setupBukkitEventListener();
                 }
             }
-            forcedInvisibilityTask = new ForcedInvisibilityTask(this);
-            VanishAPI.setPlugin(this);
-            SVAPI.setPlugin(null);
+            new ForcedInvisibilityTask(this).start();
+            checkForReload();
         } catch (Exception e) {
             printException(e);
         }
@@ -187,26 +184,22 @@ public class SuperVanish extends JavaPlugin {
 
     private void checkForReload() {
         try {
-            List<String> invisiblePlayers = playerData.getStringList("InvisiblePlayers");
+            Collection<Player> invisiblePlayers = getOnlineInvisiblePlayers();
             // boss bars
             if (getServer().getPluginManager().getPlugin("BarAPI") != null
                     && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (invisiblePlayers.contains(p.getUniqueId().toString())) {
-                        String onVanish = messages.getString("Messages.OnVanish");
-                        BarAPI.setMessage(p, convertString(onVanish, p), 100f);
-                    }
+                for (Player p : invisiblePlayers) {
+                    String onVanish = messages.getString("Messages.OnVanish");
+                    BarAPI.setMessage(p, convertString(onVanish, p), 100f);
                 }
             }
             // action bars
             if (getServer().getPluginManager().getPlugin("ProtocolLib") != null
                     && settings.getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                    && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (invisiblePlayers.contains(p.getUniqueId().toString())) {
-                        actionBarMgr.addActionBar(p);
-                    }
+                    && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN && actionBarMgr != null) {
+                for (Player p : invisiblePlayers) {
+                    actionBarMgr.addActionBar(p);
                 }
             }
         } catch (Exception e) {
@@ -221,8 +214,7 @@ public class SuperVanish extends JavaPlugin {
                     + eventName + "Priority");
             if (configSetting == null)
                 return EventPriority.NORMAL;
-            EventPriority priority = EventPriority.valueOf(configSetting);
-            return priority == null ? EventPriority.NORMAL : priority;
+            return EventPriority.valueOf(configSetting);
         } catch (Exception e) {
             printException(e);
             return EventPriority.NORMAL;
@@ -482,5 +474,11 @@ public class SuperVanish extends JavaPlugin {
 
     public TabMgr getTabMgr() {
         return tabMgr;
+    }
+
+    public boolean isOneDotX(int majorRelease) {
+        String version = getServer().getClass().getPackage().getName()
+                .replace(".", ",").split(",")[3];
+        return version.contains("v1_" + majorRelease + "_R");
     }
 }

@@ -46,14 +46,14 @@ public class ServerListPacketListener {
                     public void onPacketSending(PacketEvent e) {
                         try {
                             if (e.getPacketType() == PacketType.Status.Server.OUT_SERVER_INFO) {
-                                WrappedServerPing ping = e.getPacket()
+                                WrappedServerPing serverPing = e.getPacket()
                                         .getServerPings().read(0);
                                 Collection<Player> invisiblePlayers = ServerListPacketListener.this.
                                         plugin.getOnlineInvisiblePlayers();
                                 int invisiblePlayersCount = invisiblePlayers.size();
                                 int onlinePlayersCount = Bukkit.getOnlinePlayers().size();
                                 if (settings.getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers")) {
-                                    ping.setPlayersOnline(onlinePlayersCount - invisiblePlayersCount);
+                                    serverPing.setPlayersOnline(onlinePlayersCount - invisiblePlayersCount);
                                 }
                                 if (settings.getBoolean("Configuration.Serverlist.AdjustListOfLoggedInPlayers")) {
                                     List<WrappedGameProfile> wrappedGameProfiles = new ArrayList<>();
@@ -63,7 +63,7 @@ public class ServerListPacketListener {
                                         if (!invisiblePlayers.contains(onlinePlayer))
                                             wrappedGameProfiles.add(profile);
                                     }
-                                    ping.setPlayers(wrappedGameProfiles);
+                                    serverPing.setPlayers(wrappedGameProfiles);
                                 }
                             }
                         } catch (Exception ex) {
