@@ -35,19 +35,20 @@ public class VisibilityAdjuster {
 
     private final PlayerHider hider;
 
-    private final FileConfiguration settings;
-
     public VisibilityAdjuster(SuperVanish plugin) {
         this.plugin = plugin;
-        this.settings = plugin.settings;
         hider = new PlayerHider(plugin);
+    }
+
+    private FileConfiguration getSettings() {
+        return plugin.settings;
     }
 
     public void hidePlayer(Player p) {
         try {
             // check p
             if (p == null)
-                throw new NullPointerException("The player cannot be null!");
+                throw new IllegalArgumentException("The player cannot be null!");
             // preparations
             MessagesFile messagesCfg = new MessagesFile();
             FileConfiguration messages = messagesCfg.getConfig();
@@ -77,7 +78,7 @@ public class VisibilityAdjuster {
             // DisguiseCraft hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("DisguiseCraft") != null
-                    && settings.getBoolean(
+                    && getSettings().getBoolean(
                     "Configuration.Hooks.EnableDisguiseCraftHook")) {
                 DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
                 if (dcAPI.isDisguised(p)) {
@@ -89,7 +90,7 @@ public class VisibilityAdjuster {
             // LibsDisguises hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("LibsDisguises") != null
-                    && settings.getBoolean(
+                    && getSettings().getBoolean(
                     "Configuration.Hooks.EnableLibsDisguisesHook")) {
                 if (DisguiseAPI.isDisguised(p)) {
                     p.sendMessage(
@@ -100,57 +101,57 @@ public class VisibilityAdjuster {
             // BarAPI hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("BarAPI") != null
-                    && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
+                    && getSettings().getBoolean("Configuration.Messages.UseBarAPI")) {
                 BarAPI.setMessage(p, plugin.convertString(bossBar, p), 100f);
             }
             // Essentials hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("Essentials") != null
-                    && settings.getBoolean(
+                    && getSettings().getBoolean(
                     "Configuration.Hooks.EnableEssentialsHook")) {
                 EssentialsHook.hidePlayer(p);
             }
             // fly check
-            if (settings.getBoolean("Configuration.Players.Fly.Enable")) {
+            if (getSettings().getBoolean("Configuration.Players.Fly.Enable")) {
                 p.setAllowFlight(true);
             }
             // dynmap hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("dynmap") != null
-                    && settings.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
+                    && getSettings().getBoolean("Configuration.Hooks.EnableDynmapHook")) {
                 DynmapHook.adjustVisibility(p, true);
             }
             // action bars
             if (plugin.getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null
-                    && settings.getBoolean(
+                    && getSettings().getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
                     && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
                 plugin.getActionBarMgr().addActionBar(p);
             }
             // vanish broadcast
-            if (settings.getBoolean(
+            if (getSettings().getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
-                for (Player ap : Bukkit.getOnlinePlayers()) {
-                    if (!(ap.hasPermission("sv.see") && settings.getBoolean(
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    if (!(onlinePlayer.hasPermission("sv.see") && getSettings().getBoolean(
                             "Configuration.Players.EnableSeePermission"))) {
-                        if (!settings.getBoolean(
+                        if (!getSettings().getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
-                            ap.sendMessage(plugin.convertString(vanishBroadcast, p));
+                            onlinePlayer.sendMessage(plugin.convertString(vanishBroadcast, p));
                         }
                     } else {
-                        if (!settings.getBoolean(
+                        if (!getSettings().getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
-                            if (!settings.getBoolean(
+                            if (!getSettings().getBoolean(
                                     "Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
-                                ap.sendMessage(plugin.convertString(vanishBroadcast, p));
+                                onlinePlayer.sendMessage(plugin.convertString(vanishBroadcast, p));
                             } else {
-                                if (ap.getUniqueId().toString()
+                                if (onlinePlayer.getUniqueId().toString()
                                         .equals(p.getUniqueId().toString()))
-                                    ap.sendMessage(
+                                    onlinePlayer.sendMessage(
                                             plugin.convertString(vanishBroadcast, p));
                                 else
-                                    ap.sendMessage(
+                                    onlinePlayer.sendMessage(
                                             plugin.convertString(vanishBroadcastWithPermission, p));
                             }
                         }
@@ -158,7 +159,7 @@ public class VisibilityAdjuster {
                 }
             }
             // adjust tablist
-            if (settings.getBoolean("Configuration.Tablist.ChangeTabNames")) {
+            if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
                 plugin.getTabMgr().adjustTabname(p,
                         TabAction.SET_CUSTOM_TABNAME);
             }
@@ -170,7 +171,7 @@ public class VisibilityAdjuster {
             plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
             plugin.savePlayerData();
             // ghost team
-            if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")
+            if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")
                     && plugin.ghostTeam != null) {
                 //noinspection deprecation
                 if (!plugin.ghostTeam.hasPlayer(p)) {
@@ -185,7 +186,7 @@ public class VisibilityAdjuster {
                         PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
             }
             // add night vision potion
-            if (settings.getBoolean("Configuration.Players.AddNightVision"))
+            if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
                 p.addPotionEffect(new PotionEffect(
                         PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
             // hide player
@@ -203,7 +204,7 @@ public class VisibilityAdjuster {
         try {
             // check p
             if (p == null)
-                throw new NullPointerException("The player cannot be null!");
+                throw new IllegalArgumentException("The player cannot be null!");
             // preparations
             MessagesFile messagesCfg = new MessagesFile();
             FileConfiguration messages = messagesCfg.getConfig();
@@ -232,13 +233,13 @@ public class VisibilityAdjuster {
                 return;
             }
             // remove invisibility potion effect
-            if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")
+            if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")
                     && p.hasPotionEffect(PotionEffectType.INVISIBILITY))
                 p.removePotionEffect(PotionEffectType.INVISIBILITY);
             // BarAPI hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("BarAPI") != null
-                    && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
+                    && getSettings().getBoolean("Configuration.Messages.UseBarAPI")) {
                 BarAPI.setMessage(p, plugin.convertString(bossBar, p), 100f);
                 BarAPI.removeBar(p);
                 Bukkit.getServer().getScheduler()
@@ -251,7 +252,7 @@ public class VisibilityAdjuster {
                         }, 20);
             }
             // fly
-            if (settings.getBoolean("Configuration.Players.Fly.DisableOnReappear")
+            if (getSettings().getBoolean("Configuration.Players.Fly.DisableOnReappear")
                     && !p.hasPermission("sv.fly")
                     && p.getGameMode() != GameMode.CREATIVE
                     && (SuperVanish.SERVER_IS_ONE_DOT_SEVEN || !OneDotEightUtils.isSpectator(p))) {
@@ -260,39 +261,39 @@ public class VisibilityAdjuster {
             // essentials hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("Essentials") != null
-                    && settings.getBoolean(
+                    && getSettings().getBoolean(
                     "Configuration.Hooks.EnableEssentialsHook")) {
                 EssentialsHook.showPlayer(p);
             }
             // dynmap hook
             if (plugin.getServer().getPluginManager()
                     .getPlugin("dynmap") != null
-                    && settings.getBoolean("Configuration.Hooks.EnableDynmapHook")) {
+                    && getSettings().getBoolean("Configuration.Hooks.EnableDynmapHook")) {
                 DynmapHook.adjustVisibility(p, false);
             }
             // action bars
             if (plugin.getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null
-                    && settings.getBoolean(
+                    && getSettings().getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
                     && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
                 plugin.getActionBarMgr().removeActionBar(p);
             }
             // reappear broadcast
-            if (settings.getBoolean(
+            if (getSettings().getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")
                     && !hideJoinMsg) {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (!(onlinePlayer.hasPermission("sv.see") && settings.getBoolean(
+                    if (!(onlinePlayer.hasPermission("sv.see") && getSettings().getBoolean(
                             "Configuration.Players.EnableSeePermission"))) {
-                        if (!settings.getBoolean(
+                        if (!getSettings().getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
                             onlinePlayer.sendMessage(plugin.convertString(reappearBroadcast, p));
                         }
                     } else {
-                        if (!settings.getBoolean(
+                        if (!getSettings().getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
-                            if (!settings.getBoolean(
+                            if (!getSettings().getBoolean(
                                     "Configuration.Messages.VanishReappearMessages.SendDifferentMessages")) {
                                 onlinePlayer.sendMessage(plugin.convertString(reappearBroadcast, p));
                             } else {
@@ -309,7 +310,7 @@ public class VisibilityAdjuster {
                 }
             }
             // adjust tablist
-            if (settings.getBoolean("Configuration.Tablist.ChangeTabNames")) {
+            if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
                 plugin.getTabMgr().adjustTabname(p,
                         TabAction.RESTORE_NORMAL_TABNAME);
             }
@@ -321,7 +322,7 @@ public class VisibilityAdjuster {
             plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
             plugin.savePlayerData();
             // remove night vision
-            if (settings.getBoolean("Configuration.Players.AddNightVision"))
+            if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
                 p.removePotionEffect(PotionEffectType.NIGHT_VISION);
             // show player
             hider.showToAll(p);

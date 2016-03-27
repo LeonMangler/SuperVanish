@@ -24,7 +24,7 @@ public class CmdReload extends SubCommand {
             plugin.settingsFile = new SettingsFile();
             plugin.settingsFile.saveDefaultConfig();
             plugin.settings = plugin.settingsFile.getConfig();
-            p.sendMessage(convertString(getMsg("ConfigReloadedMessage"), p));
+            p.sendMessage(convertString(getMsg("ConfigReloadedMessage"), p).split("\\n"));
         }
     }
 }

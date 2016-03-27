@@ -40,13 +40,13 @@ import java.util.Collection;
 public class GeneralEventListener implements Listener {
 
     private final SuperVanish plugin;
-    private final FileConfiguration settings;
-    private final FileConfiguration playerData;
 
     public GeneralEventListener(SuperVanish plugin) {
         this.plugin = plugin;
-        this.playerData = plugin.playerData;
-        this.settings = plugin.settings;
+    }
+
+    private FileConfiguration getSettings() {
+        return plugin.settings;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -59,10 +59,10 @@ public class GeneralEventListener implements Listener {
                 .equals(e.getTo().getWorld().getName()))
             return;
         // remove night vision (re-added in WorldChange event)
-        if (settings.getBoolean("Configuration.Players.AddNightVision"))
+        if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
             p.removePotionEffect(PotionEffectType.NIGHT_VISION);
         // remove invisibility
-        if (settings.getBoolean("Configuration.Players.EnableGhostPlayers"))
+        if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers"))
             p.removePotionEffect(PotionEffectType.INVISIBILITY);
     }
 
@@ -70,7 +70,7 @@ public class GeneralEventListener implements Listener {
     public void onFoodLevelChangeEvent(FoodLevelChangeEvent e) {
         try {
             if (e.getEntity() instanceof Player
-                    && !settings.getBoolean("Configuration.Players.DisableHungerForInvisiblePlayers")) {
+                    && !getSettings().getBoolean("Configuration.Players.DisableHungerForInvisiblePlayers")) {
                 Player p = (Player) e.getEntity();
                 Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
                 if (invisiblePlayers.contains(p))
@@ -117,14 +117,15 @@ public class GeneralEventListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e) {
         try {
             Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
-            if (!settings.getBoolean("Configuration.Players.DisablePressurePlatesForInvisiblePlayers")) {
+            if (!getSettings().getBoolean("Configuration.Players.DisablePressurePlatesForInvisiblePlayers")) {
                 return;
             }
             if (e.getAction().equals(Action.PHYSICAL)) {
                 if (e.getClickedBlock().getType() == Material.STONE_PLATE
                         || e.getClickedBlock().getType() == Material.WOOD_PLATE
-                        || e.getClickedBlock().getType() == Material.TRIPWIRE || (!SuperVanish.SERVER_IS_ONE_DOT_SEVEN &&
-                        OneDotEightUtils.isPressurePlate(e.getClickedBlock().getType()))) {
+                        || e.getClickedBlock().getType() == Material.TRIPWIRE ||
+                        (!SuperVanish.SERVER_IS_ONE_DOT_SEVEN &&
+                                OneDotEightUtils.isPressurePlate(e.getClickedBlock().getType()))) {
                     if (invisiblePlayers.contains(e.getPlayer()))
                         e.setCancelled(true);
                 }
@@ -140,13 +141,13 @@ public class GeneralEventListener implements Listener {
             Player p = e.getPlayer();
             Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             if (invisiblePlayers.contains(p)) {
-                if (playerData.get("PlayerData." + p.getUniqueId().toString()
+                if (plugin.playerData.get("PlayerData." + p.getUniqueId().toString()
                         + ".itemPickUps") == null)
-                    if (settings.getBoolean("Configuration.Players.DisableItemPickUpsByDefault"))
+                    if (getSettings().getBoolean("Configuration.Players.DisableItemPickUpsByDefault"))
                         e.setCancelled(true);
                     else
                         return;
-                if (!playerData.getBoolean("PlayerData." + p.getUniqueId().toString()
+                if (!plugin.playerData.getBoolean("PlayerData." + p.getUniqueId().toString()
                         + ".itemPickUps"))
                     e.setCancelled(true);
             }
@@ -161,7 +162,7 @@ public class GeneralEventListener implements Listener {
             Player p = e.getPlayer();
             Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             if (invisiblePlayers.contains(p)) {
-                if (settings.getBoolean("Configuration.Players.PreventBlockPlacing")) {
+                if (getSettings().getBoolean("Configuration.Players.PreventBlockPlacing")) {
                     e.setCancelled(true);
                 }
             }
@@ -176,7 +177,7 @@ public class GeneralEventListener implements Listener {
             Player p = e.getPlayer();
             Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             if (invisiblePlayers.contains(p)) {
-                if (settings.getBoolean("Configuration.Players.PreventBlockBreaking")) {
+                if (getSettings().getBoolean("Configuration.Players.PreventBlockBreaking")) {
                     e.setCancelled(true);
                 }
             }
@@ -197,7 +198,7 @@ public class GeneralEventListener implements Listener {
             if (invisiblePlayers == null)
                 return;
             if (invisiblePlayers.contains(p)) {
-                if (settings.getBoolean("Configuration.Players.PreventHittingEntities")) {
+                if (getSettings().getBoolean("Configuration.Players.PreventHittingEntities")) {
                     e.setCancelled(true);
                 }
             }
@@ -261,7 +262,7 @@ public class GeneralEventListener implements Listener {
         try {
             final Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
             if (e.getPlugin().getName().equalsIgnoreCase("Essentials")
-                    && settings.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
+                    && getSettings().getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
                 Bukkit.getServer().getScheduler()
                         .scheduleSyncDelayedTask(plugin, new Runnable() {
 

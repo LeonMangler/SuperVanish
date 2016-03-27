@@ -24,12 +24,13 @@ import java.util.List;
 
 public class JoinEvent implements EventExecutor, Listener {
     private final SuperVanish plugin;
-    private final FileConfiguration settings, playerData;
 
     public JoinEvent(SuperVanish plugin) {
         this.plugin = plugin;
-        this.settings = plugin.settings;
-        this.playerData = plugin.playerData;
+    }
+
+    private FileConfiguration getSettings() {
+        return plugin.settings;
     }
 
     @SuppressWarnings("deprecation")
@@ -41,16 +42,16 @@ public class JoinEvent implements EventExecutor, Listener {
                 final Player p = e.getPlayer();
                 final List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
                 // compatibility delays
-                int tabDelay = settings
+                int tabDelay = getSettings()
                         .getInt("Configuration.CompatibilityOptions.ActionDelay.TabNameChangeDelayOnJoinInTicks");
-                if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
+                if (!getSettings().getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
                     tabDelay = 0;
-                int invisibilityDelay = settings
+                int invisibilityDelay = getSettings()
                         .getInt("Configuration.CompatibilityOptions.ActionDelay.InvisibilityPotionDelayOnJoinInTicks");
-                if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
+                if (!getSettings().getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
                     invisibilityDelay = 0;
                 // ghost players
-                if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")
+                if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")
                         && plugin.ghostTeam != null
                         && !plugin.ghostTeam.hasPlayer(p)) {
                     if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
@@ -58,7 +59,7 @@ public class JoinEvent implements EventExecutor, Listener {
                         plugin.ghostTeam.addPlayer(p);
                 }
                 // Join-Message
-                if (settings.getBoolean(
+                if (getSettings().getBoolean(
                         "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible",
                         true)
                         && invisiblePlayers.contains(p.getUniqueId().toString())) {
@@ -69,24 +70,24 @@ public class JoinEvent implements EventExecutor, Listener {
                     // Essentials
                     if (plugin.getServer().getPluginManager()
                             .getPlugin("Essentials") != null
-                            && settings.getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
+                            && getSettings().getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
                         EssentialsHook.hidePlayer(p);
                     }
                     // remember message
-                    if (settings.getBoolean("Configuration.Messages.RememberInvisiblePlayersOnJoin")) {
+                    if (getSettings().getBoolean("Configuration.Messages.RememberInvisiblePlayersOnJoin")) {
                         p.sendMessage(plugin.convertString(
                                 plugin.getMsg("RememberMessage"), p));
                     }
                     // BAR-API
                     if (plugin.getServer().getPluginManager()
                             .getPlugin("BarAPI") != null
-                            && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
+                            && getSettings().getBoolean("Configuration.Messages.UseBarAPI")) {
                         displayBossBar(p);
                     }
                     // hide
                     plugin.getVisibilityAdjuster().getHider().hideToAll(p);
                     // re-add invisibility
-                    if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")) {
+                    if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")) {
                         boolean isInvisible = false;
                         for (PotionEffect potionEffect : p.getActivePotionEffects())
                             if (potionEffect.getType() == PotionEffectType.INVISIBILITY) isInvisible = true;
@@ -111,7 +112,7 @@ public class JoinEvent implements EventExecutor, Listener {
                     // re-add action bar
                     if (plugin.getServer().getPluginManager()
                             .getPlugin("ProtocolLib") != null
-                            && settings.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+                            && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
                             && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
                         plugin.getActionBarMgr().addActionBar(p);
                     }
@@ -122,7 +123,7 @@ public class JoinEvent implements EventExecutor, Listener {
                 // hide vanished players to player
                 plugin.getVisibilityAdjuster().getHider().hideAllInvisibleTo(p);
                 // TAB //
-                if (settings.getBoolean("Configuration.Tablist.ChangeTabNames")
+                if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")
                         && invisiblePlayers.contains(p.getUniqueId().toString())) {
                     if (tabDelay > 0) {
                         Bukkit.getServer()
@@ -144,7 +145,7 @@ public class JoinEvent implements EventExecutor, Listener {
                     }
                 }
                 // remove invisibility if required
-                if (playerData.getBoolean("PlayerData.Player."
+                if (plugin.playerData.getBoolean("PlayerData.Player."
                         + p.getUniqueId().toString() + ".remInvis")
                         && !invisiblePlayers.contains(p.getUniqueId().toString())) {
                     removeInvisibility(p);
@@ -164,7 +165,7 @@ public class JoinEvent implements EventExecutor, Listener {
 
                     @Override
                     public void run() {
-                        final List<String> invisiblePlayers = playerData
+                        final List<String> invisiblePlayers = plugin.playerData
                                 .getStringList("InvisiblePlayers");
                         if (invisiblePlayers.contains(p.getUniqueId().toString()))
                             BarAPI.setMessage(p, plugin.convertString(bossBarVanishMessage, p),
@@ -175,7 +176,7 @@ public class JoinEvent implements EventExecutor, Listener {
 
     private void removeInvisibility(Player p) {
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
-        playerData.set("PlayerData.Player." + p.getUniqueId().toString() + ".remInvis",
+        plugin.playerData.set("PlayerData.Player." + p.getUniqueId().toString() + ".remInvis",
                 null);
         plugin.savePlayerData();
     }

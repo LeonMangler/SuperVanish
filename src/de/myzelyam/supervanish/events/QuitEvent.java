@@ -20,11 +20,13 @@ import java.util.Collection;
 public class QuitEvent implements EventExecutor, Listener {
 
     private final SuperVanish plugin;
-    private final FileConfiguration settings;
 
     public QuitEvent(SuperVanish plugin) {
         this.plugin = plugin;
-        this.settings = plugin.settings;
+    }
+
+    private FileConfiguration getSettings() {
+        return plugin.settings;
     }
 
     @Override
@@ -36,10 +38,10 @@ public class QuitEvent implements EventExecutor, Listener {
                 Collection<Player> onlineInvisiblePlayers = plugin.getOnlineInvisiblePlayers();
                 Player p = e.getPlayer();
                 // check auto-reappear option
-                if (settings.getBoolean("Configuration.Players.ReappearOnQuit")
+                if (getSettings().getBoolean("Configuration.Players.ReappearOnQuit")
                         && onlineInvisiblePlayers.contains(p)) {
                     plugin.getVisibilityAdjuster().showPlayer(p, true);
-                    if (settings.getBoolean("Configuration.Players.ReappearOnQuitHandleLeaveMsg")
+                    if (getSettings().getBoolean("Configuration.Players.ReappearOnQuitHandleLeaveMsg")
                             && config
                             .getBoolean("Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible")) {
                         e.setQuitMessage(null);
@@ -55,7 +57,7 @@ public class QuitEvent implements EventExecutor, Listener {
                 // remove action bar
                 if (plugin.getServer().getPluginManager()
                         .getPlugin("ProtocolLib") != null
-                        && settings.getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+                        && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
                         && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
                     plugin.getActionBarMgr().removeActionBar(p);
                 }

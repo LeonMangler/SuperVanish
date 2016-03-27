@@ -23,19 +23,21 @@ import java.util.Collection;
 public class WorldChangeEvent implements Listener {
 
     private final SuperVanish plugin;
-    private final FileConfiguration settings;
+
+    private FileConfiguration getSettings() {
+        return plugin.settings;
+    }
 
     public WorldChangeEvent(SuperVanish plugin) {
         this.plugin = plugin;
-        this.settings = plugin.settings;
         // init compatibility delays
-        invisibilityDelay = settings
+        invisibilityDelay = getSettings()
                 .getInt("Configuration.CompatibilityOptions.ActionDelay.InvisibilityPotionDelayOnWorldChangeInTicks");
-        if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
+        if (!getSettings().getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
             invisibilityDelay = 0;
-        tabDelay = settings
+        tabDelay = getSettings()
                 .getInt("Configuration.CompatibilityOptions.ActionDelay.TabNameChangeDelayOnWorldChangeInTicks");
-        if (!settings.getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
+        if (!getSettings().getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
             tabDelay = 0;
     }
 
@@ -50,14 +52,14 @@ public class WorldChangeEvent implements Listener {
             if (!onlineInvisiblePlayers.contains(p))
                 return;
             // check auto-reappear-option
-            if (settings.getBoolean("Configuration.Players.ReappearOnWorldChange")) {
+            if (getSettings().getBoolean("Configuration.Players.ReappearOnWorldChange")) {
                 plugin.getVisibilityAdjuster().showPlayer(p);
                 return;
             }
             // re-hide
             plugin.getVisibilityAdjuster().getHider().hideToAll(p);
             // re-add invisibility
-            if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")) {
+            if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")) {
                 boolean isInvisible = false;
                 for (PotionEffect potionEffect : p.getActivePotionEffects())
                     if (potionEffect.getType() == PotionEffectType.INVISIBILITY) isInvisible = true;
@@ -80,11 +82,11 @@ public class WorldChangeEvent implements Listener {
                 }
             }
             // re-add night vision (removed in teleport event)
-            if (settings.getBoolean("Configuration.Players.AddNightVision"))
+            if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
                 p.addPotionEffect(new PotionEffect(
                         PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
             // re-adjust tablist name
-            if (settings.getBoolean("Configuration.Tablist.ChangeTabNames")) {
+            if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
                 if (tabDelay > 0) {
                     Bukkit.getServer().getScheduler()
                             .scheduleSyncDelayedTask(plugin, new Runnable() {

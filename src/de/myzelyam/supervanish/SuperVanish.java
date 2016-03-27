@@ -58,11 +58,12 @@ public class SuperVanish extends JavaPlugin {
     public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
             .contains("(MC: 1.7");
 
-    private final List<String> nonRequiredConfigUpdates = Arrays.asList("5.4.4-5.6.0", "5.4.5-5.6.0", "5.5.0-5.6.0");
+    private final List<String> nonRequiredConfigUpdates = Arrays.asList(
+            "5.4.4-5.6.1", "5.4.5-5.6.1", "5.5.0-5.6.1", "5.6.0-5.6.1");
     private final List<String> nonRequiredMsgUpdates = Arrays.asList(
-            "5.3.1-5.6.0", "5.3.2-5.6.0", "5.3.3-5.6.0", "5.3.4-5.6.0",
-            "5.3.5-5.6.0", "5.4.0-5.6.0", "5.4.1-5.6.0", "5.4.2-5.6.0",
-            "5.4.3-5.6.0", "5.4.4-5.6.0", "5.4.5-5.6.0", "5.5.0-5.6.0");
+            "5.3.1-5.6.1", "5.3.2-5.6.1", "5.3.3-5.6.1", "5.3.4-5.6.1",
+            "5.3.5-5.6.1", "5.4.0-5.6.1", "5.4.1-5.6.1", "5.4.2-5.6.1",
+            "5.4.3-5.6.1", "5.4.4-5.6.1", "5.4.5-5.6.1", "5.5.0-5.6.1", "5.6.0-5.6.1");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
 
