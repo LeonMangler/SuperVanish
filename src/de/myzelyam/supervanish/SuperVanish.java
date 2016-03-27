@@ -104,7 +104,8 @@ public class SuperVanish extends JavaPlugin {
             checkGhostPlayers();
             if (getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null) {
-                actionBarMgr = new ActionBarMgr(this);
+                if (!SERVER_IS_ONE_DOT_SEVEN)
+                    actionBarMgr = new ActionBarMgr(this);
                 new ServerListPacketListener(this).registerListener();
                 if (settings.getBoolean("Configuration.Players.SilentOpenChest")) {
                     SilentChestListeners listeners = new SilentChestListeners(this);
@@ -474,11 +475,5 @@ public class SuperVanish extends JavaPlugin {
 
     public TabMgr getTabMgr() {
         return tabMgr;
-    }
-
-    public boolean isOneDotX(int majorRelease) {
-        String version = getServer().getClass().getPackage().getName()
-                .replace(".", ",").split(",")[3];
-        return version.contains("v1_" + majorRelease + "_R");
     }
 }
