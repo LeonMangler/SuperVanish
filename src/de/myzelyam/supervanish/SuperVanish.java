@@ -16,10 +16,7 @@ import de.myzelyam.supervanish.events.GeneralEventListener;
 import de.myzelyam.supervanish.events.JoinEvent;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
-import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
-import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
-import de.myzelyam.supervanish.hooks.SuperTrailsHook;
-import de.myzelyam.supervanish.hooks.TrailGUIHook;
+import de.myzelyam.supervanish.hooks.*;
 import de.myzelyam.supervanish.visibility.*;
 import me.MyzelYam.SuperVanish.api.SVAPI;
 import me.confuser.barapi.BarAPI;
@@ -58,12 +55,14 @@ public class SuperVanish extends JavaPlugin {
     public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
             .contains("(MC: 1.7");
 
-    private final List<String> nonRequiredConfigUpdates = Arrays.asList(
-            "5.4.4-5.6.2", "5.4.5-5.6.2", "5.5.0-5.6.2", "5.6.0-5.6.2", "5.6.1-5.6.2");
-    private final List<String> nonRequiredMsgUpdates = Arrays.asList(
-            "5.3.1-5.6.2", "5.3.2-5.6.2", "5.3.3-5.6.2", "5.3.4-5.6.2",
-            "5.3.5-5.6.2", "5.4.0-5.6.2", "5.4.1-5.6.2", "5.4.2-5.6.2",
-            "5.4.3-5.6.2", "5.4.4-5.6.2", "5.4.5-5.6.2", "5.5.0-5.6.2", "5.6.0-5.6.2", "5.6.1-5.6.2");
+    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Arrays.asList(
+            "5.4.4-5.7.0", "5.4.5-5.7.0", "5.5.0-5.7.0", "5.6.0-5.7.0",
+            "5.6.1-5.7.0", "5.6.2-5.7.0");
+    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Arrays.asList(
+            "5.3.1-5.7.0", "5.3.2-5.7.0", "5.3.3-5.7.0", "5.3.4-5.7.0",
+            "5.3.5-5.7.0", "5.4.0-5.7.0", "5.4.1-5.7.0", "5.4.2-5.7.0",
+            "5.4.3-5.7.0", "5.4.4-5.7.0", "5.4.5-5.7.0", "5.5.0-5.7.0",
+            "5.6.0-5.7.0", "5.6.1-5.7.0", "5.6.2-5.7.0");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
 
@@ -92,7 +91,6 @@ public class SuperVanish extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onEnable() {
         try {
@@ -100,6 +98,7 @@ public class SuperVanish extends JavaPlugin {
             registerEvents();
             visibilityAdjuster = new VisibilityAdjuster(this);
             VanishAPI.setPlugin(this);
+            //noinspection deprecation
             SVAPI.setPlugin(this);
             tabMgr = new TabMgr(this);
             checkGhostPlayers();
@@ -109,7 +108,7 @@ public class SuperVanish extends JavaPlugin {
                     actionBarMgr = new ActionBarMgr(this);
                 new ServerListPacketListener(this).registerListener();
                 if (settings.getBoolean("Configuration.Players.SilentOpenChest")) {
-                    SilentChestListeners listeners = new SilentChestListeners(this);
+                    SilentChestListeners_v2 listeners = new SilentChestListeners_v2(this);
                     listeners.setupAnimationListener();
                     listeners.setupSoundListener();
                     listeners.setupBukkitEventListener();
@@ -151,7 +150,6 @@ public class SuperVanish extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void checkGhostPlayers() {
         try {
             if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")) {
@@ -165,15 +163,18 @@ public class SuperVanish extends JavaPlugin {
                 }
                 ghostTeam.setCanSeeFriendlyInvisibles(true);
                 for (Player p : Bukkit.getOnlinePlayers()) {
+                    //noinspection deprecation
                     if (!ghostTeam.hasPlayer(p)) {
                         if (p.hasPermission("sv.see")
                                 || p.hasPermission("sv.use")
                                 || invisiblePlayers.contains(p.getUniqueId().toString()))
+                            //noinspection deprecation
                             ghostTeam.addPlayer(p);
                     } else {
                         if (!(p.hasPermission("sv.see")
                                 || p.hasPermission("sv.use")
                                 || invisiblePlayers.contains(p.getUniqueId().toString()))) {
+                            //noinspection deprecation
                             ghostTeam.removePlayer(p);
                         }
                     }
@@ -253,7 +254,18 @@ public class SuperVanish extends JavaPlugin {
                     currentHook = "SuperTrails";
                     new SuperTrailsHook(this);
                 }
+                if (pluginManager.isPluginEnabled("Citizens") && settings.getBoolean(
+                        "Configuration.Hooks.EnableCitizensHook", true)) {
+                    currentHook = "Citizens";
+                    new CitizensHook(this);
+                }
+                if (pluginManager.isPluginEnabled("EnjinMinecraftPlugin") && settings.getBoolean(
+                        "Configuration.Hooks.EnableEnjinMinecraftPluginHook", true)) {
+                    currentHook = "EnjinMinecraftPlugin";
+                    new EnjinMinecraftPluginHook(this);
+                }
             } catch (Throwable throwable) {
+                if (throwable instanceof ThreadDeath || throwable instanceof VirtualMachineError) throw throwable;
                 getLogger().log(Level.WARNING, "[SuperVanish] Failed to hook into " + currentHook
                         + ", please report this!");
                 // just continue normally, don't let another plugin break SV!
@@ -344,8 +356,8 @@ public class SuperVanish extends JavaPlugin {
                                    boolean checkCfg) {
         if (currentVersion == null)
             return true;
-        for (String updatesString : (checkCfg ? nonRequiredConfigUpdates
-                : nonRequiredMsgUpdates)) {
+        for (String updatesString : (checkCfg ? NON_REQUIRED_SETTINGS_UPDATES
+                : NON_REQUIRED_MESSAGES_UPDATES)) {
             String[] splittedUpdatesString = updatesString.split("-");
             if (currentVersion.equalsIgnoreCase(splittedUpdatesString[0])
                     && newestVersion.equalsIgnoreCase(splittedUpdatesString[1]))

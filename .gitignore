@@ -8,5 +8,13 @@
 *.war
 *.ear
 
+# IntelliJ files
+.idea
+*.eml
+*.iml
+
+# Eclipse files
+.settings
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*

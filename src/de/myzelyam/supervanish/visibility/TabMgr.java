@@ -24,21 +24,21 @@ public class TabMgr {
 
     private boolean enabled;
 
-    public void adjustTabname(Player p, TabAction action) {
-        if (action == TabAction.RESTORE_NORMAL_TABNAME)
-            restoreNormalTabname(p);
+    public void adjustTabName(Player p, TabAction action) {
+        if (action == TabAction.RESTORE_NORMAL_TAB_NAME)
+            restoreNormalTabName(p);
         else
-            setCustomTabname(p);
+            setCustomTabName(p);
     }
 
-    private void restoreNormalTabname(Player p) {
+    private void restoreNormalTabName(Player p) {
         String ntn = loadData(p);
         if (ntn == null)
             return;
         p.setPlayerListName(plugin.convertString(ntn, p));
     }
 
-    private void setCustomTabname(Player p) {
+    private void setCustomTabName(Player p) {
         if (!enabled)
             return;
         String tn = plugin.getMsg("TabName");
@@ -54,7 +54,7 @@ public class TabMgr {
     }
 
     public enum TabAction {
-        RESTORE_NORMAL_TABNAME, SET_CUSTOM_TABNAME
+        RESTORE_NORMAL_TAB_NAME, SET_CUSTOM_TAB_NAME
     }
 
     public void storeData(Player p) {

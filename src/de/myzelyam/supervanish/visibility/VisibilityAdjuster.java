@@ -160,8 +160,8 @@ public class VisibilityAdjuster {
             }
             // adjust tablist
             if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
-                plugin.getTabMgr().adjustTabname(p,
-                        TabAction.SET_CUSTOM_TABNAME);
+                plugin.getTabMgr().adjustTabName(p,
+                        TabAction.SET_CUSTOM_TAB_NAME);
             }
             // send message
             p.sendMessage(plugin.convertString(onVanishMessage, p));
@@ -311,8 +311,8 @@ public class VisibilityAdjuster {
             }
             // adjust tablist
             if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
-                plugin.getTabMgr().adjustTabname(p,
-                        TabAction.RESTORE_NORMAL_TABNAME);
+                plugin.getTabMgr().adjustTabName(p,
+                        TabAction.RESTORE_NORMAL_TAB_NAME);
             }
             // chat message
             p.sendMessage(plugin.convertString(onReappearMessage, p));

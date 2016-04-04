@@ -93,13 +93,13 @@ public class WorldChangeEvent implements Listener {
 
                                 @Override
                                 public void run() {
-                                    plugin.getTabMgr().adjustTabname(p,
-                                            TabAction.SET_CUSTOM_TABNAME);
+                                    plugin.getTabMgr().adjustTabName(p,
+                                            TabAction.SET_CUSTOM_TAB_NAME);
                                 }
                             }, tabDelay);
                 } else {
-                    plugin.getTabMgr().adjustTabname(p,
-                            TabAction.SET_CUSTOM_TABNAME);
+                    plugin.getTabMgr().adjustTabName(p,
+                            TabAction.SET_CUSTOM_TAB_NAME);
                 }
             }
         } catch (Exception er) {

@@ -134,14 +134,14 @@ public class JoinEvent implements EventExecutor, Listener {
                                             @Override
                                             public void run() {
                                                 plugin.getTabMgr()
-                                                        .adjustTabname(
+                                                        .adjustTabName(
                                                                 p,
-                                                                TabAction.SET_CUSTOM_TABNAME);
+                                                                TabAction.SET_CUSTOM_TAB_NAME);
                                             }
                                         }, tabDelay);
                     } else {
-                        plugin.getTabMgr().adjustTabname(p,
-                                TabAction.SET_CUSTOM_TABNAME);
+                        plugin.getTabMgr().adjustTabName(p,
+                                TabAction.SET_CUSTOM_TAB_NAME);
                     }
                 }
                 // remove invisibility if required

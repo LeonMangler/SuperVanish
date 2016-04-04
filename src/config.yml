@@ -1,4 +1,4 @@
-# SuperVanish v5.6.2 - Configuration
+# SuperVanish v5.7.0 - Configuration
 #
 Configuration:
 ##################################################
@@ -115,6 +115,10 @@ Configuration:
     EnableTrailGUIHook: true
     # Should SV hook into SuperTrails and disable trails for vanished players?
     EnableSuperTrailsHook: true
+    # Should SV stop NPCs from greeting or talking about hidden players?
+    EnableCitizensHook: true
+    # Should SV hide invisible players on Enjin's website?
+    EnableEnjinMinecraftPluginHook: true
 ##################################################
 ############# COMPATIBILITY OPTIONS ##############
 ##################################################
@@ -137,4 +141,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.6.2
+ConfigVersion: 5.7.0
