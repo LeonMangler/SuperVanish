@@ -54,13 +54,13 @@ import static java.util.logging.Level.SEVERE;
 public class SuperVanish extends JavaPlugin {
 
     private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Arrays.asList(
-            "5.4.4-5.8.0", "5.4.5-5.8.0", "5.5.0-5.8.0", "5.6.0-5.8.0",
-            "5.6.1-5.8.0", "5.6.2-5.8.0", "5.7.0-5.8.0");
+            "5.4.4-5.8.1", "5.4.5-5.8.1", "5.5.0-5.8.1", "5.6.0-5.8.1",
+            "5.6.1-5.8.1", "5.6.2-5.8.1", "5.7.0-5.8.1", "5.8.0-5.8.1");
     private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Arrays.asList(
-            "5.3.1-5.8.0", "5.3.2-5.8.0", "5.3.3-5.8.0", "5.3.4-5.8.0",
-            "5.3.5-5.8.0", "5.4.0-5.8.0", "5.4.1-5.8.0", "5.4.2-5.8.0",
-            "5.4.3-5.8.0", "5.4.4-5.8.0", "5.4.5-5.8.0", "5.5.0-5.8.0",
-            "5.6.0-5.8.0", "5.6.1-5.8.0", "5.6.2-5.8.0", "5.7.0-5.8.0");
+            "5.3.1-5.8.1", "5.3.2-5.8.1", "5.3.3-5.8.1", "5.3.4-5.8.1",
+            "5.3.5-5.8.1", "5.4.0-5.8.1", "5.4.1-5.8.1", "5.4.2-5.8.1",
+            "5.4.3-5.8.1", "5.4.4-5.8.1", "5.4.5-5.8.1", "5.5.0-5.8.1",
+            "5.6.0-5.8.1", "5.6.1-5.8.1", "5.6.2-5.8.1", "5.7.0-5.8.1", "5.8.0-5.8.1");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
 
@@ -107,7 +107,8 @@ public class SuperVanish extends JavaPlugin {
                 if (!isOneDotX(7))
                     actionBarMgr = new ActionBarMgr(this);
                 new ServerListPacketListener(this).registerListener();
-                if (settings.getBoolean("Configuration.Players.SilentOpenChest")) {
+                if (settings.getBoolean("Configuration.Players.SilentOpenChest")
+                        && isOneDotXOrHigher(8)) {
                     new SilentChestListeners_v3(this);
                 }
             }
