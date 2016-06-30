@@ -58,7 +58,7 @@ public class QuitEvent implements EventExecutor, Listener {
                 if (plugin.getServer().getPluginManager()
                         .getPlugin("ProtocolLib") != null
                         && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                        && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
+                        && !plugin.isOneDotX(7)) {
                     plugin.getActionBarMgr().removeActionBar(p);
                 }
             }

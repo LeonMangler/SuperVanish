@@ -124,7 +124,7 @@ public class GeneralEventListener implements Listener {
                 if (e.getClickedBlock().getType() == Material.STONE_PLATE
                         || e.getClickedBlock().getType() == Material.WOOD_PLATE
                         || e.getClickedBlock().getType() == Material.TRIPWIRE ||
-                        (!SuperVanish.SERVER_IS_ONE_DOT_SEVEN &&
+                        (!plugin.isOneDotX(7) &&
                                 OneDotEightUtils.isPressurePlate(e.getClickedBlock().getType()))) {
                     if (invisiblePlayers.contains(e.getPlayer()))
                         e.setCancelled(true);

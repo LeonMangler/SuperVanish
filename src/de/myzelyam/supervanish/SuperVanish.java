@@ -17,6 +17,7 @@ import de.myzelyam.supervanish.events.JoinEvent;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
 import de.myzelyam.supervanish.hooks.*;
+import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 import de.myzelyam.supervanish.visibility.*;
 import me.MyzelYam.SuperVanish.api.SVAPI;
 import me.confuser.barapi.BarAPI;
@@ -52,17 +53,14 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    public static final boolean SERVER_IS_ONE_DOT_SEVEN = Bukkit.getVersion()
-            .contains("(MC: 1.7");
-
     private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Arrays.asList(
-            "5.4.4-5.7.0", "5.4.5-5.7.0", "5.5.0-5.7.0", "5.6.0-5.7.0",
-            "5.6.1-5.7.0", "5.6.2-5.7.0");
+            "5.4.4-5.8.0", "5.4.5-5.8.0", "5.5.0-5.8.0", "5.6.0-5.8.0",
+            "5.6.1-5.8.0", "5.6.2-5.8.0", "5.7.0-5.8.0");
     private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Arrays.asList(
-            "5.3.1-5.7.0", "5.3.2-5.7.0", "5.3.3-5.7.0", "5.3.4-5.7.0",
-            "5.3.5-5.7.0", "5.4.0-5.7.0", "5.4.1-5.7.0", "5.4.2-5.7.0",
-            "5.4.3-5.7.0", "5.4.4-5.7.0", "5.4.5-5.7.0", "5.5.0-5.7.0",
-            "5.6.0-5.7.0", "5.6.1-5.7.0", "5.6.2-5.7.0");
+            "5.3.1-5.8.0", "5.3.2-5.8.0", "5.3.3-5.8.0", "5.3.4-5.8.0",
+            "5.3.5-5.8.0", "5.4.0-5.8.0", "5.4.1-5.8.0", "5.4.2-5.8.0",
+            "5.4.3-5.8.0", "5.4.4-5.8.0", "5.4.5-5.8.0", "5.5.0-5.8.0",
+            "5.6.0-5.8.0", "5.6.1-5.8.0", "5.6.2-5.8.0", "5.7.0-5.8.0");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
 
@@ -81,6 +79,7 @@ public class SuperVanish extends JavaPlugin {
     private VisibilityAdjuster visibilityAdjuster;
     private ActionBarMgr actionBarMgr;
     private TabMgr tabMgr;
+    private ProtocolLibPacketUtils protocolLibPacketUtils;
 
 
     public void savePlayerData() {
@@ -104,14 +103,12 @@ public class SuperVanish extends JavaPlugin {
             checkGhostPlayers();
             if (getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null) {
-                if (!SERVER_IS_ONE_DOT_SEVEN)
+                protocolLibPacketUtils = new ProtocolLibPacketUtils(this);
+                if (!isOneDotX(7))
                     actionBarMgr = new ActionBarMgr(this);
                 new ServerListPacketListener(this).registerListener();
                 if (settings.getBoolean("Configuration.Players.SilentOpenChest")) {
-                    SilentChestListeners_v2 listeners = new SilentChestListeners_v2(this);
-                    listeners.setupAnimationListener();
-                    listeners.setupSoundListener();
-                    listeners.setupBukkitEventListener();
+                    new SilentChestListeners_v3(this);
                 }
             }
             new ForcedInvisibilityTask(this).start();
@@ -165,14 +162,12 @@ public class SuperVanish extends JavaPlugin {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     //noinspection deprecation
                     if (!ghostTeam.hasPlayer(p)) {
-                        if (p.hasPermission("sv.see")
-                                || p.hasPermission("sv.use")
+                        if (p.hasPermission("sv.use")
                                 || invisiblePlayers.contains(p.getUniqueId().toString()))
                             //noinspection deprecation
                             ghostTeam.addPlayer(p);
                     } else {
-                        if (!(p.hasPermission("sv.see")
-                                || p.hasPermission("sv.use")
+                        if (!(p.hasPermission("sv.use")
                                 || invisiblePlayers.contains(p.getUniqueId().toString()))) {
                             //noinspection deprecation
                             ghostTeam.removePlayer(p);
@@ -200,7 +195,7 @@ public class SuperVanish extends JavaPlugin {
             if (getServer().getPluginManager().getPlugin("ProtocolLib") != null
                     && settings.getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                    && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN && actionBarMgr != null) {
+                    && !isOneDotX(7) && actionBarMgr != null) {
                 for (Player p : invisiblePlayers) {
                     actionBarMgr.addActionBar(p);
                 }
@@ -453,7 +448,21 @@ public class SuperVanish extends JavaPlugin {
         return rn;
     }
 
-    // override the standard config-api
+    public boolean isOneDotX(int majorRelease) {
+        String version = getServer().getClass().getPackage().getName()
+                .replace(".", ",").split(",")[3];
+        return version.contains("v1_" + majorRelease + "_R");
+    }
+
+    public boolean isOneDotXOrHigher(int majorRelease) {
+        String version = getServer().getClass().getPackage().getName()
+                .replace(".", ",").split(",")[3];
+        for (int i = majorRelease; i < 20; i++)
+            if (version.contains("v1_" + i + "_R")) return true;
+        return version.contains("v2_");
+    }
+
+    // override the standard Config API
     @Override
     public FileConfiguration getConfig() {
         return settings;
@@ -470,8 +479,9 @@ public class SuperVanish extends JavaPlugin {
 
     public Collection<Player> getOnlineInvisiblePlayers() {
         Collection<Player> onlineInvisiblePlayers = new HashSet<>();
+        List<String> allInvisiblePlayers = getAllInvisiblePlayers();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (getAllInvisiblePlayers().contains(player.getUniqueId().toString())) {
+            if (allInvisiblePlayers.contains(player.getUniqueId().toString())) {
                 onlineInvisiblePlayers.add(player);
             }
         }
@@ -488,5 +498,9 @@ public class SuperVanish extends JavaPlugin {
 
     public TabMgr getTabMgr() {
         return tabMgr;
+    }
+
+    public ProtocolLibPacketUtils getProtocolLibPacketUtils() {
+        return protocolLibPacketUtils;
     }
 }

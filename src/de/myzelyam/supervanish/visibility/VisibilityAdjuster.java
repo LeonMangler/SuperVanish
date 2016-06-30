@@ -8,12 +8,13 @@ package de.myzelyam.supervanish.visibility;
 
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
+import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
-import de.myzelyam.supervanish.visibility.TabMgr.TabAction;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
+import de.myzelyam.supervanish.visibility.TabMgr.TabAction;
 import me.confuser.barapi.BarAPI;
 import me.libraryaddict.disguise.DisguiseAPI;
 import org.bukkit.Bukkit;
@@ -126,15 +127,14 @@ public class VisibilityAdjuster {
                     .getPlugin("ProtocolLib") != null
                     && getSettings().getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                    && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
+                    && !plugin.isOneDotX(7)) {
                 plugin.getActionBarMgr().addActionBar(p);
             }
             // vanish broadcast
             if (getSettings().getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (!(onlinePlayer.hasPermission("sv.see") && getSettings().getBoolean(
-                            "Configuration.Players.EnableSeePermission"))) {
+                    if (!VanishAPI.canSee(onlinePlayer, p)) {
                         if (!getSettings().getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
                             onlinePlayer.sendMessage(plugin.convertString(vanishBroadcast, p));
@@ -175,7 +175,7 @@ public class VisibilityAdjuster {
                     && plugin.ghostTeam != null) {
                 //noinspection deprecation
                 if (!plugin.ghostTeam.hasPlayer(p)) {
-                    if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
+                    if (p.hasPermission("sv.use")
                             || plugin.getAllInvisiblePlayers()
                             .contains(p.getUniqueId().toString()))
                         //noinspection deprecation
@@ -255,7 +255,7 @@ public class VisibilityAdjuster {
             if (getSettings().getBoolean("Configuration.Players.Fly.DisableOnReappear")
                     && !p.hasPermission("sv.fly")
                     && p.getGameMode() != GameMode.CREATIVE
-                    && (SuperVanish.SERVER_IS_ONE_DOT_SEVEN || !OneDotEightUtils.isSpectator(p))) {
+                    && (plugin.isOneDotX(7) || !OneDotEightUtils.isSpectator(p))) {
                 p.setAllowFlight(false);
             }
             // essentials hook
@@ -276,7 +276,7 @@ public class VisibilityAdjuster {
                     .getPlugin("ProtocolLib") != null
                     && getSettings().getBoolean(
                     "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                    && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
+                    && !plugin.isOneDotX(7)) {
                 plugin.getActionBarMgr().removeActionBar(p);
             }
             // reappear broadcast
@@ -284,8 +284,7 @@ public class VisibilityAdjuster {
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnReappear")
                     && !hideJoinMsg) {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (!(onlinePlayer.hasPermission("sv.see") && getSettings().getBoolean(
-                            "Configuration.Players.EnableSeePermission"))) {
+                    if (!VanishAPI.canSee(onlinePlayer, p)) {
                         if (!getSettings().getBoolean(
                                 "Configuration.Messages.VanishReappearMessages.SendMessageOnlyToAdmins")) {
                             onlinePlayer.sendMessage(plugin.convertString(reappearBroadcast, p));

@@ -19,7 +19,7 @@ public class VanishAPI {
     private static SuperVanish plugin;
 
     /**
-     * @return A String list of the UUID's of all hidden players
+     * @return A String list of the UUIDs of all hidden players
      */
     public static List<String> getInvisiblePlayers() {
         return plugin.playerData.getStringList("InvisiblePlayers");
@@ -59,13 +59,21 @@ public class VanishAPI {
      *
      * @param viewer - the viewer
      * @param viewed - the viewed player
-     * @return TRUE if viewed is not vanished or viewer has the permission to see vanished players
+     * @return TRUE if viewed is not vanished or viewer has the permission to see viewed
      */
     public static boolean canSee(Player viewer, Player viewed) {
         if (viewer == null) throw new IllegalArgumentException("viewer cannot be null");
         if (!isInvisible(viewed)) return true;
         boolean enableSeePermission = getConfiguration().getBoolean("Configuration.Players.EnableSeePermission");
-        return enableSeePermission && viewer.hasPermission("sv.see");
+        if (!enableSeePermission) return false;
+        int viewerLevel = viewer.hasPermission("sv.see") ? 1 : 0, viewedLevel = 1;
+        for (int i = 1; i < 100; i++)
+            if (viewer.hasPermission("sv.see.level" + i))
+                viewerLevel = i;
+        for (int i = 0; i < 100; i++)
+            if (viewed.hasPermission("sv.use.level" + i))
+                viewedLevel = i;
+        return viewerLevel >= viewedLevel;
     }
 
     public static FileConfiguration getConfiguration() {

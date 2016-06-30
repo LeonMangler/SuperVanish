@@ -12,6 +12,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Collection;
+
 public class ForcedInvisibilityTask extends BukkitRunnable {
 
     private final SuperVanish plugin;
@@ -26,8 +28,9 @@ public class ForcedInvisibilityTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
         for (Player hidden : plugin.getOnlineInvisiblePlayers()) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            for (Player onlinePlayer : onlinePlayers) {
                 if (hidden == onlinePlayer) continue;
                 if (!VanishAPI.canSee(onlinePlayer, hidden))
                     onlinePlayer.hidePlayer(hidden);

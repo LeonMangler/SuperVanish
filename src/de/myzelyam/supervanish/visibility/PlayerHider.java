@@ -28,20 +28,15 @@ public class PlayerHider {
 
     public void hideToAll(Player player) {
         for (Player viewer : Bukkit.getOnlinePlayers()) {
-            if (!viewer.hasPermission("sv.see")
-                    || !plugin.settings.getBoolean("Configuration.Players.EnableSeePermission")) {
+            if (!VanishAPI.canSee(viewer, player)) {
                 viewer.hidePlayer(player);
             }
         }
     }
 
     public void hideAllInvisibleTo(Player viewer) {
-        if (viewer.hasPermission("sv.see")
-                && plugin.settings.getBoolean("Configuration.Players.EnableSeePermission"))
-            return;
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (VanishAPI.getInvisiblePlayers().contains(
-                    player.getUniqueId().toString()))
+            if (!VanishAPI.canSee(viewer, player))
                 viewer.hidePlayer(player);
         }
     }

@@ -54,7 +54,7 @@ public class JoinEvent implements EventExecutor, Listener {
                 if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")
                         && plugin.ghostTeam != null
                         && !plugin.ghostTeam.hasPlayer(p)) {
-                    if (p.hasPermission("sv.see") || p.hasPermission("sv.use")
+                    if (p.hasPermission("sv.use")
                             || invisiblePlayers.contains(p.getUniqueId().toString()))
                         plugin.ghostTeam.addPlayer(p);
                 }
@@ -113,7 +113,7 @@ public class JoinEvent implements EventExecutor, Listener {
                     if (plugin.getServer().getPluginManager()
                             .getPlugin("ProtocolLib") != null
                             && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                            && !SuperVanish.SERVER_IS_ONE_DOT_SEVEN) {
+                            && !plugin.isOneDotX(7)) {
                         plugin.getActionBarMgr().addActionBar(p);
                     }
                     //
