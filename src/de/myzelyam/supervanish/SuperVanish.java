@@ -52,8 +52,8 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.emptyList();
-    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Collections.emptyList();
+    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.singletonList("5.8.2-5.8.3");
+    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Collections.singletonList("5.8.2-5.8.3");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;

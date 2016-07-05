@@ -20,11 +20,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TeamMgr implements Listener {
 
     private final boolean enable, push;
     private final String suffix, prefix;
     private SuperVanish plugin;
+    private Map<String, Team> previousTeams = new HashMap<>();
 
     public TeamMgr(SuperVanish plugin) {
         this.plugin = plugin;
@@ -49,6 +53,10 @@ public class TeamMgr implements Listener {
         if (p.getScoreboard() == Bukkit.getScoreboardManager()
                 .getMainScoreboard())
             p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        // save previous team
+        Team previousTeam = p.getScoreboard().getEntryTeam(p.getName());
+        previousTeams.put(p.getName(), previousTeam);
+        //
         Team team = p.getScoreboard().getTeam("Vanished");
         if (team == null) {
             team = p.getScoreboard().registerNewTeam("Vanished");
@@ -75,10 +83,17 @@ public class TeamMgr implements Listener {
         Team team = p.getScoreboard().getTeam("Vanished");
         if (team == null)
             return;
-        //noinspection deprecation
-        team.removePlayer(p);
+        team.removeEntry(p.getName());
         if (team.getEntries().isEmpty())
             team.unregister();
+        // add back to previous team
+        Team previousTeam = previousTeams.get(p.getName());
+        if (previousTeam != null)
+            try {
+                previousTeam.addEntry(p.getName());
+            } catch (IllegalStateException ignored) {
+            }
+        //
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

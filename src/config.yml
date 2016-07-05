@@ -1,4 +1,4 @@
-# SuperVanish v5.8.2 - Configuration
+# SuperVanish v5.8.3 - Configuration
 #
 Configuration:
 ##################################################
@@ -122,22 +122,12 @@ Configuration:
 ############# COMPATIBILITY OPTIONS ##############
 ##################################################
   CompatibilityOptions:
-    # 1 second is equal to 20 ticks
-    # Positive integers only.
-    ActionDelay:
-      # The settings below won't do anything if this is 'false'.
-      Enable: false
-      TabNameChangeDelayOnJoinInTicks: 5
-      TabNameChangeDelayOnWorldChangeInTicks: 5
-      # If 'EnableGhostPlayers' is enabled
-      InvisibilityPotionDelayOnJoinInTicks: 3
-      InvisibilityPotionDelayOnWorldChangeInTicks: 3
-    # The event-priority supervanish should use for the specific event.
+    # The event priority which supervanish should use for the specific event.
     # If another plugin overrides supervanish's join/leave settings, setting the priorities to MONITOR can help.
-    # Allowed values are: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
+    # Allowed values: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
     PlayerJoinEventPriority: HIGH # <- Set this to "HIGH" if you use Essentials to modify join messages
     PlayerQuitEventPriority: HIGHEST
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.8.2
+ConfigVersion: 5.8.3

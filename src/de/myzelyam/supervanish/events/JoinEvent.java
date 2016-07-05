@@ -65,7 +65,7 @@ public class JoinEvent implements EventExecutor, Listener {
                     if (plugin.getServer().getPluginManager()
                             .getPlugin("ProtocolLib") != null
                             && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                            && !plugin.isOneDotXOrHigher(8)) {
+                            && plugin.isOneDotXOrHigher(8)) {
                         plugin.getActionBarMgr().addActionBar(p);
                     }
                     // packet night vision
