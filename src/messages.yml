@@ -1,4 +1,4 @@
-# SuperVanish v5.8.1 - Messages
+# SuperVanish v5.8.2 - Messages
 # Information:
 # You can use the & character for color codes. Example: '&cThe color of this text would be red!'
 # You can use %p to get the player's name. Example: '&4&l%p, you aren't allowed to execute this command!'
@@ -42,4 +42,4 @@ Messages:
   UpdateWarningMessage: '&cWarning! Updating %updates resets %changes. Please use ''&e/sv updatecfg confirm&c'' to continue.'
   UpdatedConfigMessage: '&aSuccessfully updated %updates! Please check %changes.'
   NoConfigUpdateAvailableMessage: '&eYour SuperVanish-files are up to date!'
-MessagesVersion: 5.8.1
+MessagesVersion: 5.8.2

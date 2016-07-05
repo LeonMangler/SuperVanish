@@ -130,6 +130,11 @@ public class VisibilityAdjuster {
                     && !plugin.isOneDotX(7)) {
                 plugin.getActionBarMgr().addActionBar(p);
             }
+            // adjust playerdata.yml file
+            List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
+            invisiblePlayers.add(p.getUniqueId().toString());
+            plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
+            plugin.savePlayerData();
             // vanish broadcast
             if (getSettings().getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
@@ -165,11 +170,6 @@ public class VisibilityAdjuster {
             }
             // send message
             p.sendMessage(plugin.convertString(onVanishMessage, p));
-            // adjust playerdata.yml file
-            List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
-            invisiblePlayers.add(p.getUniqueId().toString());
-            plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
-            plugin.savePlayerData();
             // ghost team
             if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")
                     && plugin.ghostTeam != null) {
