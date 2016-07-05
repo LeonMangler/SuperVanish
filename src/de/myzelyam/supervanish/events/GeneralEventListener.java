@@ -51,19 +51,17 @@ public class GeneralEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent e) {
-        // remove potion effects
-        Player p = e.getPlayer();
-        Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
-        if (!invisiblePlayers.contains(p)) return;
-        if (e.getFrom().getWorld().getName()
-                .equals(e.getTo().getWorld().getName()))
-            return;
         // remove night vision (re-added in WorldChange event)
-        if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
-            p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-        // remove invisibility
-        if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers"))
-            p.removePotionEffect(PotionEffectType.INVISIBILITY);
+        if (!plugin.packetNightVision) {
+            Player p = e.getPlayer();
+            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
+            if (!invisiblePlayers.contains(p)) return;
+            if (e.getFrom().getWorld().getName()
+                    .equals(e.getTo().getWorld().getName()))
+                return;
+            if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
+                p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)

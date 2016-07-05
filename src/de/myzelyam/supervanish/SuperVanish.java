@@ -20,7 +20,6 @@ import de.myzelyam.supervanish.hooks.*;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 import de.myzelyam.supervanish.visibility.*;
 import me.MyzelYam.SuperVanish.api.SVAPI;
-import me.confuser.barapi.BarAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -42,8 +41,8 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -53,18 +52,11 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Arrays.asList(
-            "5.4.4-5.8.2", "5.4.5-5.8.2", "5.5.0-5.8.2", "5.6.0-5.8.2",
-            "5.6.1-5.8.2", "5.6.2-5.8.2", "5.7.0-5.8.2", "5.8.0-5.8.2",
-            "5.8.1-5.8.2");
-    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Arrays.asList(
-            "5.3.1-5.8.2", "5.3.2-5.8.2", "5.3.3-5.8.2", "5.3.4-5.8.2",
-            "5.3.5-5.8.2", "5.4.0-5.8.2", "5.4.1-5.8.2", "5.4.2-5.8.2",
-            "5.4.3-5.8.2", "5.4.4-5.8.2", "5.4.5-5.8.2", "5.5.0-5.8.2",
-            "5.6.0-5.8.2", "5.6.1-5.8.2", "5.6.2-5.8.2", "5.7.0-5.8.2",
-            "5.8.0-5.8.2", "5.8.1-5.8.2");
+    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.emptyList();
+    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Collections.emptyList();
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
+    public boolean packetNightVision = false;
 
     public Team ghostTeam;
 
@@ -80,7 +72,7 @@ public class SuperVanish extends JavaPlugin {
 
     private VisibilityAdjuster visibilityAdjuster;
     private ActionBarMgr actionBarMgr;
-    private TabMgr tabMgr;
+    private TeamMgr teamMgr;
     private ProtocolLibPacketUtils protocolLibPacketUtils;
 
 
@@ -101,11 +93,11 @@ public class SuperVanish extends JavaPlugin {
             VanishAPI.setPlugin(this);
             //noinspection deprecation
             SVAPI.setPlugin(this);
-            tabMgr = new TabMgr(this);
-            checkGhostPlayers();
+            teamMgr = new TeamMgr(this);
             if (getServer().getPluginManager()
                     .getPlugin("ProtocolLib") != null) {
                 protocolLibPacketUtils = new ProtocolLibPacketUtils(this);
+                packetNightVision = true;
                 if (!isOneDotX(7))
                     actionBarMgr = new ActionBarMgr(this);
                 new ServerListPacketListener(this).registerListener();
@@ -150,50 +142,9 @@ public class SuperVanish extends JavaPlugin {
         }
     }
 
-    private void checkGhostPlayers() {
-        try {
-            if (settings.getBoolean("Configuration.Players.EnableGhostPlayers")) {
-                List<String> invisiblePlayers = playerData.getStringList("InvisiblePlayers");
-                ghostTeam = Bukkit.getServer().getScoreboardManager()
-                        .getMainScoreboard().getTeam("SuperVanishGT");
-                if (ghostTeam == null) {
-                    ghostTeam = Bukkit.getServer().getScoreboardManager()
-                            .getMainScoreboard()
-                            .registerNewTeam("SuperVanishGT");
-                }
-                ghostTeam.setCanSeeFriendlyInvisibles(true);
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    //noinspection deprecation
-                    if (!ghostTeam.hasPlayer(p)) {
-                        if (p.hasPermission("sv.use")
-                                || invisiblePlayers.contains(p.getUniqueId().toString()))
-                            //noinspection deprecation
-                            ghostTeam.addPlayer(p);
-                    } else {
-                        if (!(p.hasPermission("sv.use")
-                                || invisiblePlayers.contains(p.getUniqueId().toString()))) {
-                            //noinspection deprecation
-                            ghostTeam.removePlayer(p);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            printException(e);
-        }
-    }
-
     private void checkForReload() {
         try {
             Collection<Player> invisiblePlayers = getOnlineInvisiblePlayers();
-            // boss bars
-            if (getServer().getPluginManager().getPlugin("BarAPI") != null
-                    && settings.getBoolean("Configuration.Messages.UseBarAPI")) {
-                for (Player p : invisiblePlayers) {
-                    String onVanish = messages.getString("Messages.OnVanish");
-                    BarAPI.setMessage(p, convertString(onVanish, p), 100f);
-                }
-            }
             // action bars
             if (getServer().getPluginManager().getPlugin("ProtocolLib") != null
                     && settings.getBoolean(
@@ -203,6 +154,8 @@ public class SuperVanish extends JavaPlugin {
                     actionBarMgr.addActionBar(p);
                 }
             }
+            // teams
+            teamMgr.onReload();
         } catch (Exception e) {
             printException(e);
         }
@@ -497,10 +450,6 @@ public class SuperVanish extends JavaPlugin {
 
     public VisibilityAdjuster getVisibilityAdjuster() {
         return visibilityAdjuster;
-    }
-
-    public TabMgr getTabMgr() {
-        return tabMgr;
     }
 
     public ProtocolLibPacketUtils getProtocolLibPacketUtils() {

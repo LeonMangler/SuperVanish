@@ -14,8 +14,7 @@ import de.myzelyam.supervanish.config.MessagesFile;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
-import de.myzelyam.supervanish.visibility.TabMgr.TabAction;
-import me.confuser.barapi.BarAPI;
+import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 import me.libraryaddict.disguise.DisguiseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -53,8 +52,6 @@ public class VisibilityAdjuster {
             // preparations
             MessagesFile messagesCfg = new MessagesFile();
             FileConfiguration messages = messagesCfg.getConfig();
-            String bossBar = messages
-                    .getString("Messages.BossBarVanishMessage");
             String vanishBroadcast = messages.getString("Messages.VanishMessage");
             String vanishBroadcastWithPermission = messages
                     .getString("Messages.VanishMessageWithPermission");
@@ -65,7 +62,7 @@ public class VisibilityAdjuster {
                         + p.getName() + ", he is already invisible!");
                 return;
             }
-            //call event
+            // call event
             PlayerHideEvent event = new PlayerHideEvent(p);
             @SuppressWarnings("deprecation")
             me.MyzelYam.SuperVanish.api.PlayerHideEvent deprecatedEvent =
@@ -98,12 +95,6 @@ public class VisibilityAdjuster {
                             ChatColor.RED + "[SV] Please undisguise yourself.");
                     return;
                 }
-            }
-            // BarAPI hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("BarAPI") != null
-                    && getSettings().getBoolean("Configuration.Messages.UseBarAPI")) {
-                BarAPI.setMessage(p, plugin.convertString(bossBar, p), 100f);
             }
             // Essentials hook
             if (plugin.getServer().getPluginManager()
@@ -163,32 +154,16 @@ public class VisibilityAdjuster {
                     }
                 }
             }
-            // adjust tablist
-            if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
-                plugin.getTabMgr().adjustTabName(p,
-                        TabAction.SET_CUSTOM_TAB_NAME);
-            }
             // send message
             p.sendMessage(plugin.convertString(onVanishMessage, p));
-            // ghost team
-            if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")
-                    && plugin.ghostTeam != null) {
-                //noinspection deprecation
-                if (!plugin.ghostTeam.hasPlayer(p)) {
-                    if (p.hasPermission("sv.use")
-                            || plugin.getAllInvisiblePlayers()
-                            .contains(p.getUniqueId().toString()))
-                        //noinspection deprecation
-                        plugin.ghostTeam.addPlayer(p);
-                }
-                // add invisibility potion
-                p.addPotionEffect(new PotionEffect(
-                        PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
-            }
             // add night vision potion
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
-                p.addPotionEffect(new PotionEffect(
-                        PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
+                if (plugin.packetNightVision)
+                    plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
+                            PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                else
+                    p.addPotionEffect(new PotionEffect(
+                            PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
             // hide player
             hider.hideToAll(p);
         } catch (Exception e) {
@@ -208,8 +183,6 @@ public class VisibilityAdjuster {
             // preparations
             MessagesFile messagesCfg = new MessagesFile();
             FileConfiguration messages = messagesCfg.getConfig();
-            String bossBar = messages
-                    .getString("Messages.BossBarReappearMessage");
             String reappearBroadcast = messages
                     .getString("Messages.ReappearMessage");
             String reappearBroadcastWithPermission = messages
@@ -231,25 +204,6 @@ public class VisibilityAdjuster {
             plugin.getServer().getPluginManager().callEvent(deprecatedEvent);
             if (event.isCancelled() || deprecatedEvent.isCancelled()) {
                 return;
-            }
-            // remove invisibility potion effect
-            if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")
-                    && p.hasPotionEffect(PotionEffectType.INVISIBILITY))
-                p.removePotionEffect(PotionEffectType.INVISIBILITY);
-            // BarAPI hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("BarAPI") != null
-                    && getSettings().getBoolean("Configuration.Messages.UseBarAPI")) {
-                BarAPI.setMessage(p, plugin.convertString(bossBar, p), 100f);
-                BarAPI.removeBar(p);
-                Bukkit.getServer().getScheduler()
-                        .scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                            @Override
-                            public void run() {
-                                BarAPI.removeBar(p);
-                            }
-                        }, 20);
             }
             // fly
             if (getSettings().getBoolean("Configuration.Players.Fly.DisableOnReappear")
@@ -308,11 +262,6 @@ public class VisibilityAdjuster {
                     }
                 }
             }
-            // adjust tablist
-            if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
-                plugin.getTabMgr().adjustTabName(p,
-                        TabAction.RESTORE_NORMAL_TAB_NAME);
-            }
             // chat message
             p.sendMessage(plugin.convertString(onReappearMessage, p));
             // adjust playerdata.yml file
@@ -322,7 +271,10 @@ public class VisibilityAdjuster {
             plugin.savePlayerData();
             // remove night vision
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
-                p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+                if (plugin.packetNightVision) {
+                    plugin.getProtocolLibPacketUtils().sendRemovePotionEffect(p, PotionEffectType.NIGHT_VISION);
+                } else
+                    p.removePotionEffect(PotionEffectType.NIGHT_VISION);
             // show player
             hider.showToAll(p);
         } catch (Exception e) {

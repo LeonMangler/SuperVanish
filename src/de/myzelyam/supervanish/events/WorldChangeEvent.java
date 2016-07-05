@@ -7,8 +7,7 @@
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.visibility.TabMgr.TabAction;
-import org.bukkit.Bukkit;
+import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,25 +23,13 @@ public class WorldChangeEvent implements Listener {
 
     private final SuperVanish plugin;
 
+    public WorldChangeEvent(SuperVanish plugin) {
+        this.plugin = plugin;
+    }
+
     private FileConfiguration getSettings() {
         return plugin.settings;
     }
-
-    public WorldChangeEvent(SuperVanish plugin) {
-        this.plugin = plugin;
-        // init compatibility delays
-        invisibilityDelay = getSettings()
-                .getInt("Configuration.CompatibilityOptions.ActionDelay.InvisibilityPotionDelayOnWorldChangeInTicks");
-        if (!getSettings().getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
-            invisibilityDelay = 0;
-        tabDelay = getSettings()
-                .getInt("Configuration.CompatibilityOptions.ActionDelay.TabNameChangeDelayOnWorldChangeInTicks");
-        if (!getSettings().getBoolean("Configuration.CompatibilityOptions.ActionDelay.Enable"))
-            tabDelay = 0;
-    }
-
-    private int invisibilityDelay;
-    private int tabDelay;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldChange(PlayerChangedWorldEvent e) {
@@ -58,50 +45,14 @@ public class WorldChangeEvent implements Listener {
             }
             // re-hide
             plugin.getVisibilityAdjuster().getHider().hideToAll(p);
-            // re-add invisibility
-            if (getSettings().getBoolean("Configuration.Players.EnableGhostPlayers")) {
-                boolean isInvisible = false;
-                for (PotionEffect potionEffect : p.getActivePotionEffects())
-                    if (potionEffect.getType() == PotionEffectType.INVISIBILITY) isInvisible = true;
-                if (!isInvisible) {
-                    if (invisibilityDelay > 0) {
-                        Bukkit.getServer().getScheduler()
-                                .scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        p.addPotionEffect(new PotionEffect(
-                                                PotionEffectType.INVISIBILITY,
-                                                Integer.MAX_VALUE, 1));
-                                    }
-                                }, invisibilityDelay);
-                    } else {
-                        p.addPotionEffect(new PotionEffect(
-                                PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
-                    }
-                }
-            }
             // re-add night vision (removed in teleport event)
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
-                p.addPotionEffect(new PotionEffect(
-                        PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
-            // re-adjust tablist name
-            if (getSettings().getBoolean("Configuration.Tablist.ChangeTabNames")) {
-                if (tabDelay > 0) {
-                    Bukkit.getServer().getScheduler()
-                            .scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    plugin.getTabMgr().adjustTabName(p,
-                                            TabAction.SET_CUSTOM_TAB_NAME);
-                                }
-                            }, tabDelay);
-                } else {
-                    plugin.getTabMgr().adjustTabName(p,
-                            TabAction.SET_CUSTOM_TAB_NAME);
-                }
-            }
+                if (plugin.packetNightVision)
+                    plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
+                            PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                else
+                    p.addPotionEffect(new PotionEffect(
+                            PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
         } catch (Exception er) {
             plugin.printException(er);
         }

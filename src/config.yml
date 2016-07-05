@@ -23,13 +23,9 @@ Configuration:
     ########################################
     # Should this plugin hide the 'normal' Join- and LeaveMessages of invisible players?
     HideNormalJoinAndLeaveMessagesWhileInvisible: true
-    # Should this plugin remember players who join the server invisible?
+    # Should this plugin remind players who join the server invisible?
     # You can change that message in the messages.yml file.
-    RememberInvisiblePlayersOnJoin: true
-    # Should this plugin use BarAPI to show invisible players awesome bossbars?
-    # Requires BarAPI.
-    # You can change the bars in the messages.yml file.
-    UseBarAPI: false
+    RemindInvisiblePlayersOnJoin: true
     # Should invisible players have action bars that tell them that they're invisible?
     # You can change the actionbar msg in the messages.yml file.
     DisplayActionBarsToInvisiblePlayers: true
@@ -39,10 +35,6 @@ Configuration:
   Players:
     # Should invisible players be able to pick up items?
     DisableItemPickUpsByDefault: true
-    # Should players with the permission 'sv.see' view invisible players as ghosts?
-    # This feature uses scoreboard teams and could break other plugins.
-    # Please disable this feature if it causes problems.
-    EnableGhostPlayers: false
     # Should invisible players have the night vision effect?
     AddNightVision: true
     # Should this plugin disable hunger of invisible players?
@@ -73,16 +65,23 @@ Configuration:
     ReappearOnQuit: false
     # Should SV still handle leave messages if 'ReappearOnQuit' is turned on?
     ReappearOnQuitHandleLeaveMsg: true
+    # Should invisible players not be able to push other players or be able to be pushed?
+    # Uses the scoreboard and may conflict with other plugins; Ignored in 1.8 or below
+    DisablePush: true
 ##################################################
 ################ TABLIST OPTIONS #################
 ##################################################
   Tablist:
-    # Should this plugin change the tabname of invisible players?
-    # Players without the permission 'sv.see' won't see this tabname.
-    # This feature changes the tabname of invisible players and could break other plugins.
-    # You can change the new tabname in the messages.yml file.
-    # Please note that tabnames can only have a length of 16 or less characters.
-    ChangeTabNames: true
+    # Should invisible players have a prefix in the tablist and on their nametag?
+    # (shows up for players with the permission 'sv.see' if it is enabled)
+    # You can use color codes here; please make sure that the prefix isn't longer than 16 characters
+    # Uses the scoreboard and may conflict with other plugins
+    TabPrefix: ""
+    # Should invisible players have a suffix in the tablist and on their nametag?
+    # (shows up for players with the permission 'sv.see' if it is enabled)
+    # You can use color codes here; please make sure that the suffix isn't longer than 16 characters
+    # Uses the scoreboard and may conflict with other plugins
+    TabSuffix: " &a[HIDDEN]"
 ##################################################
 ############## SERVERLIST OPTIONS ################
 ##################################################

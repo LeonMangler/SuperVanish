@@ -10,6 +10,7 @@ import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
+import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -116,7 +117,7 @@ public class SilentChestListeners_v3 implements Listener {
         p.setGameMode(GameMode.SPECTATOR);
         if (!stateInfo.hasSlowness && !stateInfo.isFlying)
             plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p,
-                    new PotionEffect(PotionEffectType.SLOW, 32767, 0));
+                    new PotionEffect(PotionEffectType.SLOW, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
 
         // don't let the gamemode change move the player down
         if (!stateInfo.isFlying)
