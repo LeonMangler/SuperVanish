@@ -17,13 +17,13 @@ public abstract class DynmapHook {
     public static SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
             .getPlugin("SuperVanish");
 
-    public static void adjustVisibility(Player p, boolean hide, FileConfiguration settings) {
+    public static void adjustVisibility(Player p, boolean show, FileConfiguration settings) {
         try {
             DynmapPlugin plugin = (DynmapPlugin) Bukkit.getPluginManager()
                     .getPlugin("dynmap");
-            plugin.setPlayerVisiblity(p.getName(), !hide);
-            if (settings.getBoolean("Configuration.Hooks.DynmapHook.ShowJoinQuitMessage")) {
-                plugin.postPlayerJoinQuitToWeb(p.getName(), p.getName(), !hide);
+            plugin.setPlayerVisiblity(p.getName(), show);
+            if (settings.getBoolean("Configuration.Messages.VanishReappearMessages.SendMessageOnlyToUsers")) {
+                plugin.postPlayerJoinQuitToWeb(p.getName(), p.getName(), show);
             }
         } catch (Exception e) {
             plugin.printException(e);
