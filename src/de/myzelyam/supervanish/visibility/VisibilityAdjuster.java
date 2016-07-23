@@ -111,7 +111,7 @@ public class VisibilityAdjuster {
             if (plugin.getServer().getPluginManager()
                     .getPlugin("dynmap") != null
                     && getSettings().getBoolean("Configuration.Hooks.EnableDynmapHook")) {
-                DynmapHook.adjustVisibility(p, true);
+                DynmapHook.adjustVisibility(p, true, getSettings());
             }
             // action bars
             if (plugin.getServer().getPluginManager()
@@ -223,7 +223,7 @@ public class VisibilityAdjuster {
             if (plugin.getServer().getPluginManager()
                     .getPlugin("dynmap") != null
                     && getSettings().getBoolean("Configuration.Hooks.EnableDynmapHook")) {
-                DynmapHook.adjustVisibility(p, false);
+                DynmapHook.adjustVisibility(p, false, getSettings());
             }
             // action bars
             if (plugin.getServer().getPluginManager()

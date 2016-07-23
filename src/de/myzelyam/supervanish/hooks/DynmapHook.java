@@ -22,7 +22,7 @@ public abstract class DynmapHook {
             DynmapPlugin plugin = (DynmapPlugin) Bukkit.getPluginManager()
                     .getPlugin("dynmap");
             plugin.setPlayerVisiblity(p.getName(), !hide);
-            if (settings.getBoolean("Configuration.Hooks.DynmapHook.showJoinQuitMessage")) {
+            if (settings.getBoolean("Configuration.Hooks.DynmapHook.ShowJoinQuitMessage")) {
                 plugin.postPlayerJoinQuitToWeb(p.getName(), p.getName(), !hide);
             }
         } catch (Exception e) {
