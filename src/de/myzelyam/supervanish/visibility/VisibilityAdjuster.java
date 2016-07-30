@@ -21,6 +21,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
@@ -126,6 +127,8 @@ public class VisibilityAdjuster {
             invisiblePlayers.add(p.getUniqueId().toString());
             plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
             plugin.savePlayerData();
+            // metadata
+            p.setMetadata("vanished", new FixedMetadataValue(plugin, true));
             // vanish broadcast
             if (getSettings().getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
@@ -269,6 +272,8 @@ public class VisibilityAdjuster {
             invisiblePlayers.remove(p.getUniqueId().toString());
             plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
             plugin.savePlayerData();
+            // metadata
+            p.removeMetadata("vanished", plugin);
             // remove night vision
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
                 if (plugin.packetNightVision) {

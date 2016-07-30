@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -61,11 +62,11 @@ public class JoinEvent implements EventExecutor, Listener {
                     }
                     // hide
                     plugin.getVisibilityAdjuster().getHider().hideToAll(p);
+                    // metadata
+                    p.setMetadata("vanished", new FixedMetadataValue(plugin, true));
                     // re-add action bar
-                    if (plugin.getServer().getPluginManager()
-                            .getPlugin("ProtocolLib") != null
-                            && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                            && plugin.isOneDotXOrHigher(8)) {
+                    if (plugin.getActionBarMgr() != null
+                            && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
                         plugin.getActionBarMgr().addActionBar(p);
                     }
                     // packet night vision

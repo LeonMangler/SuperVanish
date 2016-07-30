@@ -98,7 +98,7 @@ public class SuperVanish extends JavaPlugin {
                     .getPlugin("ProtocolLib") != null) {
                 protocolLibPacketUtils = new ProtocolLibPacketUtils(this);
                 packetNightVision = true;
-                if (!isOneDotX(7))
+                if (isOneDotXOrHigher(8))
                     actionBarMgr = new ActionBarMgr(this);
                 new ServerListPacketListener(this).registerListener();
                 if (settings.getBoolean("Configuration.Players.SilentOpenChest")

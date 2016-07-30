@@ -16,8 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Collection;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class WorldChangeEvent implements Listener {
 
@@ -35,8 +34,7 @@ public class WorldChangeEvent implements Listener {
     public void onWorldChange(PlayerChangedWorldEvent e) {
         try {
             final Player p = e.getPlayer();
-            Collection<Player> onlineInvisiblePlayers = plugin.getOnlineInvisiblePlayers();
-            if (!onlineInvisiblePlayers.contains(p))
+            if (!plugin.getOnlineInvisiblePlayers().contains(p))
                 return;
             // check auto-reappear-option
             if (getSettings().getBoolean("Configuration.Players.ReappearOnWorldChange")) {
@@ -47,10 +45,17 @@ public class WorldChangeEvent implements Listener {
             plugin.getVisibilityAdjuster().getHider().hideToAll(p);
             // re-add night vision (removed in teleport event)
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
-                if (plugin.packetNightVision)
+                if (plugin.packetNightVision) {
                     plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
                             PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
-                else
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
+                                    PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                        }
+                    }.runTaskLater(plugin, 1);
+                } else
                     p.addPotionEffect(new PotionEffect(
                             PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
         } catch (Exception er) {

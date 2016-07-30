@@ -93,6 +93,7 @@ public class TeamMgr implements Listener {
                 previousTeam.addEntry(p.getName());
             } catch (IllegalStateException ignored) {
             }
+        previousTeams.remove(p.getName());
         //
     }
 
