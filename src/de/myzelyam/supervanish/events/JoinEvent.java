@@ -42,8 +42,7 @@ public class JoinEvent implements EventExecutor, Listener {
                 final List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
                 // join message
                 if (getSettings().getBoolean(
-                        "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible",
-                        true)
+                        "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible", true)
                         && invisiblePlayers.contains(p.getUniqueId().toString())) {
                     e.setJoinMessage(null);
                 }

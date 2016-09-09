@@ -35,7 +35,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Team;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -57,8 +56,6 @@ public class SuperVanish extends JavaPlugin {
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;
-
-    public Team ghostTeam;
 
     public MessagesFile messagesFile;
     public FileConfiguration messages;
@@ -113,10 +110,10 @@ public class SuperVanish extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onDisable() {
         VanishAPI.setPlugin(null);
+        //noinspection deprecation
         SVAPI.setPlugin(null);
     }
 
@@ -218,7 +215,8 @@ public class SuperVanish extends JavaPlugin {
             } catch (Throwable throwable) {
                 if (throwable instanceof ThreadDeath || throwable instanceof VirtualMachineError) throw throwable;
                 getLogger().log(Level.WARNING, "[SuperVanish] Failed to hook into " + currentHook
-                        + ", please report this!");
+                        + ", please report this if you are using the latest version of that plugin: "
+                        + throwable.getMessage());
                 // just continue normally, don't let another plugin break SV!
             }
             // join event
@@ -269,7 +267,8 @@ public class SuperVanish extends JavaPlugin {
             logger.log(SEVERE, "[SuperVanish] if you report the issue.");
         } catch (Exception e2) {
             logger.log(SEVERE,
-                    "[SuperVanish] An exception occurred while trying to print a detailed stacktrace, printing an undetailed stacktrace of both exceptions:");
+                    "[SuperVanish] An exception occurred while trying to print a detailed stacktrace, "
+                            + "printing an undetailed stacktrace of both exceptions:");
             logger.log(SEVERE, "ORIGINAL EXCEPTION:");
             e.printStackTrace();
             logger.log(SEVERE, "SECOND EXCEPTION:");
@@ -293,7 +292,7 @@ public class SuperVanish extends JavaPlugin {
                     newestVersion, false);
             this.requiresCfgUpdate = requiresUpdate(currentCfgVersion,
                     newestVersion, true);
-            // check if same
+            // check if equal
             if (newestVersion.equals(currentCfgVersion))
                 this.requiresCfgUpdate = false;
             if (newestVersion.equals(currentMsgsVersion))

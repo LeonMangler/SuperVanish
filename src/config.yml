@@ -103,6 +103,7 @@ Configuration:
     # Important: You have to reload both Essentials and SuperVanish if you change this setting.
     EnableEssentialsHook: true
     # Should SV hide invisible players on your dynamic map and broadcast join/leave messages if you use Dynmap?
+    # You can change the default fake join/leave messages in the messages.yml file
     EnableDynmapHook: true
     # Should SV prevent players from being invisible and disguised at the same time? (LibsDisguises commands)
     # It's recommended to keep this turned on to prevent incompatibility.

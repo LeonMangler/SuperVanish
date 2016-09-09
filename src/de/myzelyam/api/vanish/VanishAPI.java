@@ -70,6 +70,7 @@ public class VanishAPI {
         for (int i = 1; i < 100; i++)
             if (viewer.hasPermission("sv.see.level" + i))
                 viewerLevel = i;
+        if (viewerLevel == 0) return false;
         for (int i = 0; i < 100; i++)
             if (viewed.hasPermission("sv.use.level" + i))
                 viewedLevel = i;

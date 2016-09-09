@@ -18,14 +18,16 @@ public abstract class DynmapHook {
 
     public static void adjustVisibility(Player p, boolean hide) {
         try {
-            DynmapPlugin plugin = (DynmapPlugin) Bukkit.getPluginManager()
+            DynmapPlugin dynmap = (DynmapPlugin) Bukkit.getPluginManager()
                     .getPlugin("dynmap");
             if (hide) {
-                plugin.setPlayerVisiblity(p.getName(), false);
-                plugin.sendBroadcastToWeb("", p.getName() + " quit");
+                dynmap.setPlayerVisiblity(p.getName(), false);
+                dynmap.sendBroadcastToWeb("",
+                        plugin.convertString(plugin.getMsg("DynmapFakeQuit"), p));
             } else {
-                plugin.setPlayerVisiblity(p.getName(), true);
-                plugin.sendBroadcastToWeb("", p.getName() + " joined");
+                dynmap.setPlayerVisiblity(p.getName(), true);
+                dynmap.sendBroadcastToWeb("",
+                        plugin.convertString(plugin.getMsg("DynmapFakeJoin"), p));
             }
         } catch (Exception e) {
             plugin.printException(e);

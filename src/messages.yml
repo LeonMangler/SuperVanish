@@ -38,4 +38,6 @@ Messages:
   UpdateWarningMessage: '&cWarning! Updating %updates resets %changes. Please use ''&e/sv updatecfg confirm&c'' to continue.'
   UpdatedConfigMessage: '&aSuccessfully updated %updates! Please check %changes.'
   NoConfigUpdateAvailableMessage: '&eYour SuperVanish-files are up to date!'
+  DynmapFakeJoin: '%d joined'
+  DynmapFakeQuit: '%d left'
 MessagesVersion: 5.8.3
