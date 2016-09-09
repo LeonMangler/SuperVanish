@@ -396,11 +396,13 @@ public class SuperVanish extends JavaPlugin {
         }
     }
 
-    public String getMsg(String msg) {
-        String rn = messages.getString("Messages." + msg);
-        if (rn == null)
-            rn = "SV: Unavailable message in messages.yml: " + msg;
-        return rn;
+    public String getMsg(String path) {
+        String message = messages.getString("Messages." + path);
+        if (message == null) {
+            // get default value if not present
+            message = messagesFile.getDefaultConfig().getString("Messages." + path);
+        }
+        return message;
     }
 
     public boolean isOneDotX(int majorRelease) {

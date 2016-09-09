@@ -17,7 +17,7 @@ import java.io.InputStreamReader;
 
 public class SettingsFile {
 
-    private final String configFile;
+    private final String fileName;
     private SuperVanish plugin = (SuperVanish) Bukkit.getPluginManager()
             .getPlugin("SuperVanish");
     private File config;
@@ -25,16 +25,16 @@ public class SettingsFile {
     private FileConfiguration fileConfiguration;
 
     public SettingsFile() {
-        this.configFile = "config.yml";
+        this.fileName = "config.yml";
         File dataFolder = plugin.getDataFolder();
         if (dataFolder == null)
             throw new IllegalStateException();
-        this.config = new File(plugin.getDataFolder(), configFile);
+        this.config = new File(dataFolder, fileName);
     }
 
     public void reloadConfig() {
         fileConfiguration = YamlConfiguration.loadConfiguration(config);
-        InputStream defConfigStream = plugin.getResource(configFile);
+        InputStream defConfigStream = plugin.getResource(fileName);
         if (defConfigStream != null) {
             YamlConfiguration defConfig = YamlConfiguration
                     .loadConfiguration(new InputStreamReader(defConfigStream));
@@ -51,7 +51,7 @@ public class SettingsFile {
 
     public void saveDefaultConfig() {
         if (!config.exists()) {
-            this.plugin.saveResource(configFile, false);
+            this.plugin.saveResource(fileName, false);
         }
     }
 }
