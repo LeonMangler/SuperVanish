@@ -7,6 +7,7 @@
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -37,7 +38,10 @@ public class QuitEvent implements EventExecutor, Listener {
                 FileConfiguration config = plugin.getConfig();
                 Collection<Player> onlineInvisiblePlayers = plugin.getOnlineInvisiblePlayers();
                 Player p = e.getPlayer();
-                // check auto-reappear option
+                if (onlineInvisiblePlayers.contains(p)) plugin.getTeamMgr().setNormal(p);
+                if (plugin.getTeamMgr().isOnlyPlayerWithScoreboard(p, p.getScoreboard())) {
+                    plugin.getTeamMgr().adjustLeavingScoreboard(p.getScoreboard());
+                }
                 if (getSettings().getBoolean("Configuration.Players.ReappearOnQuit")
                         && onlineInvisiblePlayers.contains(p)) {
                     plugin.getVisibilityAdjuster().showPlayer(p, true);
@@ -48,13 +52,11 @@ public class QuitEvent implements EventExecutor, Listener {
                     }
                     return;
                 }
-                // check remove-quit-msg option
                 if (config
                         .getBoolean("Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible")
                         && onlineInvisiblePlayers.contains(p)) {
                     e.setQuitMessage(null);
                 }
-                // remove action bar
                 if (plugin.getActionBarMgr() != null
                         && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
                     plugin.getActionBarMgr().removeActionBar(p);

@@ -6,15 +6,19 @@
 
 package de.myzelyam.supervanish.hooks;
 
-import com.enjin.core.Enjin;
 import com.google.common.base.Predicate;
+
+import com.enjin.core.Enjin;
+
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class EnjinMinecraftPluginHook {
 

@@ -15,7 +15,7 @@ import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
-import me.libraryaddict.disguise.DisguiseAPI;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -24,11 +24,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
-import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
 
 import java.util.List;
 import java.util.logging.Level;
+
+import me.libraryaddict.disguise.DisguiseAPI;
+import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
+import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
 
 public class VisibilityAdjuster {
 
@@ -50,7 +52,6 @@ public class VisibilityAdjuster {
             // check p
             if (p == null)
                 throw new IllegalArgumentException("The player cannot be null!");
-            // preparations
             MessagesFile messagesCfg = new MessagesFile();
             FileConfiguration messages = messagesCfg.getConfig();
             String vanishBroadcast = messages.getString("Messages.VanishMessage");
@@ -167,6 +168,8 @@ public class VisibilityAdjuster {
                 else
                     p.addPotionEffect(new PotionEffect(
                             PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
+            // teams
+            plugin.getTeamMgr().setVanished(p, null);
             // hide player
             hider.hideToAll(p);
         } catch (Exception e) {
@@ -280,6 +283,8 @@ public class VisibilityAdjuster {
                     plugin.getProtocolLibPacketUtils().sendRemovePotionEffect(p, PotionEffectType.NIGHT_VISION);
                 } else
                     p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            // teams
+            plugin.getTeamMgr().setNormal(p);
             // show player
             hider.showToAll(p);
         } catch (Exception e) {

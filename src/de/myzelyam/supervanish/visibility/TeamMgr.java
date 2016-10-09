@@ -1,129 +1,141 @@
-/*
- *  This Source Code Form is subject to the terms of the Mozilla Public
- *   License, v. 2.0. If a copy of the MPL was not distributed with this
- *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-
 package de.myzelyam.supervanish.visibility;
 
-import de.myzelyam.api.vanish.PlayerHideEvent;
-import de.myzelyam.api.vanish.PlayerShowEvent;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.utils.OneDotNineUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
-public class TeamMgr implements Listener {
+public class TeamMgr {
 
-    private final boolean enable, push;
-    private final String suffix, prefix;
+    private boolean enabled, noPushEnabled;
+    private String suffix, prefix;
     private SuperVanish plugin;
-    private Map<String, Team> previousTeams = new HashMap<>();
+    private Table<Scoreboard, UUID, Team> scoreboardUUIDPrevTeamTable = HashBasedTable.create();
 
     public TeamMgr(SuperVanish plugin) {
         this.plugin = plugin;
         prefix = plugin.settings.getString("Configuration.Tablist.TabPrefix", "");
+        prefix = prefix.length() > 16 ? prefix.substring(0, 16) : prefix;
         suffix = plugin.settings.getString("Configuration.Tablist.TabSuffix", "");
-        push = plugin.settings.getBoolean("Configuration.Players.DisablePush");
-        enable = !prefix.equals("") || !suffix.equals("") || push;
-        if (enable) {
-            plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        }
+        suffix = suffix.length() > 16 ? suffix.substring(0, 16) : suffix;
+        noPushEnabled = plugin.settings.getBoolean("Configuration.Players.DisablePush");
+        enabled = !prefix.equals("") || !suffix.equals("") || noPushEnabled;
     }
 
-    public void onReload() {
-        if (enable)
-            for (Player p : plugin.getOnlineInvisiblePlayers())
-                addToTeam(p);
-    }
-
-    public void addToTeam(Player p) {
-        if (!enable) return;
-        // never use main scoreboard
-        if (p.getScoreboard() == Bukkit.getScoreboardManager()
-                .getMainScoreboard())
-            p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-        // save previous team
-        Team previousTeam = p.getScoreboard().getEntryTeam(p.getName());
-        previousTeams.put(p.getName(), previousTeam);
-        //
-        Team team = p.getScoreboard().getTeam("Vanished");
-        if (team == null) {
-            team = p.getScoreboard().registerNewTeam("Vanished");
-        }
-        try {
-            if (suffix != null)
+    public void setVanished(Player p, Team prev) {
+        if (!enabled) return;
+        for (Scoreboard scoreboard : getAllScoreboards()) {
+            Team team = scoreboard.getTeam("Vanished");
+            if (team == null) {
+                team = scoreboard.registerNewTeam("Vanished");
                 team.setSuffix(
                         ChatColor.translateAlternateColorCodes('&', suffix));
-            if (prefix != null) {
                 team.setPrefix(
                         ChatColor.translateAlternateColorCodes('&', prefix));
+                if (plugin.isOneDotXOrHigher(9) && noPushEnabled) {
+                    team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+                }
             }
-        } catch (IllegalArgumentException e) {
-            Bukkit.getLogger().warning("[SuperVanish] Either the TabPrefix or TabSuffix is too long!");
+            Team previousTeam = prev != null ? prev : p.getScoreboard().getEntryTeam(p.getName());
+            if (previousTeam != null) {
+                scoreboardUUIDPrevTeamTable.put(scoreboard, p.getUniqueId(), previousTeam);
+                if (team.getEntries().size() < 2) {
+                    if (prefix.equals("")) team.setPrefix(previousTeam.getPrefix());
+                    if (suffix.equals("")) team.setSuffix(previousTeam.getSuffix());
+                }
+            }
+            team.addEntry(p.getName());
         }
-        if (push && plugin.isOneDotXOrHigher(9)) {
-            OneDotNineUtils.setNoPushForTeam(team);
-        }
-        team.addEntry(p.getName());
     }
 
-    public void removeFromTeam(Player p) {
-        if (!enable) return;
-        Team team = p.getScoreboard().getTeam("Vanished");
-        if (team == null)
-            return;
-        team.removeEntry(p.getName());
-        if (team.getEntries().isEmpty())
-            team.unregister();
-        // add back to previous team
-        Team previousTeam = previousTeams.get(p.getName());
-        if (previousTeam != null)
+    public void setNormal(Player p) {
+        if (!enabled) return;
+        for (Scoreboard scoreboard : getAllScoreboards()) {
+            Team team = scoreboard.getTeam("Vanished");
+            if (team == null)
+                continue;
+            team.removeEntry(p.getName());
+            if (!scoreboardUUIDPrevTeamTable.contains(scoreboard, p.getUniqueId()))
+                continue;
+            Team previousTeam = scoreboardUUIDPrevTeamTable.get(scoreboard, p.getUniqueId());
             try {
                 previousTeam.addEntry(p.getName());
             } catch (IllegalStateException ignored) {
             }
-        previousTeams.remove(p.getName());
-        //
+        }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onVanish(PlayerHideEvent e) {
-        final Player p = e.getPlayer();
-        new BukkitRunnable() {
+    private Set<Scoreboard> getAllScoreboards() {
+        Set<Scoreboard> scoreboards = new HashSet<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            scoreboards.add(p.getScoreboard());
+        }
+        return scoreboards;
+    }
 
-            @Override
-            public void run() {
-                addToTeam(p);
+    public boolean isOnlyPlayerWithScoreboard(Player p, Scoreboard scoreboard) {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.getScoreboard() == scoreboard && onlinePlayer != p) return false;
+        }
+        return true;
+    }
+
+    public void adjustLeavingScoreboard(Scoreboard scoreboard) {
+        if (!enabled) return;
+        Team team = scoreboard.getTeam("Vanished");
+        if (team == null)
+            return;
+        // remove currently online vanished players
+        for (Player vanished : plugin.getOnlineInvisiblePlayers()) {
+            team.removeEntry(vanished.getName());
+            Team previousTeam = scoreboardUUIDPrevTeamTable.get(scoreboard, vanished.getUniqueId());
+            if (previousTeam == null) continue;
+            try {
+                previousTeam.addEntry(vanished.getName());
+            } catch (IllegalStateException ignored) {
             }
-        }.runTaskLater(plugin, 1);
+        }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onReappear(PlayerShowEvent e) {
-        final Player p = e.getPlayer();
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                removeFromTeam(p);
+    public void adjustJoiningScoreboard(Scoreboard scoreboard) {
+        if (!enabled) return;
+        Team team = scoreboard.getTeam("Vanished");
+        if (team == null) {
+            team = scoreboard.registerNewTeam("Vanished");
+            team.setSuffix(
+                    ChatColor.translateAlternateColorCodes('&', suffix));
+            team.setPrefix(
+                    ChatColor.translateAlternateColorCodes('&', prefix));
+            if (plugin.isOneDotXOrHigher(9) && noPushEnabled) {
+                team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
             }
-        }.runTaskLater(plugin, 1);
+        }
+        // add currently online vanished players
+        for (Player vanished : plugin.getOnlineInvisiblePlayers()) {
+            Team previousTeam = scoreboardUUIDPrevTeamTable.contains(scoreboard, vanished.getUniqueId())
+                    ? scoreboardUUIDPrevTeamTable.get(scoreboard, vanished.getUniqueId()) : null;
+            if (previousTeam != null && team.getEntries().size() < 2) {
+                try {
+                    if (prefix.equals("")) team.setPrefix(previousTeam.getPrefix());
+                    if (suffix.equals("")) team.setSuffix(previousTeam.getSuffix());
+                } catch (IllegalStateException ignored) {
+                }
+            }
+            team.addEntry(vanished.getName());
+        }
     }
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        if (plugin.getOnlineInvisiblePlayers().contains(e.getPlayer()))
-            addToTeam(e.getPlayer());
+    public boolean isEnabled() {
+        return enabled;
     }
 }

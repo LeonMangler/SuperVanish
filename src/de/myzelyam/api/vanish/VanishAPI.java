@@ -67,11 +67,11 @@ public class VanishAPI {
         boolean enableSeePermission = getConfiguration().getBoolean("Configuration.Players.EnableSeePermission");
         if (!enableSeePermission) return false;
         int viewerLevel = viewer.hasPermission("sv.see") ? 1 : 0, viewedLevel = 1;
-        for (int i = 1; i < 100; i++)
+        for (int i = 1; i < 101; i++)
             if (viewer.hasPermission("sv.see.level" + i))
                 viewerLevel = i;
         if (viewerLevel == 0) return false;
-        for (int i = 0; i < 100; i++)
+        for (int i = 1; i < 101; i++)
             if (viewed.hasPermission("sv.use.level" + i))
                 viewedLevel = i;
         return viewerLevel >= viewedLevel;

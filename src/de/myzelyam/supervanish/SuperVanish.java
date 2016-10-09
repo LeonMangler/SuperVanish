@@ -8,6 +8,7 @@ package de.myzelyam.supervanish;
 
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
+
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.cmd.CommandMgr;
 import de.myzelyam.supervanish.config.MessagesFile;
@@ -16,10 +17,20 @@ import de.myzelyam.supervanish.events.GeneralEventListener;
 import de.myzelyam.supervanish.events.JoinEvent;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
-import de.myzelyam.supervanish.hooks.*;
+import de.myzelyam.supervanish.hooks.CitizensHook;
+import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
+import de.myzelyam.supervanish.hooks.EnjinMinecraftPluginHook;
+import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
+import de.myzelyam.supervanish.hooks.SuperTrailsHook;
+import de.myzelyam.supervanish.hooks.TrailGUIHook;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
-import de.myzelyam.supervanish.visibility.*;
-import me.MyzelYam.SuperVanish.api.SVAPI;
+import de.myzelyam.supervanish.visibility.ActionBarMgr;
+import de.myzelyam.supervanish.visibility.ForcedInvisibilityTask;
+import de.myzelyam.supervanish.visibility.ServerListPacketListener;
+import de.myzelyam.supervanish.visibility.SilentChestListeners_v3;
+import de.myzelyam.supervanish.visibility.TeamMgr;
+import de.myzelyam.supervanish.visibility.VisibilityAdjuster;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -35,24 +46,28 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.MyzelYam.SuperVanish.api.SVAPI;
+import ru.tehkode.permissions.PermissionUser;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.singletonList("5.8.2-5.8.3");
-    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Collections.singletonList("5.8.2-5.8.3");
+    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Arrays.asList
+            ("5.8.2-5.8.4", "5.8.3-5.8.4");
+    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Arrays.asList
+            ("5.8.2-5.8.4", "5.8.3-5.8.4");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;
@@ -97,7 +112,7 @@ public class SuperVanish extends JavaPlugin {
                 packetNightVision = true;
                 if (isOneDotXOrHigher(8))
                     actionBarMgr = new ActionBarMgr(this);
-                new ServerListPacketListener(this).registerListener();
+                new ServerListPacketListener(this).register();
                 if (settings.getBoolean("Configuration.Players.SilentOpenChest")
                         && isOneDotXOrHigher(8)) {
                     new SilentChestListeners_v3(this);
@@ -151,8 +166,6 @@ public class SuperVanish extends JavaPlugin {
                     actionBarMgr.addActionBar(p);
                 }
             }
-            // teams
-            teamMgr.onReload();
         } catch (Exception e) {
             printException(e);
         }
@@ -213,7 +226,8 @@ public class SuperVanish extends JavaPlugin {
                     new EnjinMinecraftPluginHook(this);
                 }
             } catch (Throwable throwable) {
-                if (throwable instanceof ThreadDeath || throwable instanceof VirtualMachineError) throw throwable;
+                if (throwable instanceof ThreadDeath || throwable instanceof VirtualMachineError)
+                    throw throwable;
                 getLogger().log(Level.WARNING, "[SuperVanish] Failed to hook into " + currentHook
                         + ", please report this if you are using the latest version of that plugin: "
                         + throwable.getMessage());
@@ -455,5 +469,9 @@ public class SuperVanish extends JavaPlugin {
 
     public ProtocolLibPacketUtils getProtocolLibPacketUtils() {
         return protocolLibPacketUtils;
+    }
+
+    public TeamMgr getTeamMgr() {
+        return teamMgr;
     }
 }

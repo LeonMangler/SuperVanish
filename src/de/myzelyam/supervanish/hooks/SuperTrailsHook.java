@@ -9,13 +9,17 @@ package de.myzelyam.supervanish.hooks;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.VanishAPI;
-import me.kvq.plugin.trails.API.SuperTrailsAPI;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
+
+import me.kvq.plugin.trails.API.SuperTrailsAPI;
 
 public class SuperTrailsHook implements Listener {
 
