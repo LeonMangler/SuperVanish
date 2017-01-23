@@ -67,7 +67,7 @@ Configuration:
     ReappearOnQuitHandleLeaveMsg: true
     # Should invisible players not be able to push other players or be able to be pushed?
     # !! Uses scoreboard teams and may conflict with other plugins !! (1.8+)
-    DisablePush: true
+    DisablePush: false
 ##################################################
 ################ TABLIST OPTIONS #################
 ##################################################

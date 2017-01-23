@@ -50,6 +50,6 @@ public class CmdVanish extends SubCommand {
         if (!(sender instanceof Player)) return false;
         Player p = (Player) sender;
         int level = PlayerCache.fromPlayer(p).getUsePermissionLevel();
-        return level > 0 && p.hasPermission("pv.use.level" + level);
+        return level > 0 && p.hasPermission("sv.use.level" + level);
     }
 }

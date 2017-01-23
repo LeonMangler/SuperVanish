@@ -130,6 +130,13 @@ public class VisibilityAdjuster {
             plugin.savePlayerData();
             // metadata
             p.setMetadata("vanished", new FixedMetadataValue(plugin, true));
+            // tab packet
+            if (plugin.getTablistPacketMgr() != null) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    if (!plugin.canSee(onlinePlayer, p) || p == onlinePlayer) continue;
+                    plugin.getTablistPacketMgr().sendGameModeChangePacket(onlinePlayer, p, true);
+                }
+            }
             // vanish broadcast
             if (getSettings().getBoolean(
                     "Configuration.Messages.VanishReappearMessages.BroadcastMessageOnVanish")) {
@@ -270,6 +277,13 @@ public class VisibilityAdjuster {
             }
             // chat message
             p.sendMessage(plugin.convertString(onReappearMessage, p));
+            // tab packet
+            if (plugin.getTablistPacketMgr() != null) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    if (!plugin.canSee(onlinePlayer, p) || p == onlinePlayer) continue;
+                    plugin.getTablistPacketMgr().sendGameModeChangePacket(onlinePlayer, p, false);
+                }
+            }
             // adjust playerdata.yml file
             List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
             invisiblePlayers.remove(p.getUniqueId().toString());

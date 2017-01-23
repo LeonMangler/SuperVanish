@@ -29,7 +29,7 @@ import de.myzelyam.supervanish.visibility.ActionBarMgr;
 import de.myzelyam.supervanish.visibility.ForcedInvisibilityTask;
 import de.myzelyam.supervanish.visibility.ServerListPacketListener;
 import de.myzelyam.supervanish.visibility.SilentChestListeners_v3;
-import de.myzelyam.supervanish.visibility.TablistPacketListener;
+import de.myzelyam.supervanish.visibility.TablistPacketMgr;
 import de.myzelyam.supervanish.visibility.TeamMgr;
 import de.myzelyam.supervanish.visibility.VisibilityAdjuster;
 
@@ -88,6 +88,7 @@ public class SuperVanish extends JavaPlugin {
     private ActionBarMgr actionBarMgr;
     private TeamMgr teamMgr;
     private ProtocolLibPacketUtils protocolLibPacketUtils;
+    private TablistPacketMgr tablistPacketMgr;
 
     @Override
     public void onEnable() {
@@ -114,7 +115,8 @@ public class SuperVanish extends JavaPlugin {
                 new ServerListPacketListener(this).register();
                 if (settings.getBoolean("Configuration.Tablist.MarkVanishedPlayersAsSpectators")
                         && isOneDotXOrHigher(8)) {
-                    new TablistPacketListener(this).register();
+                    tablistPacketMgr = new TablistPacketMgr(this);
+                    tablistPacketMgr.registerListener();
                 }
             }
 
@@ -493,5 +495,9 @@ public class SuperVanish extends JavaPlugin {
 
     public TeamMgr getTeamMgr() {
         return teamMgr;
+    }
+
+    public TablistPacketMgr getTablistPacketMgr() {
+        return tablistPacketMgr;
     }
 }

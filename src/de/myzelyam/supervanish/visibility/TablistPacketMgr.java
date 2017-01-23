@@ -10,33 +10,45 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.NativeGameMode;
+import com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
 
 import de.myzelyam.supervanish.SuperVanish;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class TablistPacketListener extends PacketAdapter {
+import static com.comphenix.protocol.PacketType.Play.Server.PLAYER_INFO;
+
+public class TablistPacketMgr extends PacketAdapter {
 
     private final SuperVanish plugin;
 
     private final FileConfiguration settings;
 
-    public TablistPacketListener(SuperVanish plugin) {
+    private boolean dontHandle = false;
+
+    public TablistPacketMgr(SuperVanish plugin) {
         //noinspection deprecation
         super(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO);
         this.plugin = plugin;
         settings = plugin.settings;
     }
 
-    public void register() {
+    public void registerListener() {
         if (!settings.getBoolean("Configuration.Tablist.MarkVanishedPlayersAsSpectators")) return;
         ProtocolLibrary.getProtocolManager().addPacketListener(this);
     }
@@ -44,6 +56,7 @@ public class TablistPacketListener extends PacketAdapter {
     @Override
     public void onPacketSending(PacketEvent event) {
         try {
+            if (dontHandle) return;
             List<PlayerInfoData> data = new ArrayList<>(
                     event.getPacket().getPlayerInfoDataLists().read(0));
             int originalSize = data.size();
@@ -75,5 +88,45 @@ public class TablistPacketListener extends PacketAdapter {
         } catch (Exception ex) {
             this.plugin.printException(ex);
         }
+    }
+
+    public void sendGameModeChangePacket(Player receiver, Player change, boolean markAsHidden) {
+        if (!settings.getBoolean("Configuration.Tablist.MarkVanishedPlayersAsSpectators")) return;
+        dontHandle = true;
+        PacketContainer packet = new PacketContainer(PLAYER_INFO);
+        // action
+        packet.getPlayerInfoAction().write(0, PlayerInfoAction.UPDATE_GAME_MODE);
+        List<PlayerInfoData> data = new ArrayList<>();
+        int ping = getPing(receiver);
+        GameMode gameMode = markAsHidden ? GameMode.SPECTATOR : change.getGameMode();
+        data.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(change), ping,
+                NativeGameMode.fromBukkit(gameMode),
+                WrappedChatComponent.fromText(change.getPlayerListName())));
+        // data
+        packet.getPlayerInfoDataLists().write(0, data);
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(receiver, packet);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Cannot send packet", e);
+        }
+        dontHandle = false;
+    }
+
+    private int getPing(Player p) {
+        try {
+            Class<?> craftPlayer = Class.forName("org.bukkit.craftbukkit."
+                    + getServerVersion() + ".entity.CraftPlayer");
+            Method getHandle = craftPlayer.getMethod("getHandle");
+            Object entityPlayer = getHandle.invoke(p);
+            return (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
+        } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException
+                | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    private String getServerVersion() {
+        return Bukkit.getServer().getClass().getPackage().getName().substring(23);
     }
 }
