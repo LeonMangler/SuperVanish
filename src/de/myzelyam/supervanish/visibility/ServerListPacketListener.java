@@ -32,15 +32,13 @@ public class ServerListPacketListener extends PacketAdapter {
 
     public ServerListPacketListener(SuperVanish plugin) {
         //noinspection deprecation
-        super(plugin, ListenerPriority.NORMAL,
-                PacketType.Status.Server.OUT_SERVER_INFO);
+        super(plugin, ListenerPriority.NORMAL, PacketType.Status.Server.OUT_SERVER_INFO);
         this.plugin = plugin;
         settings = plugin.settings;
     }
 
     public void register() {
-        if ((!settings
-                .getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers"))
+        if ((!settings.getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers"))
                 && (!settings.getBoolean("Configuration.Serverlist.AdjustListOfLoggedInPlayers")))
             return;
         ProtocolLibrary.getProtocolManager().addPacketListener(this);
@@ -51,8 +49,7 @@ public class ServerListPacketListener extends PacketAdapter {
         try {
             WrappedServerPing serverPing = e.getPacket()
                     .getServerPings().read(0);
-            Collection<Player> invisiblePlayers = ServerListPacketListener.this.
-                    plugin.getOnlineInvisiblePlayers();
+            Collection<Player> invisiblePlayers = this.plugin.getOnlineInvisiblePlayers();
             int invisiblePlayersCount = invisiblePlayers.size();
             int onlinePlayersCount = Bukkit.getOnlinePlayers().size();
             if (settings.getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers")) {
@@ -69,7 +66,7 @@ public class ServerListPacketListener extends PacketAdapter {
                 serverPing.setPlayers(wrappedGameProfiles);
             }
         } catch (Exception ex) {
-            ServerListPacketListener.this.plugin.printException(ex);
+            plugin.printException(ex);
         }
     }
 }

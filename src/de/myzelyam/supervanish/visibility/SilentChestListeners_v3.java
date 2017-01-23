@@ -11,6 +11,7 @@ import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -23,7 +24,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -64,7 +69,8 @@ public class SilentChestListeners_v3 implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onTeleport(PlayerTeleportEvent e) {
         Player p = e.getPlayer();
-        if (playerStateInfoMap.containsKey(p) && e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
+        if (playerStateInfoMap.containsKey(p)
+                && e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
             e.setCancelled(true);
         }
     }
@@ -117,7 +123,8 @@ public class SilentChestListeners_v3 implements Listener {
         p.setGameMode(GameMode.SPECTATOR);
         if (!stateInfo.hasSlowness && !stateInfo.isFlying)
             plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p,
-                    new PotionEffect(PotionEffectType.SLOW, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                    new PotionEffect(PotionEffectType.SLOW,
+                            ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
 
         // don't let the gamemode change move the player down
         if (!stateInfo.isFlying)
@@ -142,7 +149,8 @@ public class SilentChestListeners_v3 implements Listener {
                 playerStateInfoMap.remove(p);
                 // don't let the player glitch into the block below by sneaking
                 if (p.isSneaking())
-                    p.teleport(p.getLocation().add(0, 0.3, 0), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    p.teleport(p.getLocation().add(0, 0.3, 0),
+                            PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
         }.runTaskLater(plugin, 1);
     }

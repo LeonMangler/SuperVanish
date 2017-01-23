@@ -7,6 +7,7 @@
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.PlayerCache;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -38,16 +39,13 @@ public class QuitEvent implements EventExecutor, Listener {
                 FileConfiguration config = plugin.getConfig();
                 Collection<Player> onlineInvisiblePlayers = plugin.getOnlineInvisiblePlayers();
                 Player p = e.getPlayer();
-                if (onlineInvisiblePlayers.contains(p)) plugin.getTeamMgr().setNormal(p);
-                if (plugin.getTeamMgr().isOnlyPlayerWithScoreboard(p, p.getScoreboard())) {
-                    plugin.getTeamMgr().adjustLeavingScoreboard(p.getScoreboard());
-                }
+                if (onlineInvisiblePlayers.contains(p)) plugin.getTeamMgr().setCanPush(p);
                 if (getSettings().getBoolean("Configuration.Players.ReappearOnQuit")
                         && onlineInvisiblePlayers.contains(p)) {
                     plugin.getVisibilityAdjuster().showPlayer(p, true);
                     if (getSettings().getBoolean("Configuration.Players.ReappearOnQuitHandleLeaveMsg")
-                            && config
-                            .getBoolean("Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible")) {
+                            && config.getBoolean(
+                            "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible")) {
                         e.setQuitMessage(null);
                     }
                     return;
@@ -57,10 +55,11 @@ public class QuitEvent implements EventExecutor, Listener {
                         && onlineInvisiblePlayers.contains(p)) {
                     e.setQuitMessage(null);
                 }
-                if (plugin.getActionBarMgr() != null
-                        && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+                if (plugin.getActionBarMgr() != null && getSettings().getBoolean(
+                        "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
                     plugin.getActionBarMgr().removeActionBar(p);
                 }
+                PlayerCache.getPlayerCacheMap().remove(p);
             }
         } catch (Exception er) {
             plugin.printException(er);

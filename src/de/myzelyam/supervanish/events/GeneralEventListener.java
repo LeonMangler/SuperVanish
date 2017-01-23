@@ -9,6 +9,7 @@ package de.myzelyam.supervanish.events;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -68,10 +69,11 @@ public class GeneralEventListener implements Listener {
     public void onFoodLevelChangeEvent(FoodLevelChangeEvent e) {
         try {
             if (e.getEntity() instanceof Player
-                    && !getSettings().getBoolean("Configuration.Players.DisableHungerForInvisiblePlayers")) {
+                    && !getSettings().getBoolean(
+                    "Configuration.Players.DisableHungerForInvisiblePlayers")) {
                 Player p = (Player) e.getEntity();
                 Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
-                if (invisiblePlayers.contains(p))
+                if (invisiblePlayers.contains(p) && e.getFoodLevel() <= p.getFoodLevel())
                     e.setCancelled(true);
             }
         } catch (Exception er) {
@@ -114,8 +116,8 @@ public class GeneralEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent e) {
         try {
-            Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
-            if (!getSettings().getBoolean("Configuration.Players.DisablePressurePlatesForInvisiblePlayers")) {
+            if (!getSettings().getBoolean(
+                    "Configuration.Players.DisablePressurePlatesForInvisiblePlayers")) {
                 return;
             }
             if (e.getAction().equals(Action.PHYSICAL)) {
@@ -124,7 +126,7 @@ public class GeneralEventListener implements Listener {
                         || e.getClickedBlock().getType() == Material.TRIPWIRE ||
                         (!plugin.isOneDotX(7) &&
                                 OneDotEightUtils.isPressurePlate(e.getClickedBlock().getType()))) {
-                    if (invisiblePlayers.contains(e.getPlayer()))
+                    if (plugin.getAllInvisiblePlayers().contains(e.getPlayer().getUniqueId().toString()))
                         e.setCancelled(true);
                 }
             }
@@ -236,8 +238,7 @@ public class GeneralEventListener implements Listener {
                     if (invisiblePlayers.contains(damaged)) {
                         Vector velocity = arrow.getVelocity();
                         damaged.teleport(damaged.getLocation().add(0, 2, 0));
-                        Arrow nextArrow = arrow.getShooter().launchProjectile(
-                                Arrow.class);
+                        Arrow nextArrow = arrow.getShooter().launchProjectile(Arrow.class);
                         nextArrow.setVelocity(velocity);
                         nextArrow.setBounce(false);
                         nextArrow.setShooter(arrow.getShooter());

@@ -7,6 +7,8 @@
 package de.myzelyam.supervanish.cmd;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.PlayerCache;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,7 +18,7 @@ public class CmdVanish extends SubCommand {
 
     public CmdVanish(SuperVanish plugin, CommandSender sender, String[] args, String label) {
         super(plugin);
-        if (canDo(sender, CommandAction.VANISH_SELF)) {
+        if (hasLayeredAccess(sender) || canDo(sender, CommandAction.VANISH_SELF)) {
             Player p = (Player) sender;
             Collection<Player> onlineInvisiblePlayers = getOnlineInvisiblePlayers();
             if (args.length == 0) {
@@ -42,5 +44,12 @@ public class CmdVanish extends SubCommand {
                 }
             }
         }
+    }
+
+    private boolean hasLayeredAccess(CommandSender sender) {
+        if (!(sender instanceof Player)) return false;
+        Player p = (Player) sender;
+        int level = PlayerCache.fromPlayer(p).getUsePermissionLevel();
+        return level > 0 && p.hasPermission("pv.use.level" + level);
     }
 }

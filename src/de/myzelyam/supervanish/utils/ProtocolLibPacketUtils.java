@@ -78,7 +78,7 @@ public class ProtocolLibPacketUtils {
             @SuppressWarnings("deprecation")
             int effectID = type.getId();
             packet.getIntegers().write(0, entityID);
-            packet.getBytes().write(1, (byte) effectID);
+            packet.getBytes().write(0, (byte) effectID);
         } else if (plugin.isOneDotX(8)) {
             // 1.8
             @SuppressWarnings("deprecation")

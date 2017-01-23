@@ -169,7 +169,7 @@ public class VisibilityAdjuster {
                     p.addPotionEffect(new PotionEffect(
                             PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
             // teams
-            plugin.getTeamMgr().setVanished(p, null);
+            plugin.getTeamMgr().setCantPush(p);
             // hide player
             hider.hideToAll(p);
         } catch (Exception e) {
@@ -280,11 +280,12 @@ public class VisibilityAdjuster {
             // remove night vision
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
                 if (plugin.packetNightVision) {
-                    plugin.getProtocolLibPacketUtils().sendRemovePotionEffect(p, PotionEffectType.NIGHT_VISION);
+                    plugin.getProtocolLibPacketUtils().sendRemovePotionEffect(p,
+                            PotionEffectType.NIGHT_VISION);
                 } else
                     p.removePotionEffect(PotionEffectType.NIGHT_VISION);
             // teams
-            plugin.getTeamMgr().setNormal(p);
+            plugin.getTeamMgr().setCanPush(p);
             // show player
             hider.showToAll(p);
         } catch (Exception e) {

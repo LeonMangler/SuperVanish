@@ -23,11 +23,13 @@ import de.myzelyam.supervanish.hooks.EnjinMinecraftPluginHook;
 import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 import de.myzelyam.supervanish.hooks.SuperTrailsHook;
 import de.myzelyam.supervanish.hooks.TrailGUIHook;
+import de.myzelyam.supervanish.utils.PlayerCache;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 import de.myzelyam.supervanish.visibility.ActionBarMgr;
 import de.myzelyam.supervanish.visibility.ForcedInvisibilityTask;
 import de.myzelyam.supervanish.visibility.ServerListPacketListener;
 import de.myzelyam.supervanish.visibility.SilentChestListeners_v3;
+import de.myzelyam.supervanish.visibility.TablistPacketListener;
 import de.myzelyam.supervanish.visibility.TeamMgr;
 import de.myzelyam.supervanish.visibility.VisibilityAdjuster;
 
@@ -51,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -64,10 +67,9 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Arrays.asList
-            ("5.8.2-5.8.4", "5.8.3-5.8.4");
+    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.emptyList();
     private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Arrays.asList
-            ("5.8.2-5.8.4", "5.8.3-5.8.4");
+            ("5.8.2-5.9.0", "5.8.3-5.9.0", "5.8.4-5.9.0");
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;
@@ -87,37 +89,35 @@ public class SuperVanish extends JavaPlugin {
     private TeamMgr teamMgr;
     private ProtocolLibPacketUtils protocolLibPacketUtils;
 
-
-    public void savePlayerData() {
-        try {
-            playerData.save(playerDataFile);
-        } catch (IOException e) {
-            printException(e);
-        }
-    }
-
     @Override
     public void onEnable() {
         try {
-            prepareConfig();
-            registerEvents();
-            visibilityAdjuster = new VisibilityAdjuster(this);
             VanishAPI.setPlugin(this);
             //noinspection deprecation
             SVAPI.setPlugin(this);
-            teamMgr = new TeamMgr(this);
-            if (getServer().getPluginManager()
-                    .getPlugin("ProtocolLib") != null) {
+
+            prepareConfig();
+            registerEvents();
+            visibilityAdjuster = new VisibilityAdjuster(this);
+            if (isOneDotXOrHigher(8))
+                teamMgr = new TeamMgr(this);
+            if (settings.getBoolean("Configuration.Players.SilentOpenChest")
+                    && isOneDotXOrHigher(8)) {
+                new SilentChestListeners_v3(this);
+            }
+
+            if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
                 protocolLibPacketUtils = new ProtocolLibPacketUtils(this);
                 packetNightVision = true;
                 if (isOneDotXOrHigher(8))
                     actionBarMgr = new ActionBarMgr(this);
                 new ServerListPacketListener(this).register();
-                if (settings.getBoolean("Configuration.Players.SilentOpenChest")
+                if (settings.getBoolean("Configuration.Tablist.MarkVanishedPlayersAsSpectators")
                         && isOneDotXOrHigher(8)) {
-                    new SilentChestListeners_v3(this);
+                    new TablistPacketListener(this).register();
                 }
             }
+
             new ForcedInvisibilityTask(this).start();
             checkForReload();
         } catch (Exception e) {
@@ -130,6 +130,7 @@ public class SuperVanish extends JavaPlugin {
         VanishAPI.setPlugin(null);
         //noinspection deprecation
         SVAPI.setPlugin(null);
+        PlayerCache.getPlayerCacheMap().clear();
     }
 
     private void prepareConfig() {
@@ -147,9 +148,17 @@ public class SuperVanish extends JavaPlugin {
                     + " - Player data");
             playerData.options().copyHeader(true);
             savePlayerData();
-            // check for updates
+            // check for config updates
             checkConfig();
         } catch (Exception e) {
+            printException(e);
+        }
+    }
+
+    public void savePlayerData() {
+        try {
+            playerData.save(playerDataFile);
+        } catch (IOException e) {
             printException(e);
         }
     }
@@ -306,7 +315,6 @@ public class SuperVanish extends JavaPlugin {
                     newestVersion, false);
             this.requiresCfgUpdate = requiresUpdate(currentCfgVersion,
                     newestVersion, true);
-            // check if equal
             if (newestVersion.equals(currentCfgVersion))
                 this.requiresCfgUpdate = false;
             if (newestVersion.equals(currentMsgsVersion))
@@ -408,6 +416,18 @@ public class SuperVanish extends JavaPlugin {
             printException(e);
             return "SV-Error occurred; more information in console";
         }
+    }
+
+    public boolean canSee(Player viewer, Player viewed) {
+        if (viewer == null) throw new IllegalArgumentException("viewer cannot be null");
+        if (!playerData.getStringList("InvisiblePlayers").contains(viewed.getUniqueId().toString()))
+            return true;
+        boolean enableSeePermission = getConfig().getBoolean("Configuration.Players.EnableSeePermission");
+        if (!enableSeePermission) return false;
+        int viewerLevel = PlayerCache.fromPlayer(viewer).getSeePermissionLevel();
+        if (viewerLevel == 0) return false;
+        int viewedLevel = PlayerCache.fromPlayer(viewed).getUsePermissionLevel();
+        return viewerLevel >= viewedLevel;
     }
 
     public String getMsg(String path) {

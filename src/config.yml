@@ -1,4 +1,4 @@
-# SuperVanish v5.8.4 - Configuration
+# SuperVanish v5.9.0 - Configuration
 #
 Configuration:
 ##################################################
@@ -16,12 +16,12 @@ Configuration:
       # Should players with the permission 'sv.see' get an other message when a player vanishs/reappears?
       # You can change that message in the messages.yml file.
       SendDifferentMessages: true
-      # Should only players with the permission 'sv.see' receive 'fake' Join-/LeaveMessages?
+      # Should only players with the permission 'sv.see' receive 'fake' join/leave messages?
       SendMessageOnlyToAdmins: false
-      # Should only players without the permission 'sv.see' receive 'fake' Join-/LeaveMessages?
+      # Should only players without the permission 'sv.see' receive 'fake' join/leave messages?
       SendMessageOnlyToUsers: false
     ########################################
-    # Should this plugin hide the 'normal' Join- and LeaveMessages of invisible players?
+    # Should this plugin hide the 'normal' join/leave messages of invisible players?
     HideNormalJoinAndLeaveMessagesWhileInvisible: true
     # Should this plugin remind players who join the server invisible?
     # You can change that message in the messages.yml file.
@@ -66,22 +66,16 @@ Configuration:
     # Should SV still handle leave messages if 'ReappearOnQuit' is turned on?
     ReappearOnQuitHandleLeaveMsg: true
     # Should invisible players not be able to push other players or be able to be pushed?
-    # !! Uses scoreboard teams and may conflict with other plugins !!
-    DisablePush: false
+    # !! Uses scoreboard teams and may conflict with other plugins !! (1.8+)
+    DisablePush: true
 ##################################################
 ################ TABLIST OPTIONS #################
 ##################################################
   Tablist:
-    # Should invisible players have a prefix in the tablist and on their nametag?
-    # (shows up for players with the permission 'sv.see' if it is enabled)
-    # You can use color codes here; please make sure that the prefix isn't longer than 16 characters
-    # Uses the scoreboard and may conflict with other plugins
-    TabPrefix: ""
-    # Should invisible players have a suffix in the tablist and on their nametag?
-    # (shows up for players with the permission 'sv.see' if it is enabled)
-    # You can use color codes here; please make sure that the suffix isn't longer than 16 characters
-    # Uses the scoreboard and may conflict with other plugins
-    TabSuffix: " &a[VANISH]"
+    # Should vanished players show up dark gray in the tablist and should only their head be visible?
+    # Only players who are allowed to see the player will see this effect; this helps other staff with
+    # differentiating them from players they should talk to (1.8+)
+    MarkVanishedPlayersAsSpectators: true
 ##################################################
 ############## SERVERLIST OPTIONS ################
 ##################################################
@@ -123,12 +117,12 @@ Configuration:
 ############# COMPATIBILITY OPTIONS ##############
 ##################################################
   CompatibilityOptions:
-    # The event priority which supervanish should use for the specific event.
-    # If another plugin overrides supervanish's join/leave settings, setting the priorities to MONITOR can help.
+    # The event priority which SV should use for the specific event.
+    # If another plugin overrides SV's join/leave settings, setting the priorities to MONITOR can help.
     # Allowed values: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
     PlayerJoinEventPriority: HIGH # <- Set this to "HIGH" if you use Essentials to modify join messages
     PlayerQuitEventPriority: HIGHEST
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.8.4
+ConfigVersion: 5.9.0

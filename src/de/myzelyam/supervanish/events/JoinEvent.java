@@ -8,6 +8,7 @@ package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
+import de.myzelyam.supervanish.utils.PlayerCache;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -40,6 +41,7 @@ public class JoinEvent implements EventExecutor, Listener {
             if (event instanceof PlayerJoinEvent) {
                 PlayerJoinEvent e = (PlayerJoinEvent) event;
                 final Player p = e.getPlayer();
+                PlayerCache.fromPlayer(p);
                 final List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
                 if (getSettings().getBoolean(
                         "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible", true)
@@ -60,13 +62,16 @@ public class JoinEvent implements EventExecutor, Listener {
                     plugin.getVisibilityAdjuster().getHider().hideToAll(p);
                     p.setMetadata("vanished", new FixedMetadataValue(plugin, true));
                     if (plugin.getActionBarMgr() != null
-                            && getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+                            && getSettings().getBoolean(
+                            "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
                         plugin.getActionBarMgr().addActionBar(p);
                     }
-                    if (plugin.packetNightVision && getSettings().getBoolean("Configuration.Players.AddNightVision"))
+                    if (plugin.packetNightVision && getSettings().getBoolean(
+                            "Configuration.Players.AddNightVision"))
                         plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
-                                PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
-                    plugin.getTeamMgr().setVanished(p, null);
+                                PotionEffectType.NIGHT_VISION,
+                                ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                    plugin.getTeamMgr().setCantPush(p);
 
                 }
                 // not necessarily vanished:
