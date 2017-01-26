@@ -124,7 +124,7 @@ public class SilentChestListeners_v3 implements Listener {
         if (!stateInfo.hasSlowness && !stateInfo.isFlying)
             plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p,
                     new PotionEffect(PotionEffectType.SLOW,
-                            ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                            ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
 
         // don't let the gamemode change move the player down
         if (!stateInfo.isFlying)

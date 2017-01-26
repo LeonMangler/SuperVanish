@@ -6,16 +6,19 @@
 
 package de.myzelyam.supervanish.visibility;
 
+import com.google.common.collect.ImmutableList;
+
 import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ActionBarMgr {
 
-    private List<Player> actionBars = new LinkedList<>();
+    private final List<Player> actionBars = new ArrayList<>();
 
     public ActionBarMgr(SuperVanish plugin) {
         startTimerTask(plugin);
@@ -26,19 +29,17 @@ public class ActionBarMgr {
 
             @Override
             public void run() {
+                List<Player> actionBars = ImmutableList.copyOf(ActionBarMgr.this.actionBars);
                 for (Player player : actionBars) {
                     plugin.getProtocolLibPacketUtils().sendActionBar(
-                            player,
-                            plugin.convertString(
-                                    plugin.getMsg("ActionBarMessage"), player));
+                            player, plugin.convertString(plugin.getMsg("ActionBarMessage"), player));
                 }
             }
-        }.runTaskTimer(plugin, 0, 2 * 20);
+        }.runTaskTimerAsynchronously(plugin, 0, 2 * 20);
     }
 
     public void addActionBar(Player p) {
-        if (!actionBars.contains(p))
-            actionBars.add(p);
+        actionBars.add(p);
     }
 
     public void removeActionBar(Player p) {

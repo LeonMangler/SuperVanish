@@ -171,7 +171,7 @@ public class VisibilityAdjuster {
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
                 if (plugin.packetNightVision)
                     plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
-                            PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                            PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
                 else
                     p.addPotionEffect(new PotionEffect(
                             PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));

@@ -64,13 +64,20 @@ public class TablistPacketMgr extends PacketAdapter {
             Collection<Player> vanishedPlayers = this.plugin.getOnlineInvisiblePlayers();
             for (PlayerInfoData infoData : new ArrayList<>(data)) {
                 for (Player vanishedTabPlayer : vanishedPlayers) {
-                    // is infoData player a vanished player?
                     if (infoData.getProfile().getUUID().toString()
                             .equals(vanishedTabPlayer.getUniqueId().toString())) {
-                        // vanishedTabPlayer = the player who's shown in the data
-                        if (receiver.canSee(vanishedTabPlayer) && !receiver.getUniqueId().equals
-                                (vanishedTabPlayer.getUniqueId())) {
-                            // receiver IS allowed to see vanishedTabPlayer: show in tab as vanished
+                        // if default has changed because of previous modifications of the list then simply
+                        // override it using the actual gamemode
+                        if (receiver.getUniqueId().toString().equals
+                                (vanishedTabPlayer.getUniqueId().toString())) {
+                            PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(), infoData
+                                    .getLatency(), NativeGameMode.fromBukkit(vanishedTabPlayer.getGameMode()),
+                                    infoData.getDisplayName());
+                            data.remove(infoData);
+                            data.add(newData);
+                            continue;
+                        }
+                        if (receiver.canSee(vanishedTabPlayer)) {
                             if (infoData.getGameMode() == NativeGameMode.CREATIVE
                                     || infoData.getGameMode() == NativeGameMode.SURVIVAL
                                     || infoData.getGameMode() == NativeGameMode.ADVENTURE) {
@@ -83,8 +90,8 @@ public class TablistPacketMgr extends PacketAdapter {
                         break;
                     }
                 }
-                event.getPacket().getPlayerInfoDataLists().write(0, data);
             }
+            event.getPacket().getPlayerInfoDataLists().write(0, data);
         } catch (Exception ex) {
             this.plugin.printException(ex);
         }

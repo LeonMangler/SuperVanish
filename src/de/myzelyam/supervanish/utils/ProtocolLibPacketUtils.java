@@ -10,7 +10,9 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+
 import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -18,12 +20,11 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_EFFECT;
-import static com.comphenix.protocol.PacketType.Play.Server.REMOVE_ENTITY_EFFECT;
+import static com.comphenix.protocol.PacketType.Play.Server.*;
 
 public class ProtocolLibPacketUtils {
 
-    public static final int INFINITE_POTION_LENGTH = 32767;
+    public static final int INFINITE_POTION_DURATION = 32767;
 
     private final SuperVanish plugin;
 
@@ -46,54 +47,62 @@ public class ProtocolLibPacketUtils {
         }
     }
 
-    public void sendAddPotionEffect(Player p, PotionEffect effect) {
-        PacketContainer packet = new PacketContainer(ENTITY_EFFECT);
-        @SuppressWarnings("deprecation")
-        int effectID = effect.getType().getId();
-        int amplifier = effect.getAmplifier();
-        int duration = effect.getDuration();
-        int entityID = p.getEntityId();
-        packet.getIntegers().write(0, entityID);
-        packet.getBytes().write(0, (byte) effectID);
-        packet.getBytes().write(1, (byte) amplifier);
-        if (!plugin.isOneDotXOrHigher(8))
-            packet.getShorts().write(1, (short) duration);
-        else
-            packet.getIntegers().write(1, duration);
-        // hide particles in 1.8 or higher
-        if (plugin.isOneDotXOrHigher(8))
-            packet.getBytes().write(2, (byte) 0);
-        try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet", e);
-        }
+    public void sendAddPotionEffect(final Player p, PotionEffect effect) {
+        //noinspection deprecation
+        final int effectID = effect.getType().getId();
+        final int amplifier = effect.getAmplifier();
+        final int duration = effect.getDuration();
+        final int entityID = p.getEntityId();
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                PacketContainer packet = new PacketContainer(ENTITY_EFFECT);
+                packet.getIntegers().write(0, entityID);
+                packet.getBytes().write(0, (byte) effectID);
+                packet.getBytes().write(1, (byte) amplifier);
+                if (!plugin.isOneDotXOrHigher(8))
+                    packet.getShorts().write(1, (short) duration);
+                else
+                    packet.getIntegers().write(1, duration);
+                // hide particles in 1.8 or higher
+                if (plugin.isOneDotXOrHigher(8))
+                    packet.getBytes().write(2, (byte) 0);
+                try {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException("Cannot send packet", e);
+                }
+            }
+        });
     }
 
-    public void sendRemovePotionEffect(Player p, PotionEffectType type) {
-        PacketContainer packet = new PacketContainer(REMOVE_ENTITY_EFFECT);
-        int entityID = p.getEntityId();
-        // 1.7 or below
-        if (!plugin.isOneDotXOrHigher(8)) {
-            @SuppressWarnings("deprecation")
-            int effectID = type.getId();
-            packet.getIntegers().write(0, entityID);
-            packet.getBytes().write(0, (byte) effectID);
-        } else if (plugin.isOneDotX(8)) {
-            // 1.8
-            @SuppressWarnings("deprecation")
-            int effectID = type.getId();
-            packet.getIntegers().write(0, entityID);
-            packet.getIntegers().write(1, effectID);
-        } else {
-            // 1.9 or higher
-            packet.getEffectTypes().write(0, type);
-            packet.getIntegers().write(0, entityID);
-        }
-        try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet", e);
-        }
+    public void sendRemovePotionEffect(final Player p, final PotionEffectType type) {
+        final int entityID = p.getEntityId();
+        //noinspection deprecation
+        final int effectID = type.getId();
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                PacketContainer packet = new PacketContainer(REMOVE_ENTITY_EFFECT);
+                // 1.7 or below
+                if (!plugin.isOneDotXOrHigher(8)) {
+                    packet.getIntegers().write(0, entityID);
+                    packet.getBytes().write(0, (byte) effectID);
+                } else if (plugin.isOneDotX(8)) {
+                    // 1.8
+                    packet.getIntegers().write(0, entityID);
+                    packet.getIntegers().write(1, effectID);
+                } else {
+                    // 1.9 or higher
+                    packet.getEffectTypes().write(0, type);
+                    packet.getIntegers().write(0, entityID);
+                }
+                try {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException("Cannot send packet", e);
+                }
+            }
+        });
     }
 }

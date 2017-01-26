@@ -8,6 +8,7 @@ package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,12 +48,15 @@ public class WorldChangeEvent implements Listener {
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
                 if (plugin.packetNightVision) {
                     plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
-                            PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                            PotionEffectType.NIGHT_VISION,
+                            ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
-                                    PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_LENGTH, 0));
+                                    PotionEffectType.NIGHT_VISION,
+                                    ProtocolLibPacketUtils
+                                            .INFINITE_POTION_DURATION, 0));
                         }
                     }.runTaskLater(plugin, 1);
                 } else
