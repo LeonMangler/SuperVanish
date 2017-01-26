@@ -9,20 +9,37 @@ package de.myzelyam.api.vanish;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
 import de.myzelyam.supervanish.config.SettingsFile;
+
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class VanishAPI {
 
     private static SuperVanish plugin;
 
     /**
-     * @return A String list of the UUIDs of all hidden players
+     * @return A list of the UUIDs of all online vanished players
      */
-    public static List<String> getInvisiblePlayers() {
-        return plugin.playerData.getStringList("InvisiblePlayers");
+    public static List<UUID> getInvisiblePlayers() {
+        List<UUID> uuids = new ArrayList<>();
+        for (String uuidStr : plugin.playerData.getStringList("InvisiblePlayers")) {
+            UUID uuid = UUID.fromString(uuidStr);
+            if (Bukkit.getPlayer(uuid) != null)
+                uuids.add(uuid);
+        }
+        return uuids;
+    }
+
+    /**
+     * @return A list of the UUIDs of all vanished players, both online and offline
+     */
+    public static List<UUID> getAllInvisiblePlayers() {
+        return getInvisiblePlayers();
     }
 
     /**
