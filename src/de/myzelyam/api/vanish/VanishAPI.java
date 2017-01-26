@@ -39,7 +39,12 @@ public class VanishAPI {
      * @return A list of the UUIDs of all vanished players, both online and offline
      */
     public static List<UUID> getAllInvisiblePlayers() {
-        return getInvisiblePlayers();
+        List<UUID> uuids = new ArrayList<>();
+        for (String uuidStr : plugin.playerData.getStringList("InvisiblePlayers")) {
+            UUID uuid = UUID.fromString(uuidStr);
+            uuids.add(uuid);
+        }
+        return uuids;
     }
 
     /**
