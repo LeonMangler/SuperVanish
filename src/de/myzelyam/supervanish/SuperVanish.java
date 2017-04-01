@@ -51,7 +51,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -67,10 +66,8 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.singletonList
-            ("5.9.0-5.9.1");
-    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Arrays.asList
-            ("5.8.2-5.9.1", "5.8.3-5.9.1", "5.8.4-5.9.1", "5.9.0-5.9.1");
+    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.emptyList();
+    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Collections.emptyList();
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;
@@ -274,13 +271,13 @@ public class SuperVanish extends JavaPlugin {
             logger.log(SEVERE, "Message: ");
             logger.log(SEVERE, "  " + e.getMessage());
             logger.log(SEVERE, "General information: ");
-            String plugins = "";
+            StringBuilder plugins = new StringBuilder();
             for (Plugin plugin : Bukkit.getServer().getPluginManager()
                     .getPlugins()) {
                 if (plugin.getName().equalsIgnoreCase("SuperVanish"))
                     continue;
-                plugins = plugins + plugin.getName() + " v"
-                        + plugin.getDescription().getVersion() + ", ";
+                plugins.append(plugin.getName()).append(" v")
+                        .append(plugin.getDescription().getVersion()).append(", ");
             }
             logger.log(SEVERE, "  ServerVersion: "
                     + getServer().getVersion());

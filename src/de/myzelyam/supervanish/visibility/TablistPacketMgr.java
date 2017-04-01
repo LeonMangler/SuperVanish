@@ -38,7 +38,7 @@ public class TablistPacketMgr extends PacketAdapter {
     private final SuperVanish plugin;
 
     private final FileConfiguration settings;
-
+    private int error = 0;
     private boolean dontHandle = false;
 
     public TablistPacketMgr(SuperVanish plugin) {
@@ -93,30 +93,36 @@ public class TablistPacketMgr extends PacketAdapter {
             }
             event.getPacket().getPlayerInfoDataLists().write(0, data);
         } catch (Exception ex) {
-            this.plugin.printException(ex);
+            if (error++ > 20) return;
+            plugin.getLogger().warning("Failed to modify tab packet: " + ex.getMessage());
         }
     }
 
     public void sendGameModeChangePacket(Player receiver, Player change, boolean markAsHidden) {
-        if (!settings.getBoolean("Configuration.Tablist.MarkVanishedPlayersAsSpectators")) return;
-        dontHandle = true;
-        PacketContainer packet = new PacketContainer(PLAYER_INFO);
-        // action
-        packet.getPlayerInfoAction().write(0, PlayerInfoAction.UPDATE_GAME_MODE);
-        List<PlayerInfoData> data = new ArrayList<>();
-        int ping = getPing(receiver);
-        GameMode gameMode = markAsHidden ? GameMode.SPECTATOR : change.getGameMode();
-        data.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(change), ping,
-                NativeGameMode.fromBukkit(gameMode),
-                WrappedChatComponent.fromText(change.getPlayerListName())));
-        // data
-        packet.getPlayerInfoDataLists().write(0, data);
         try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(receiver, packet);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet", e);
+            if (!settings.getBoolean("Configuration.Tablist.MarkVanishedPlayersAsSpectators")) return;
+            dontHandle = true;
+            PacketContainer packet = new PacketContainer(PLAYER_INFO);
+            // action
+            packet.getPlayerInfoAction().write(0, PlayerInfoAction.UPDATE_GAME_MODE);
+            List<PlayerInfoData> data = new ArrayList<>();
+            int ping = getPing(receiver);
+            GameMode gameMode = markAsHidden ? GameMode.SPECTATOR : change.getGameMode();
+            data.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(change), ping,
+                    NativeGameMode.fromBukkit(gameMode),
+                    WrappedChatComponent.fromText(change.getPlayerListName())));
+            // data
+            packet.getPlayerInfoDataLists().write(0, data);
+            try {
+                ProtocolLibrary.getProtocolManager().sendServerPacket(receiver, packet);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException("Cannot send packet", e);
+            }
+            dontHandle = false;
+        } catch (Exception e) {
+            if (error++ > 20) return;
+            plugin.getLogger().warning("Failed to send GameMode change packet: " + e.getMessage());
         }
-        dontHandle = false;
     }
 
     private int getPing(Player p) {
@@ -130,6 +136,10 @@ public class TablistPacketMgr extends PacketAdapter {
                 | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
             return -1;
+        } catch (Exception e) {
+            if (error++ > 20) return 0;
+            plugin.getLogger().warning("Failed to get player ping: " + e.getMessage());
+            return 0;
         }
     }
 

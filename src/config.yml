@@ -1,4 +1,4 @@
-# SuperVanish v5.9.1 - Configuration
+# SuperVanish v5.9.2 - Configuration
 #
 Configuration:
 ##################################################
@@ -75,7 +75,8 @@ Configuration:
     # Should vanished players show up dark gray in the tablist and should only their head be visible?
     # Only players who are allowed to see the player will see this effect; this helps other staff with
     # differentiating them from players they should talk to (1.8+)
-    MarkVanishedPlayersAsSpectators: true
+    # !! Likely to cause bugs !!
+    MarkVanishedPlayersAsSpectators: false
 ##################################################
 ############## SERVERLIST OPTIONS ################
 ##################################################
@@ -105,7 +106,7 @@ Configuration:
     # Should SV prevent players from being invisible and disguised at the same time? (DisguiseCraft commands)
     # It's recommended to keep this turned on to prevent incompatibility.
     EnableDisguiseCraftHook: true
-    # Should SV hook into TraiGUI and disable trails for vanished players?
+    # Should SV hook into TrailGUI and disable trails for vanished players?
     EnableTrailGUIHook: true
     # Should SV hook into SuperTrails and disable trails for vanished players?
     EnableSuperTrailsHook: true
@@ -125,4 +126,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.9.1
+ConfigVersion: 5.9.2

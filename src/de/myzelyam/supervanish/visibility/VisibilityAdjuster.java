@@ -169,12 +169,16 @@ public class VisibilityAdjuster {
             p.sendMessage(plugin.convertString(onVanishMessage, p));
             // add night vision potion
             if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
-                if (plugin.packetNightVision)
-                    plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
-                            PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
-                else
-                    p.addPotionEffect(new PotionEffect(
-                            PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
+                try {
+                    if (plugin.packetNightVision)
+                        plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
+                                PotionEffectType.NIGHT_VISION, ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
+                    else
+                        p.addPotionEffect(new PotionEffect(
+                                PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
+                } catch (Exception e) {
+                    plugin.getLogger().warning("Cannot apply night vision: " + e.getMessage());
+                }
             // teams
             plugin.getTeamMgr().setCantPush(p);
             // hide player
@@ -277,13 +281,6 @@ public class VisibilityAdjuster {
             }
             // chat message
             p.sendMessage(plugin.convertString(onReappearMessage, p));
-            // tab packet
-            if (plugin.getTablistPacketMgr() != null) {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (!plugin.canSee(onlinePlayer, p) || p == onlinePlayer) continue;
-                    plugin.getTablistPacketMgr().sendGameModeChangePacket(onlinePlayer, p, false);
-                }
-            }
             // adjust playerdata.yml file
             List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
             invisiblePlayers.remove(p.getUniqueId().toString());
@@ -292,16 +289,26 @@ public class VisibilityAdjuster {
             // metadata
             p.removeMetadata("vanished", plugin);
             // remove night vision
-            if (getSettings().getBoolean("Configuration.Players.AddNightVision"))
+            if (getSettings().getBoolean("Configuration.Players.AddNightVision")) try {
                 if (plugin.packetNightVision) {
                     plugin.getProtocolLibPacketUtils().sendRemovePotionEffect(p,
                             PotionEffectType.NIGHT_VISION);
                 } else
                     p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            } catch (Exception e) {
+                plugin.getLogger().warning("Cannot remove night vision: " + e.getMessage());
+            }
             // teams
             plugin.getTeamMgr().setCanPush(p);
             // show player
             hider.showToAll(p);
+            // tab packet
+            if (plugin.getTablistPacketMgr() != null) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    if (!plugin.canSee(onlinePlayer, p) || p == onlinePlayer) continue;
+                    plugin.getTablistPacketMgr().sendGameModeChangePacket(onlinePlayer, p, false);
+                }
+            }
         } catch (Exception e) {
             plugin.printException(e);
         }

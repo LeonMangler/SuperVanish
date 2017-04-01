@@ -71,7 +71,8 @@ public class JoinEvent implements EventExecutor, Listener {
                         plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
                                 PotionEffectType.NIGHT_VISION,
                                 ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
-                    plugin.getTeamMgr().setCantPush(p);
+                    if (plugin.getTeamMgr() != null)
+                        plugin.getTeamMgr().setCantPush(p);
 
                 }
                 // not necessarily vanished:

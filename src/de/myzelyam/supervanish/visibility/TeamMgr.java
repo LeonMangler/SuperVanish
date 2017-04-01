@@ -19,8 +19,11 @@ public class TeamMgr {
         if (team == null) {
             team = p.getScoreboard().registerNewTeam("Vanished");
         }
-        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-        team.addEntry(p.getName());
+        try {
+            team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+            team.addEntry(p.getName());
+        } catch (NoClassDefFoundError ignored) {
+        }
     }
 
     public void setCanPush(Player p) {
