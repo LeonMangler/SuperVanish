@@ -8,7 +8,6 @@ package de.myzelyam.supervanish;
 
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
-
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.cmd.CommandMgr;
 import de.myzelyam.supervanish.config.MessagesFile;
@@ -17,22 +16,11 @@ import de.myzelyam.supervanish.events.GeneralEventListener;
 import de.myzelyam.supervanish.events.JoinEvent;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
-import de.myzelyam.supervanish.hooks.CitizensHook;
-import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
-import de.myzelyam.supervanish.hooks.EnjinMinecraftPluginHook;
-import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
-import de.myzelyam.supervanish.hooks.SuperTrailsHook;
-import de.myzelyam.supervanish.hooks.TrailGUIHook;
+import de.myzelyam.supervanish.hooks.*;
 import de.myzelyam.supervanish.utils.PlayerCache;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
-import de.myzelyam.supervanish.visibility.ActionBarMgr;
-import de.myzelyam.supervanish.visibility.ForcedInvisibilityTask;
-import de.myzelyam.supervanish.visibility.ServerListPacketListener;
-import de.myzelyam.supervanish.visibility.SilentChestListeners_v3;
-import de.myzelyam.supervanish.visibility.TablistPacketMgr;
-import de.myzelyam.supervanish.visibility.TeamMgr;
-import de.myzelyam.supervanish.visibility.VisibilityAdjuster;
-
+import de.myzelyam.supervanish.visibility.*;
+import me.MyzelYam.SuperVanish.api.SVAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -48,6 +36,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.tehkode.permissions.PermissionUser;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,10 +47,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import me.MyzelYam.SuperVanish.api.SVAPI;
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import static java.util.logging.Level.SEVERE;
 
@@ -229,11 +215,11 @@ public class SuperVanish extends JavaPlugin {
                     currentHook = "Citizens";
                     new CitizensHook(this);
                 }
-                if (pluginManager.isPluginEnabled("EnjinMinecraftPlugin") && settings.getBoolean(
+                /* if (pluginManager.isPluginEnabled("EnjinMinecraftPlugin") && settings.getBoolean(
                         "Configuration.Hooks.EnableEnjinMinecraftPluginHook", true)) {
                     currentHook = "EnjinMinecraftPlugin";
                     new EnjinMinecraftPluginHook(this);
-                }
+                } */ // dismissing this, api cannot be found.
             } catch (Throwable throwable) {
                 if (throwable instanceof ThreadDeath || throwable instanceof VirtualMachineError)
                     throw throwable;

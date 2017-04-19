@@ -6,30 +6,18 @@
 
 package de.myzelyam.supervanish.hooks;
 
-import com.google.common.base.Predicate;
-
-import com.enjin.core.Enjin;
-
-import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SuperVanish;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 public class EnjinMinecraftPluginHook {
 
     public EnjinMinecraftPluginHook(final SuperVanish plugin) {
-        Enjin.getApi().registerVanishPredicate(new Predicate<UUID>() {
+        /* Enjin.getApi().registerVanishPredicate(new Predicate<UUID>() {
             @Override
             public boolean apply(@Nullable UUID uuid) {
                 if (uuid == null) return false;
                 Player player = Bukkit.getPlayer(uuid);
                 return player != null && VanishAPI.isInvisible(player);
             }
-        });
+        }); */ // dismissing, api cannot be found.
     }
 }

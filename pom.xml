@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.myzelyam</groupId>
+    <artifactId>SuperVanish</artifactId>
+    <version>5.9.2-SNAPSHOT</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>ess-repo</id>
+            <url>http://repo.ess3.net/content/groups/essentials</url>
+        </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>http://repo.dmulloy2.net/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>md_5-public</id>
+            <url>http://repo.md-5.net/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>pex-repo</id>
+            <url>http://pex-repo.aoeu.xyz</url>
+        </repository>
+        <repository>
+            <id>everything</id>
+            <url>http://repo.citizensnpcs.co</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <!--Spigot API-->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.9.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Bukkit API-->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.11.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Essentials API-->
+        <dependency>
+            <groupId>net.ess3</groupId>
+            <artifactId>Essentials</artifactId>
+            <version>2.13-SNAPSHOT</version>
+        </dependency>
+        <!--ProtocolLib-->
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib-API</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+        <!--LibsDisguises-->
+        <dependency>
+            <groupId>LibsDisguises</groupId>
+            <artifactId>LibsDisguises</artifactId>
+            <version>9.0.7</version>
+        </dependency>
+        <!--PermissionsEx-->
+        <dependency>
+            <groupId>ru.tehkode</groupId>
+            <artifactId>PermissionsEx</artifactId>
+            <version>1.23.2-SNAPSHOT</version>
+        </dependency>
+        <!--Citizens API-->
+        <dependency>
+            <groupId>net.citizensnpcs</groupId>
+            <artifactId>citizensapi</artifactId>
+            <version>2.0.18-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <!--Enjin-->
+        <!-- <dependency>
+            <groupId>com.enjin</groupId>
+            <artifactId>EnjinMinecraftPlugin</artifactId>
+            <scope>system</scope>
+            <systemPath>${basedir}/jars/EnjinMinecraftPlugin.jar</systemPath>
+        </dependency> API didn't match current code -->
+        <!--TrailGUI-->
+        <dependency>
+            <groupId>ca.jamiesinn.trailgui</groupId>
+            <artifactId>TrailGUI</artifactId>
+            <scope>system</scope>
+            <systemPath>${basedir}/jars/TrailGUI-5.2-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <!--DisguiseCraft-->
+        <dependency>
+            <groupId>pgDev.bukkit</groupId>
+            <artifactId>DisguiseCraft</artifactId>
+            <scope>system</scope>
+            <systemPath>${basedir}/jars/DisguiseCraft.jar</systemPath>
+        </dependency>
+        <!--Dynmap-->
+        <dependency>
+            <groupId>org.dynmap</groupId>
+            <artifactId>Dynmap</artifactId>
+            <scope>system</scope>
+            <systemPath>${basedir}/jars/dynmap-2.4.jar</systemPath>
+        </dependency>
+        <!--SuperTrails-->
+        <dependency>
+            <groupId>me.kvq.plugin.trails</groupId>
+            <artifactId>SuperTrails</artifactId>
+            <scope>system</scope>
+            <systemPath>${basedir}/jars/SuperTrails.jar</systemPath>
+        </dependency>
+    </dependencies>
+</project>
