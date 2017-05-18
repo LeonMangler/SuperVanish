@@ -7,13 +7,16 @@
 package de.myzelyam.supervanish.config;
 
 import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 public class MessagesFile {
 
@@ -30,8 +33,11 @@ public class MessagesFile {
         if (dataFolder == null)
             throw new IllegalStateException();
         this.messages = new File(plugin.getDataFolder(), fileName);
-        //noinspection deprecation
-        defaultFileConfiguration = YamlConfiguration.loadConfiguration(plugin.getResource(fileName));
+        try (Reader reader = new InputStreamReader(plugin.getResource(fileName))) {
+            defaultFileConfiguration = YamlConfiguration.loadConfiguration(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void reloadConfig() {

@@ -19,7 +19,6 @@ import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
 import de.myzelyam.supervanish.hooks.CitizensHook;
 import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
-import de.myzelyam.supervanish.hooks.EnjinMinecraftPluginHook;
 import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 import de.myzelyam.supervanish.hooks.SuperTrailsHook;
 import de.myzelyam.supervanish.hooks.TrailGUIHook;
@@ -228,11 +227,6 @@ public class SuperVanish extends JavaPlugin {
                         "Configuration.Hooks.EnableCitizensHook", true)) {
                     currentHook = "Citizens";
                     new CitizensHook(this);
-                }
-                if (pluginManager.isPluginEnabled("EnjinMinecraftPlugin") && settings.getBoolean(
-                        "Configuration.Hooks.EnableEnjinMinecraftPluginHook", true)) {
-                    currentHook = "EnjinMinecraftPlugin";
-                    new EnjinMinecraftPluginHook(this);
                 }
             } catch (Throwable throwable) {
                 if (throwable instanceof ThreadDeath || throwable instanceof VirtualMachineError)
