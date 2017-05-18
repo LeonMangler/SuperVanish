@@ -112,8 +112,6 @@ Configuration:
     EnableSuperTrailsHook: true
     # Should SV stop NPCs from greeting or talking about hidden players?
     EnableCitizensHook: true
-    # Should SV hide invisible players on Enjin's website?
-    EnableEnjinMinecraftPluginHook: true
 ##################################################
 ############# COMPATIBILITY OPTIONS ##############
 ##################################################
