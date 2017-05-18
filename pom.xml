@@ -68,6 +68,7 @@
             <artifactId>ProtocolLib-API</artifactId>
             <version>4.2.1</version>
         </dependency>
+        <!--LibsDisguises-->
         <dependency>
             <groupId>LibsDisguises</groupId>
             <artifactId>LibsDisguises</artifactId>
