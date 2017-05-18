@@ -68,8 +68,7 @@ public class GeneralEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onFoodLevelChangeEvent(FoodLevelChangeEvent e) {
         try {
-            if (e.getEntity() instanceof Player
-                    && !getSettings().getBoolean(
+            if (e.getEntity() instanceof Player && getSettings().getBoolean(
                     "Configuration.Players.DisableHungerForInvisiblePlayers")) {
                 Player p = (Player) e.getEntity();
                 Collection<Player> invisiblePlayers = plugin.getOnlineInvisiblePlayers();
