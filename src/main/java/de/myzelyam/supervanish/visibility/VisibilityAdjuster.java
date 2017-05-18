@@ -40,7 +40,7 @@ public class VisibilityAdjuster {
 
     public VisibilityAdjuster(SuperVanish plugin) {
         this.plugin = plugin;
-        hider = new PlayerHider(plugin);
+        hider = new PlayerHider();
     }
 
     private FileConfiguration getSettings() {

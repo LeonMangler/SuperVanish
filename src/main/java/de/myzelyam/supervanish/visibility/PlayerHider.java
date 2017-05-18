@@ -7,18 +7,11 @@
 package de.myzelyam.supervanish.visibility;
 
 import de.myzelyam.api.vanish.VanishAPI;
-import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class PlayerHider {
-
-    private final SuperVanish plugin;
-
-    public PlayerHider(SuperVanish plugin) {
-        this.plugin = plugin;
-
-    }
 
     public void showToAll(Player player) {
         for (Player viewer : Bukkit.getOnlinePlayers()) {

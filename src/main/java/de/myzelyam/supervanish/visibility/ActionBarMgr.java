@@ -29,10 +29,14 @@ public class ActionBarMgr {
 
             @Override
             public void run() {
-                List<Player> actionBars = ImmutableList.copyOf(ActionBarMgr.this.actionBars);
-                for (Player player : actionBars) {
-                    plugin.getProtocolLibPacketUtils().sendActionBar(
-                            player, plugin.convertString(plugin.getMsg("ActionBarMessage"), player));
+                try {
+                    List<Player> actionBars = ImmutableList.copyOf(ActionBarMgr.this.actionBars);
+                    for (Player player : actionBars) {
+                        plugin.getProtocolLibPacketUtils().sendActionBar(
+                                player, plugin.convertString(plugin.getMsg("ActionBarMessage"), player));
+                    }
+                } catch (Exception e) {
+                    plugin.printException(e);
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 0, 2 * 20);

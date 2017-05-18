@@ -51,7 +51,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -65,8 +64,8 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final List<String> NON_REQUIRED_SETTINGS_UPDATES = Collections.emptyList();
-    private static final List<String> NON_REQUIRED_MESSAGES_UPDATES = Collections.emptyList();
+    private static final String[] NON_REQUIRED_SETTING_UPDATES = new String[]{"5.9.2"};
+    private static final String[] NON_REQUIRED_MESSAGE_UPDATES = new String[]{"5.9.2"};
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;
@@ -305,10 +304,8 @@ public class SuperVanish extends JavaPlugin {
             String currentCfgVersion = settings.getString("ConfigVersion");
             String newestVersion = getDescription().getVersion();
             String currentMsgsVersion = messages.getString("MessagesVersion");
-            this.requiresMsgUpdate = requiresUpdate(currentMsgsVersion,
-                    newestVersion, false);
-            this.requiresCfgUpdate = requiresUpdate(currentCfgVersion,
-                    newestVersion, true);
+            this.requiresMsgUpdate = fileRequiresRecreation(currentMsgsVersion, false);
+            this.requiresCfgUpdate = fileRequiresRecreation(currentCfgVersion, true);
             if (newestVersion.equals(currentCfgVersion))
                 this.requiresCfgUpdate = false;
             if (newestVersion.equals(currentMsgsVersion))
@@ -318,15 +315,12 @@ public class SuperVanish extends JavaPlugin {
         }
     }
 
-    private boolean requiresUpdate(String currentVersion, String newestVersion,
-                                   boolean checkCfg) {
+    private boolean fileRequiresRecreation(String currentVersion, boolean isSettingsFile) {
         if (currentVersion == null)
             return true;
-        for (String updatesString : (checkCfg ? NON_REQUIRED_SETTINGS_UPDATES
-                : NON_REQUIRED_MESSAGES_UPDATES)) {
-            String[] splittedUpdatesString = updatesString.split("-");
-            if (currentVersion.equalsIgnoreCase(splittedUpdatesString[0])
-                    && newestVersion.equalsIgnoreCase(splittedUpdatesString[1]))
+        for (String ignoredVersion : isSettingsFile ? NON_REQUIRED_SETTING_UPDATES
+                : NON_REQUIRED_MESSAGE_UPDATES) {
+            if (currentVersion.equalsIgnoreCase(ignoredVersion))
                 return false;
         }
         return true;
