@@ -10,6 +10,9 @@ import com.google.common.collect.ImmutableList;
 
 import de.myzelyam.supervanish.SuperVanish;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -31,12 +34,18 @@ public class ActionBarMgr {
             public void run() {
                 try {
                     List<Player> actionBars = ImmutableList.copyOf(ActionBarMgr.this.actionBars);
+
                     for (Player player : actionBars) {
-                        plugin.getProtocolLibPacketUtils().sendActionBar(
-                                player, plugin.convertString(plugin.getMsg("ActionBarMessage"), player));
+                        String message = plugin.convertString(plugin.getMsg("ActionBarMessage"), player);
+                        if (plugin.isOneDotX(12)) {
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent
+                                    .fromLegacyText(message));
+                        } else
+                            plugin.getProtocolLibPacketUtils().sendActionBar(player, message);
                     }
                 } catch (Exception e) {
                     plugin.printException(e);
+                    cancel();
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 0, 2 * 20);
