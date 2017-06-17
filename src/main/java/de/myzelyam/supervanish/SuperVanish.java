@@ -253,14 +253,14 @@ public class SuperVanish extends JavaPlugin {
     public void printException(Exception e) {
         Logger logger = getLogger();
         try {
-            logger.log(SEVERE, "[SuperVanish] Unknown Exception occurred!");
+            logger.log(SEVERE, "Unknown Exception occurred!");
             if (requiresCfgUpdate || requiresMsgUpdate) {
                 logger.log(SEVERE,
-                        "[SuperVanish] You have an outdated configuration,");
+                        "You have an outdated configuration,");
                 logger.log(SEVERE,
-                        "[SuperVanish] regenerating it by using '/sv updatecfg' might fix this problem.");
+                        "regenerating it by using '/sv updatecfg' might fix this problem.");
             } else
-                logger.log(SEVERE, "[SuperVanish] Please report this issue!");
+                logger.log(SEVERE, "Please report this issue!");
             logger.log(SEVERE, "Message: ");
             logger.log(SEVERE, "  " + e.getMessage());
             logger.log(SEVERE, "General information: ");
@@ -279,11 +279,11 @@ public class SuperVanish extends JavaPlugin {
             logger.log(SEVERE, "  ServerPlugins: " + plugins);
             logger.log(SEVERE, "StackTrace: ");
             e.printStackTrace();
-            logger.log(SEVERE, "[SuperVanish] Please include this information");
-            logger.log(SEVERE, "[SuperVanish] if you report the issue.");
+            logger.log(SEVERE, "Please include this information");
+            logger.log(SEVERE, "if you report the issue.");
         } catch (Exception e2) {
             logger.log(SEVERE,
-                    "[SuperVanish] An exception occurred while trying to print a detailed stacktrace, "
+                    "An exception occurred while trying to print a detailed stacktrace, "
                             + "printing an undetailed stacktrace of both exceptions:");
             logger.log(SEVERE, "ORIGINAL EXCEPTION:");
             e.printStackTrace();

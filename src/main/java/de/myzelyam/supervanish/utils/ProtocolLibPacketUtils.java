@@ -6,14 +6,11 @@
 
 package de.myzelyam.supervanish.utils;
 
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
 
 import de.myzelyam.supervanish.SuperVanish;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -30,21 +27,6 @@ public class ProtocolLibPacketUtils {
 
     public ProtocolLibPacketUtils(SuperVanish plugin) {
         this.plugin = plugin;
-    }
-
-    public void sendActionBar(Player p, String bar) {
-        String json = "{\"text\": \""
-                + ChatColor.translateAlternateColorCodes('&', bar) + "\"}";
-        WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
-        PacketContainer chatMsg = new PacketContainer(
-                PacketType.Play.Server.CHAT);
-        chatMsg.getChatComponents().write(0, msg);
-        chatMsg.getBytes().write(0, (byte) 2);
-        try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(p, chatMsg);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet " + chatMsg, e);
-        }
     }
 
     public void sendAddPotionEffect(final Player p, PotionEffect effect) {

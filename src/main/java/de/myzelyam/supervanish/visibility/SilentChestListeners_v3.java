@@ -121,7 +121,7 @@ public class SilentChestListeners_v3 implements Listener {
         StateInfo stateInfo = StateInfo.extract(p);
         playerStateInfoMap.put(p, stateInfo);
         p.setGameMode(GameMode.SPECTATOR);
-        if (!stateInfo.hasSlowness && !stateInfo.isFlying)
+        if (!stateInfo.hasSlowness && !stateInfo.isFlying && plugin.getProtocolLibPacketUtils() != null)
             plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p,
                     new PotionEffect(PotionEffectType.SLOW,
                             ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
@@ -159,7 +159,8 @@ public class SilentChestListeners_v3 implements Listener {
         p.setGameMode(stateInfo.gameMode);
         p.setAllowFlight(stateInfo.canFly);
         p.setFlying(stateInfo.isFlying);
-        if (!stateInfo.hasSlowness && p.isOnline() && !stateInfo.isFlying)
+        if (!stateInfo.hasSlowness && p.isOnline() && !stateInfo.isFlying
+                && plugin.getProtocolLibPacketUtils() != null)
             plugin.getProtocolLibPacketUtils().sendRemovePotionEffect(p, PotionEffectType.SLOW);
     }
 

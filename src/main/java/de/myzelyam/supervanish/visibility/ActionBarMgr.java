@@ -34,14 +34,10 @@ public class ActionBarMgr {
             public void run() {
                 try {
                     List<Player> actionBars = ImmutableList.copyOf(ActionBarMgr.this.actionBars);
-
                     for (Player player : actionBars) {
                         String message = plugin.convertString(plugin.getMsg("ActionBarMessage"), player);
-                        if (plugin.isOneDotX(12)) {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent
-                                    .fromLegacyText(message));
-                        } else
-                            plugin.getProtocolLibPacketUtils().sendActionBar(player, message);
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent
+                                .fromLegacyText(message));
                     }
                 } catch (Exception e) {
                     plugin.printException(e);
