@@ -64,8 +64,10 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final String[] NON_REQUIRED_SETTING_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4"};
-    private static final String[] NON_REQUIRED_MESSAGE_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4"};
+    private static final String[] NON_REQUIRED_SETTING_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4",
+            "5.9.5"};
+    private static final String[] NON_REQUIRED_MESSAGE_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4",
+            "5.9.5"};
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;

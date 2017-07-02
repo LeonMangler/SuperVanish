@@ -36,8 +36,11 @@ public class ActionBarMgr {
                     List<Player> actionBars = ImmutableList.copyOf(ActionBarMgr.this.actionBars);
                     for (Player player : actionBars) {
                         String message = plugin.convertString(plugin.getMsg("ActionBarMessage"), player);
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent
-                                .fromLegacyText(message));
+                        if (!plugin.isOneDotXOrHigher(11)) {
+                            plugin.getProtocolLibPacketUtils().sendActionBarLegacy(player, message);
+                        } else
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent
+                                    .fromLegacyText(message));
                     }
                 } catch (Exception e) {
                     plugin.printException(e);
