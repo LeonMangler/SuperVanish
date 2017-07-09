@@ -1,4 +1,4 @@
-# SuperVanish v5.9.6 - Configuration
+# SuperVanish v5.9.7 - Configuration
 #
 Configuration:
 ##################################################
@@ -66,7 +66,7 @@ Configuration:
     # Should SV still handle leave messages if 'ReappearOnQuit' is turned on?
     ReappearOnQuitHandleLeaveMsg: true
     # Should invisible players not be able to push other players or be able to be pushed?
-    # !! Uses scoreboard teams and may conflict with other plugins !! (1.8+)
+    # !! Uses scoreboard teams and may conflict with other plugins !! (1.9+)
     DisablePush: false
 ##################################################
 ################ TABLIST OPTIONS #################
@@ -124,4 +124,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.9.6
+ConfigVersion: 5.9.7

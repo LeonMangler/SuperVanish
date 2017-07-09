@@ -70,8 +70,9 @@ public class TablistPacketMgr extends PacketAdapter {
                         // override it using the actual gamemode
                         if (receiver.getUniqueId().toString().equals
                                 (vanishedTabPlayer.getUniqueId().toString())) {
-                            PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(), infoData
-                                    .getLatency(), NativeGameMode.fromBukkit(vanishedTabPlayer.getGameMode()),
+                            PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(), getPing
+                                    (vanishedTabPlayer),
+                                    NativeGameMode.fromBukkit(vanishedTabPlayer.getGameMode()),
                                     infoData.getDisplayName());
                             data.remove(infoData);
                             data.add(newData);
@@ -81,8 +82,9 @@ public class TablistPacketMgr extends PacketAdapter {
                             if (infoData.getGameMode() == NativeGameMode.CREATIVE
                                     || infoData.getGameMode() == NativeGameMode.SURVIVAL
                                     || infoData.getGameMode() == NativeGameMode.ADVENTURE) {
-                                PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(), infoData
-                                        .getLatency(), NativeGameMode.SPECTATOR, infoData.getDisplayName());
+                                PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(), getPing
+                                        (vanishedTabPlayer),
+                                        NativeGameMode.SPECTATOR, infoData.getDisplayName());
                                 data.remove(infoData);
                                 data.add(newData);
                             }
