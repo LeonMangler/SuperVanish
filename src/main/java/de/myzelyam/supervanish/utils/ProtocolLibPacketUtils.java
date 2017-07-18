@@ -9,9 +9,13 @@ package de.myzelyam.supervanish.utils;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 
 import de.myzelyam.supervanish.SuperVanish;
+
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -32,14 +36,22 @@ public class ProtocolLibPacketUtils {
         this.plugin = plugin;
     }
 
-    public void sendActionBarLegacy(Player p, String bar) {
+    public void sendActionBar(Player p, String bar) {
         String json = "{\"text\": \""
                 + ChatColor.translateAlternateColorCodes('&', bar) + "\"}";
         WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
         PacketContainer chatMsg = new PacketContainer(
                 PacketType.Play.Server.CHAT);
         chatMsg.getChatComponents().write(0, msg);
-        chatMsg.getBytes().write(0, (byte) 2);
+        if (plugin.isOneDotXOrHigher(12))
+            try {
+                chatMsg.getChatTypes().write(0, EnumWrappers.ChatType.GAME_INFO);
+            } catch (NoSuchMethodError e) {
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText
+                        ("SuperVanish: Please update ProtocolLib"));
+            }
+        else
+            chatMsg.getBytes().write(0, (byte) 2);
         try {
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, chatMsg);
         } catch (InvocationTargetException e) {

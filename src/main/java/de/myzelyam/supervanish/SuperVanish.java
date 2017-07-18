@@ -65,9 +65,9 @@ import static java.util.logging.Level.SEVERE;
 public class SuperVanish extends JavaPlugin {
 
     private static final String[] NON_REQUIRED_SETTING_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4",
-            "5.9.5", "5.9.6"};
+            "5.9.5", "5.9.6", "5.9.7"};
     private static final String[] NON_REQUIRED_MESSAGE_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4",
-            "5.9.5", "5.9.6"};
+            "5.9.5", "5.9.6", "5.9.7"};
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;
@@ -116,7 +116,9 @@ public class SuperVanish extends JavaPlugin {
                     tablistPacketMgr = new TablistPacketMgr(this);
                     tablistPacketMgr.registerListener();
                 }
-            }
+            } else Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[SuperVanish]" +
+                    " Please install ProtocolLib to be able to use all SuperVanish features:" +
+                    " https://www.spigotmc.org/resources/protocollib.1997/");
 
             new ForcedInvisibilityTask(this).start();
             checkForReload();

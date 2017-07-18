@@ -1,4 +1,4 @@
-# SuperVanish v5.9.7 - Messages
+# SuperVanish v5.9.8 - Messages
 # Information:
 # You can use the & character for color codes. Example: '&cThe color of this text would be red!'
 # You can use %p to get the player's name. Example: '&4&l%p, you aren't allowed to execute this command!'
@@ -40,4 +40,4 @@ Messages:
   NoConfigUpdateAvailableMessage: '&eYour SuperVanish-files are up to date!'
   DynmapFakeJoin: '%d joined'
   DynmapFakeQuit: '%d left'
-MessagesVersion: 5.9.7
+MessagesVersion: 5.9.8
