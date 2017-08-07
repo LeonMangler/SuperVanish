@@ -45,7 +45,8 @@ public class JoinEvent implements EventExecutor, Listener {
                 final List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
 
                 if (getSettings().getBoolean("Configuration.Players.AutoVanishOnJoin", false)
-                        && p.hasPermission("sv.joinvanished")) {
+                        && p.hasPermission("sv.joinvanished")
+                        && !invisiblePlayers.contains(p.getUniqueId().toString())) {
                     invisiblePlayers.add(p.getUniqueId().toString());
                     plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
                     plugin.savePlayerData();
