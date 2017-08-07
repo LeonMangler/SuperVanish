@@ -9,6 +9,7 @@ package de.myzelyam.supervanish.cmd;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.config.MessagesFile;
 import de.myzelyam.supervanish.config.SettingsFile;
+
 import org.bukkit.command.CommandSender;
 
 public class CmdReload extends SubCommand {
@@ -24,7 +25,7 @@ public class CmdReload extends SubCommand {
             plugin.settingsFile = new SettingsFile();
             plugin.settingsFile.saveDefaultConfig();
             plugin.settings = plugin.settingsFile.getConfig();
-            p.sendMessage(convertString(getMsg("ConfigReloadedMessage"), p).split("\\n"));
+            p.sendMessage(convertString(getMsg("ConfigReloadedMessage"), p));
         }
     }
 }

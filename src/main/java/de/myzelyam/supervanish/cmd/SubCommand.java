@@ -7,8 +7,8 @@
 package de.myzelyam.supervanish.cmd;
 
 import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -17,13 +17,9 @@ import java.util.List;
 public abstract class SubCommand {
 
     protected final SuperVanish plugin;
-    protected final FileConfiguration settings;
-    protected final FileConfiguration playerData;
 
     public SubCommand(SuperVanish plugin) {
         this.plugin = plugin;
-        settings = plugin.settings;
-        playerData = plugin.playerData;
     }
 
     protected List<String> getAllInvisiblePlayers() {

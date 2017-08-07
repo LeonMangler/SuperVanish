@@ -56,7 +56,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import me.MyzelYam.SuperVanish.api.SVAPI;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -64,10 +63,9 @@ import static java.util.logging.Level.SEVERE;
 
 public class SuperVanish extends JavaPlugin {
 
-    private static final String[] NON_REQUIRED_SETTING_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4",
-            "5.9.5", "5.9.6", "5.9.7"};
+    private static final String[] NON_REQUIRED_SETTING_UPDATES = new String[]{};
     private static final String[] NON_REQUIRED_MESSAGE_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4",
-            "5.9.5", "5.9.6", "5.9.7"};
+            "5.9.5", "5.9.6", "5.9.7", "5.9.8"};
     public boolean requiresCfgUpdate = false;
     public boolean requiresMsgUpdate = false;
     public boolean packetNightVision = false;
@@ -92,8 +90,6 @@ public class SuperVanish extends JavaPlugin {
     public void onEnable() {
         try {
             VanishAPI.setPlugin(this);
-            //noinspection deprecation
-            SVAPI.setPlugin(this);
 
             prepareConfig();
             registerEvents();
@@ -130,8 +126,6 @@ public class SuperVanish extends JavaPlugin {
     @Override
     public void onDisable() {
         VanishAPI.setPlugin(null);
-        //noinspection deprecation
-        SVAPI.setPlugin(null);
         PlayerCache.getPlayerCacheMap().clear();
     }
 
@@ -416,9 +410,9 @@ public class SuperVanish extends JavaPlugin {
             return true;
         boolean enableSeePermission = getConfig().getBoolean("Configuration.Players.EnableSeePermission");
         if (!enableSeePermission) return false;
-        int viewerLevel = PlayerCache.fromPlayer(viewer).getSeePermissionLevel();
+        int viewerLevel = PlayerCache.fromPlayer(viewer, this).getSeePermissionLevel();
         if (viewerLevel == 0) return false;
-        int viewedLevel = PlayerCache.fromPlayer(viewed).getUsePermissionLevel();
+        int viewedLevel = PlayerCache.fromPlayer(viewed, this).getUsePermissionLevel();
         return viewerLevel >= viewedLevel;
     }
 

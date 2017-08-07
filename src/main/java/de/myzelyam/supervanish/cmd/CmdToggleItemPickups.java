@@ -22,9 +22,9 @@ public class CmdToggleItemPickups extends SubCommand {
     }
 
     private boolean toggleState(Player player) {
-        boolean hasEnabled = playerData.getBoolean("PlayerData."
+        boolean hasEnabled = plugin.playerData.getBoolean("PlayerData."
                 + player.getUniqueId().toString() + ".itemPickUps");
-        playerData.set("PlayerData." + player.getUniqueId().toString() + ".itemPickUps",
+        plugin.playerData.set("PlayerData." + player.getUniqueId().toString() + ".itemPickUps",
                 !hasEnabled);
         plugin.savePlayerData();
         return !hasEnabled;

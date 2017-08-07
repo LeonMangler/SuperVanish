@@ -48,8 +48,9 @@ public class CmdVanish extends SubCommand {
 
     private boolean hasLayeredAccess(CommandSender sender) {
         if (!(sender instanceof Player)) return false;
+        if (!plugin.settings.getBoolean("Configuration.Players.LayeredSeeAndUsePermissions")) return false;
         Player p = (Player) sender;
-        int level = PlayerCache.fromPlayer(p).getUsePermissionLevel();
+        int level = PlayerCache.fromPlayer(p, plugin).getUsePermissionLevel();
         return level > 0 && p.hasPermission("sv.use.level" + level);
     }
 }

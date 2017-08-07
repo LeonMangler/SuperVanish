@@ -6,6 +6,8 @@
 
 package de.myzelyam.supervanish.utils;
 
+import de.myzelyam.supervanish.SuperVanish;
+
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -19,21 +21,23 @@ public class PlayerCache {
 
     private int seePermissionLevel, usePermissionLevel;
 
-    private PlayerCache(Player player) {
+    private PlayerCache(Player player, SuperVanish plugin) {
         this.player = player;
         seePermissionLevel = player.hasPermission("sv.see") ? 1 : 0;
         usePermissionLevel = 1;
-        for (int i = 1; i < 101; i++)
-            if (player.hasPermission("sv.see.level" + i))
-                seePermissionLevel = i;
-        for (int i = 1; i < 101; i++)
-            if (player.hasPermission("sv.use.level" + i))
-                usePermissionLevel = i;
+        if (plugin.settings.getBoolean("Configuration.Players.LayeredSeeAndUsePermissions", true)) {
+            for (int i = 1; i < 101; i++)
+                if (player.hasPermission("sv.see.level" + i))
+                    seePermissionLevel = i;
+            for (int i = 1; i < 101; i++)
+                if (player.hasPermission("sv.use.level" + i))
+                    usePermissionLevel = i;
+        }
     }
 
-    public static PlayerCache fromPlayer(Player p) {
+    public static PlayerCache fromPlayer(Player p, SuperVanish plugin) {
         if (!playerCacheMap.containsKey(p)) {
-            playerCacheMap.put(p, new PlayerCache(p));
+            playerCacheMap.put(p, new PlayerCache(p, plugin));
         }
         return playerCacheMap.get(p);
     }

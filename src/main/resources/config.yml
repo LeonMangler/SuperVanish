@@ -1,4 +1,4 @@
-# SuperVanish v5.9.8 - Configuration
+# SuperVanish v5.10.0 - Configuration
 #
 Configuration:
 ##################################################
@@ -51,6 +51,12 @@ Configuration:
     DisablePressurePlatesForInvisiblePlayers: true
     # Should players with the permission 'sv.see' be able to see invisible players?
     EnableSeePermission: true
+    # Should sv.use and sv.see be layered? => sv.use.levelX, sv.see.levelX
+    # Higher levels override; more information on Spigot
+    # Note: Layered permission levels are only updated on player join
+    LayeredSeeAndUsePermissions: false
+    # Should players with sv.joinvanished always join vanished?
+    AutoVanishOnJoin: false
     # Should invisible players not be able to break blocks?
     PreventBlockBreaking: false
     # Should invisible players not be able to place blocks?
@@ -124,4 +130,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.9.8
+ConfigVersion: 5.10.0

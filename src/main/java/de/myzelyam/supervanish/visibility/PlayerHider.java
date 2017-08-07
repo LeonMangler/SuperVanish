@@ -6,12 +6,18 @@
 
 package de.myzelyam.supervanish.visibility;
 
-import de.myzelyam.api.vanish.VanishAPI;
+import de.myzelyam.supervanish.SuperVanish;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class PlayerHider {
+
+    private final SuperVanish plugin;
+
+    public PlayerHider(SuperVanish plugin) {
+        this.plugin = plugin;
+    }
 
     public void showToAll(Player player) {
         for (Player viewer : Bukkit.getOnlinePlayers()) {
@@ -21,7 +27,7 @@ public class PlayerHider {
 
     public void hideToAll(Player player) {
         for (Player viewer : Bukkit.getOnlinePlayers()) {
-            if (!VanishAPI.canSee(viewer, player)) {
+            if (!plugin.canSee(viewer, player)) {
                 viewer.hidePlayer(player);
             }
         }
@@ -29,7 +35,7 @@ public class PlayerHider {
 
     public void hideAllInvisibleTo(Player viewer) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!VanishAPI.canSee(viewer, player))
+            if (!plugin.canSee(viewer, player))
                 viewer.hidePlayer(player);
         }
     }

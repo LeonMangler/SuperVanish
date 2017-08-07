@@ -6,7 +6,6 @@
 
 package de.myzelyam.supervanish.visibility;
 
-import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SuperVanish;
 
 import org.bukkit.Bukkit;
@@ -34,7 +33,7 @@ public class ForcedInvisibilityTask extends BukkitRunnable {
             for (Player onlinePlayer : onlinePlayers) {
                 if (hidden == onlinePlayer) continue;
                 if (!onlinePlayer.canSee(hidden)) continue;
-                if (!VanishAPI.canSee(onlinePlayer, hidden))
+                if (!plugin.canSee(onlinePlayer, hidden))
                     onlinePlayer.hidePlayer(hidden);
             }
         }

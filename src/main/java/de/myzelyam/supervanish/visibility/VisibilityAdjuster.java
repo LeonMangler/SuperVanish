@@ -10,7 +10,6 @@ import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.config.MessagesFile;
 import de.myzelyam.supervanish.hooks.DynmapHook;
 import de.myzelyam.supervanish.hooks.EssentialsHook;
 import de.myzelyam.supervanish.utils.OneDotEightUtils;
@@ -40,7 +39,7 @@ public class VisibilityAdjuster {
 
     public VisibilityAdjuster(SuperVanish plugin) {
         this.plugin = plugin;
-        hider = new PlayerHider();
+        hider = new PlayerHider(plugin);
     }
 
     private FileConfiguration getSettings() {
@@ -52,8 +51,7 @@ public class VisibilityAdjuster {
             // check p
             if (p == null)
                 throw new IllegalArgumentException("The player cannot be null!");
-            MessagesFile messagesCfg = new MessagesFile();
-            FileConfiguration messages = messagesCfg.getConfig();
+            FileConfiguration messages = plugin.messages;
             String vanishBroadcast = messages.getString("Messages.VanishMessage");
             String vanishBroadcastWithPermission = messages
                     .getString("Messages.VanishMessageWithPermission");
@@ -66,14 +64,8 @@ public class VisibilityAdjuster {
             }
             // call event
             PlayerHideEvent event = new PlayerHideEvent(p);
-            @SuppressWarnings("deprecation")
-            me.MyzelYam.SuperVanish.api.PlayerHideEvent deprecatedEvent =
-                    new me.MyzelYam.SuperVanish.api.PlayerHideEvent(p);
             plugin.getServer().getPluginManager().callEvent(event);
-            plugin.getServer().getPluginManager().callEvent(deprecatedEvent);
-            if (event.isCancelled() || deprecatedEvent.isCancelled()) {
-                return;
-            }
+            if (event.isCancelled()) return;
             // /////
             // DisguiseCraft hook
             if (plugin.getServer().getPluginManager()
@@ -198,8 +190,7 @@ public class VisibilityAdjuster {
             if (p == null)
                 throw new IllegalArgumentException("The player cannot be null!");
             // preparations
-            MessagesFile messagesCfg = new MessagesFile();
-            FileConfiguration messages = messagesCfg.getConfig();
+            FileConfiguration messages = plugin.messages;
             String reappearBroadcast = messages
                     .getString("Messages.ReappearMessage");
             String reappearBroadcastWithPermission = messages
@@ -214,14 +205,8 @@ public class VisibilityAdjuster {
             }
             // call event
             PlayerShowEvent event = new PlayerShowEvent(p);
-            @SuppressWarnings("deprecation")
-            me.MyzelYam.SuperVanish.api.PlayerShowEvent deprecatedEvent =
-                    new me.MyzelYam.SuperVanish.api.PlayerShowEvent(p);
             plugin.getServer().getPluginManager().callEvent(event);
-            plugin.getServer().getPluginManager().callEvent(deprecatedEvent);
-            if (event.isCancelled() || deprecatedEvent.isCancelled()) {
-                return;
-            }
+            if (event.isCancelled()) return;
             // fly
             if (getSettings().getBoolean("Configuration.Players.Fly.DisableOnReappear")
                     && !p.hasPermission("sv.fly")

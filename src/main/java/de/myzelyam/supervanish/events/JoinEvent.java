@@ -41,15 +41,22 @@ public class JoinEvent implements EventExecutor, Listener {
             if (event instanceof PlayerJoinEvent) {
                 PlayerJoinEvent e = (PlayerJoinEvent) event;
                 final Player p = e.getPlayer();
-                PlayerCache.fromPlayer(p);
+                PlayerCache.fromPlayer(p, plugin);
                 final List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
-                if (getSettings().getBoolean(
-                        "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible", true)
-                        && invisiblePlayers.contains(p.getUniqueId().toString())) {
-                    e.setJoinMessage(null);
+
+                if (getSettings().getBoolean("Configuration.Players.AutoVanishOnJoin", false)
+                        && p.hasPermission("sv.joinvanished")) {
+                    invisiblePlayers.add(p.getUniqueId().toString());
+                    plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
+                    plugin.savePlayerData();
                 }
+
                 // vanished:
                 if (invisiblePlayers.contains(p.getUniqueId().toString())) {
+                    if (getSettings().getBoolean(
+                            "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible", true)) {
+                        e.setJoinMessage(null);
+                    }
                     if (plugin.getServer().getPluginManager()
                             .getPlugin("Essentials") != null
                             && getSettings().getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
@@ -73,8 +80,8 @@ public class JoinEvent implements EventExecutor, Listener {
                                 ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
                     if (plugin.getTeamMgr() != null)
                         plugin.getTeamMgr().setCantPush(p);
-
                 }
+
                 // not necessarily vanished:
                 plugin.getVisibilityAdjuster().getHider().hideAllInvisibleTo(p);
             }
