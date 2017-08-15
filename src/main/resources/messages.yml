@@ -7,8 +7,8 @@
 # You can use %d to get the player's displayname. Example: '&6Your displayname: &c%d'
 # You can use %t to get the player's tabname (This is the name of the player in the playerlist [TAB]).
 # You can use %l to get a list of invisible players. (Only in 'ListMessage' available)
-# You can use %prefix to get the player's prefix (Requires PermissionsEx).
-# You can use %suffix to get the player's suffix (Requires PermissionsEx).
+# You can use %prefix to get the player's prefix (Requires Vault).
+# You can use %suffix to get the player's suffix (Requires Vault).
 # You can use %nick to get the player's nickname (Requires Essentials).
 # Important:
 # You must put your messages in quotes if you use colorcodes and/or special characters like colons! Example: 'Hi: &6%p'

@@ -6,7 +6,7 @@
 
     <groupId>de.myzelyam</groupId>
     <artifactId>SuperVanish</artifactId>
-    <version>5.10.0</version>
+    <version>5.10.1</version>
 
     <build>
         <plugins>
@@ -36,12 +36,8 @@
             <url>http://repo.dmulloy2.net/content/groups/public/</url>
         </repository>
         <repository>
-            <id>md_5-public</id>
-            <url>http://repo.md-5.net/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>pex-repo</id>
-            <url>http://pex-repo.aoeu.xyz</url>
+            <id>vault-repo</id>
+            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
         <repository>
             <id>everything</id>
@@ -68,17 +64,12 @@
             <artifactId>ProtocolLib-API</artifactId>
             <version>4.4.0-SNAPSHOT</version>
         </dependency>
-        <!--LibsDisguises-->
+        <!--Vault API-->
         <dependency>
-            <groupId>LibsDisguises</groupId>
-            <artifactId>LibsDisguises</artifactId>
-            <version>9.0.7</version>
-        </dependency>
-        <!--PermissionsEx-->
-        <dependency>
-            <groupId>ru.tehkode</groupId>
-            <artifactId>PermissionsEx</artifactId>
-            <version>1.23.2-SNAPSHOT</version>
+            <groupId>net.milkbowl.vault</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.6</version>
+            <scope>provided</scope>
         </dependency>
         <!--Citizens API-->
         <dependency>
@@ -93,14 +84,6 @@
             <artifactId>TrailGUI</artifactId>
             <scope>system</scope>
             <systemPath>${basedir}/dependencies/TrailGUI-5.15-SNAPSHOT.jar</systemPath>
-            <version>1.0</version>
-        </dependency>
-        <!--DisguiseCraft-->
-        <dependency>
-            <groupId>pgDev.bukkit</groupId>
-            <artifactId>DisguiseCraft</artifactId>
-            <scope>system</scope>
-            <systemPath>${basedir}/dependencies/DisguiseCraft.jar</systemPath>
             <version>1.0</version>
         </dependency>
         <!--Dynmap-->

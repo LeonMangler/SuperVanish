@@ -18,8 +18,6 @@ import de.myzelyam.supervanish.events.JoinEvent;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
 import de.myzelyam.supervanish.hooks.CitizensHook;
-import de.myzelyam.supervanish.hooks.DisguiseCraftHook;
-import de.myzelyam.supervanish.hooks.LibsDisguisesHook;
 import de.myzelyam.supervanish.hooks.SuperTrailsHook;
 import de.myzelyam.supervanish.hooks.TrailGUIHook;
 import de.myzelyam.supervanish.utils.PlayerCache;
@@ -31,6 +29,8 @@ import de.myzelyam.supervanish.visibility.SilentChestListeners_v3;
 import de.myzelyam.supervanish.visibility.TablistPacketMgr;
 import de.myzelyam.supervanish.visibility.TeamMgr;
 import de.myzelyam.supervanish.visibility.VisibilityAdjuster;
+
+import net.milkbowl.vault.chat.Chat;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -46,6 +46,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -55,9 +56,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import static java.util.logging.Level.SEVERE;
 
@@ -200,16 +198,6 @@ public class SuperVanish extends JavaPlugin {
             // plugin hooks
             String currentHook = "Unknown";
             try {
-                if (pluginManager.isPluginEnabled("LibsDisguises") && settings
-                        .getBoolean("Configuration.Hooks.EnableLibsDisguisesHook")) {
-                    currentHook = "LibsDisguises";
-                    pluginManager.registerEvents(new LibsDisguisesHook(), this);
-                }
-                if (pluginManager.isPluginEnabled("DisguiseCraft") && settings
-                        .getBoolean("Configuration.Hooks.EnableDisguiseCraftHook")) {
-                    currentHook = "DisguiseCraft";
-                    pluginManager.registerEvents(new DisguiseCraftHook(), this);
-                }
                 if (pluginManager.isPluginEnabled("TrailGUI") && settings
                         .getBoolean("Configuration.Hooks.EnableTrailGUIHook", true)) {
                     currentHook = "TrailGUI";
@@ -332,9 +320,8 @@ public class SuperVanish extends JavaPlugin {
                         && !(unspecifiedPlayer instanceof Player)) {
                     // offline player
                     OfflinePlayer specifiedPlayer = (OfflinePlayer) unspecifiedPlayer;
-                    // replace PEX prefix and suffix
-                    if (getServer().getPluginManager()
-                            .getPlugin("PermissionsEx") != null) {
+                    // remove Vault prefix and suffix
+                    if (getServer().getPluginManager().getPlugin("Vault") != null) {
                         msg = msg.replace("%prefix", "").replace("%suffix", "");
                     }
                     // replace essentials nick names
@@ -351,16 +338,18 @@ public class SuperVanish extends JavaPlugin {
                 if (unspecifiedPlayer instanceof Player) {
                     // player
                     Player specifiedPlayer = (Player) unspecifiedPlayer;
-                    // replace PEX prefix and suffix
-                    if (getServer().getPluginManager()
-                            .getPlugin("PermissionsEx") != null) {
-                        PermissionUser user = PermissionsEx
-                                .getUser(specifiedPlayer);
-                        if (user != null) {
-                            if (user.getPrefix() != null)
-                                msg = msg.replace("%prefix", user.getPrefix());
-                            if (user.getSuffix() != null)
-                                msg = msg.replace("%suffix", user.getSuffix());
+                    // replace Vault prefix and suffix
+                    if (getServer().getPluginManager().getPlugin("Vault") != null) {
+                        RegisteredServiceProvider<Chat> rsp = getServer()
+                                .getServicesManager().getRegistration(Chat.class);
+                        if (rsp != null) {
+                            Chat chat = rsp.getProvider();
+                            if (chat != null) {
+                                if (chat.getPlayerPrefix(specifiedPlayer) != null)
+                                    msg = msg.replace("%prefix", chat.getPlayerPrefix(specifiedPlayer));
+                                if (chat.getPlayerSuffix(specifiedPlayer) != null)
+                                    msg = msg.replace("%suffix", chat.getPlayerSuffix(specifiedPlayer));
+                            }
                         }
                     }
                     // replace essentials nick names
@@ -384,9 +373,8 @@ public class SuperVanish extends JavaPlugin {
                 }
                 if (unspecifiedPlayer instanceof CommandSender) {
                     // console
-                    // replace PEX prefixes
-                    if (getServer().getPluginManager()
-                            .getPlugin("PermissionsEx") != null) {
+                    // remove Vault prefixes
+                    if (getServer().getPluginManager().getPlugin("Vault") != null) {
                         msg = msg.replace("%prefix", "").replace("%suffix", "");
                     }
                     // replace general variables

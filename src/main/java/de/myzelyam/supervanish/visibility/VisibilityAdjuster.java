@@ -16,7 +16,6 @@ import de.myzelyam.supervanish.utils.OneDotEightUtils;
 import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -26,10 +25,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 import java.util.logging.Level;
-
-import me.libraryaddict.disguise.DisguiseAPI;
-import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
-import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;
 
 public class VisibilityAdjuster {
 
@@ -66,26 +61,6 @@ public class VisibilityAdjuster {
             PlayerHideEvent event = new PlayerHideEvent(p);
             plugin.getServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) return;
-            // /////
-            // DisguiseCraft hook
-            if (plugin.getServer().getPluginManager().getPlugin("DisguiseCraft") != null
-                    && getSettings().getBoolean("Configuration.Hooks.EnableDisguiseCraftHook")) {
-                DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
-                if (dcAPI.isDisguised(p)) {
-                    p.sendMessage(
-                            ChatColor.RED + "[SV] Please undisguise yourself.");
-                    return;
-                }
-            }
-            // LibsDisguises hook
-            if (plugin.getServer().getPluginManager().getPlugin("LibsDisguises") != null
-                    && getSettings().getBoolean("Configuration.Hooks.EnableLibsDisguisesHook")) {
-                if (DisguiseAPI.isDisguised(p)) {
-                    p.sendMessage(
-                            ChatColor.RED + "[SV] Please undisguise yourself.");
-                    return;
-                }
-            }
             // Essentials hook
             if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null
                     && getSettings().getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
