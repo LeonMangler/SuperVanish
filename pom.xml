@@ -6,7 +6,7 @@
 
     <groupId>de.myzelyam</groupId>
     <artifactId>SuperVanish</artifactId>
-    <version>5.10.0</version>
+    <version>5.10.1</version>
 
     <build>
         <plugins>

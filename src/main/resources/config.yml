@@ -1,4 +1,4 @@
-# SuperVanish v5.10.0 - Configuration
+# SuperVanish v5.10.1 - Configuration
 #
 Configuration:
 ##################################################
@@ -130,4 +130,4 @@ Configuration:
 #################################################
 ################# DO NOT TOUCH ##################
 #################################################
-ConfigVersion: 5.10.0
+ConfigVersion: 5.10.1

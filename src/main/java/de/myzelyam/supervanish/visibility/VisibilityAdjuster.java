@@ -68,10 +68,8 @@ public class VisibilityAdjuster {
             if (event.isCancelled()) return;
             // /////
             // DisguiseCraft hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("DisguiseCraft") != null
-                    && getSettings().getBoolean(
-                    "Configuration.Hooks.EnableDisguiseCraftHook")) {
+            if (plugin.getServer().getPluginManager().getPlugin("DisguiseCraft") != null
+                    && getSettings().getBoolean("Configuration.Hooks.EnableDisguiseCraftHook")) {
                 DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
                 if (dcAPI.isDisguised(p)) {
                     p.sendMessage(
@@ -80,10 +78,8 @@ public class VisibilityAdjuster {
                 }
             }
             // LibsDisguises hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("LibsDisguises") != null
-                    && getSettings().getBoolean(
-                    "Configuration.Hooks.EnableLibsDisguisesHook")) {
+            if (plugin.getServer().getPluginManager().getPlugin("LibsDisguises") != null
+                    && getSettings().getBoolean("Configuration.Hooks.EnableLibsDisguisesHook")) {
                 if (DisguiseAPI.isDisguised(p)) {
                     p.sendMessage(
                             ChatColor.RED + "[SV] Please undisguise yourself.");
@@ -91,10 +87,8 @@ public class VisibilityAdjuster {
                 }
             }
             // Essentials hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("Essentials") != null
-                    && getSettings().getBoolean(
-                    "Configuration.Hooks.EnableEssentialsHook")) {
+            if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null
+                    && getSettings().getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
                 EssentialsHook.hidePlayer(p);
             }
             // fly check
@@ -102,17 +96,13 @@ public class VisibilityAdjuster {
                 p.setAllowFlight(true);
             }
             // dynmap hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("dynmap") != null
+            if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null
                     && getSettings().getBoolean("Configuration.Hooks.EnableDynmapHook")) {
                 DynmapHook.adjustVisibility(p, true);
             }
             // action bars
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("ProtocolLib") != null
-                    && getSettings().getBoolean(
-                    "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                    && !plugin.isOneDotX(7)) {
+            if (getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+                    && plugin.getActionBarMgr() != null) {
                 plugin.getActionBarMgr().addActionBar(p);
             }
             // adjust playerdata.yml file
@@ -172,7 +162,8 @@ public class VisibilityAdjuster {
                     plugin.getLogger().warning("Cannot apply night vision: " + e.getMessage());
                 }
             // teams
-            plugin.getTeamMgr().setCantPush(p);
+            if (plugin.getTeamMgr() != null)
+                plugin.getTeamMgr().setCantPush(p);
             // hide player
             hider.hideToAll(p);
         } catch (Exception e) {
@@ -211,28 +202,22 @@ public class VisibilityAdjuster {
             if (getSettings().getBoolean("Configuration.Players.Fly.DisableOnReappear")
                     && !p.hasPermission("sv.fly")
                     && p.getGameMode() != GameMode.CREATIVE
-                    && (plugin.isOneDotX(7) || !OneDotEightUtils.isSpectator(p))) {
+                    && (!plugin.isOneDotXOrHigher(8) || !OneDotEightUtils.isSpectator(p))) {
                 p.setAllowFlight(false);
             }
             // essentials hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("Essentials") != null
-                    && getSettings().getBoolean(
-                    "Configuration.Hooks.EnableEssentialsHook")) {
+            if (plugin.getServer().getPluginManager().getPlugin("Essentials") != null
+                    && getSettings().getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
                 EssentialsHook.showPlayer(p);
             }
             // dynmap hook
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("dynmap") != null
+            if (plugin.getServer().getPluginManager().getPlugin("dynmap") != null
                     && getSettings().getBoolean("Configuration.Hooks.EnableDynmapHook")) {
                 DynmapHook.adjustVisibility(p, false);
             }
             // action bars
-            if (plugin.getServer().getPluginManager()
-                    .getPlugin("ProtocolLib") != null
-                    && getSettings().getBoolean(
-                    "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                    && !plugin.isOneDotX(7)) {
+            if (getSettings().getBoolean("Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
+                    && plugin.getActionBarMgr() != null) {
                 plugin.getActionBarMgr().removeActionBar(p);
             }
             // reappear broadcast
@@ -284,7 +269,8 @@ public class VisibilityAdjuster {
                 plugin.getLogger().warning("Cannot remove night vision: " + e.getMessage());
             }
             // teams
-            plugin.getTeamMgr().setCanPush(p);
+            if (plugin.getTeamMgr() != null)
+                plugin.getTeamMgr().setCanPush(p);
             // show player
             hider.showToAll(p);
             // tab packet
