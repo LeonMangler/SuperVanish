@@ -8,13 +8,13 @@ Configuration:
     ####### Fake Join-/LeaveMessages #######
     VanishReappearMessages:
       # Should this plugin broadcast a message when a player vanishs?
-      # You can change that message in the messages.yml file.
+      # You can change this message in the messages.yml file.
       BroadcastMessageOnVanish: true
       # Should this plugin broadcast a message when a player reappears?
-      # You can change that message in the messages.yml file.
+      # You can change this message in the messages.yml file.
       BroadcastMessageOnReappear: true
-      # Should players with the permission 'sv.see' get an other message when a player vanishs/reappears?
-      # You can change that message in the messages.yml file.
+      # Should players with the permission 'sv.see' get a different message when a player vanishs/reappears?
+      # You can change this message in the messages.yml file.
       SendDifferentMessages: true
       # Should only players with the permission 'sv.see' receive 'fake' join/leave messages?
       SendMessageOnlyToAdmins: false
@@ -24,10 +24,10 @@ Configuration:
     # Should this plugin hide the 'normal' join/leave messages of invisible players?
     HideNormalJoinAndLeaveMessagesWhileInvisible: true
     # Should this plugin remind players who join the server invisible?
-    # You can change that message in the messages.yml file.
+    # You can change this message in the messages.yml file.
     RemindInvisiblePlayersOnJoin: true
-    # Should invisible players have action bars that tell them that they're invisible?
-    # You can change the actionbar msg in the messages.yml file.
+    # Should invisible players have a message above their action bar which tells them that they're invisible?
+    # You can change this message in the messages.yml file. Requires ProtocolLib.
     DisplayActionBarsToInvisiblePlayers: true
 ##################################################
 ################ PLAYER OPTIONS ##################
@@ -47,7 +47,6 @@ Configuration:
       DisableOnReappear: true
     ########################################
     # Should invisible players not be able to trigger pressure plates and tripwire?
-    # If this feature is enabled invisible players can't trigger pressure plates and tripwire.
     DisablePressurePlatesForInvisiblePlayers: true
     # Should players with the permission 'sv.see' be able to see invisible players?
     EnableSeePermission: true
@@ -69,7 +68,7 @@ Configuration:
     ReappearOnWorldChange: false
     # Should invisible players automatically reappear when they quit the server?
     ReappearOnQuit: false
-    # Should SV still handle leave messages if 'ReappearOnQuit' is turned on?
+    # Should SV still handle quit messages if 'ReappearOnQuit' is turned on?
     ReappearOnQuitHandleLeaveMsg: true
     # Should invisible players not be able to push other players or be able to be pushed?
     # !! Uses scoreboard teams and may conflict with other plugins !! (1.9+)
@@ -101,7 +100,6 @@ Configuration:
     # Should SV hide invisible players in /who, /list, /online
     # and all other commands of Essentials?
     # Note: Players with a specific Essentials permission can still see invisible players in those commands
-    # Important: You have to reload both Essentials and SuperVanish if you change this setting.
     EnableEssentialsHook: true
     # Should SV hide invisible players on your dynamic map and broadcast join/leave messages if you use Dynmap?
     # You can change the default fake join/leave messages in the messages.yml file
@@ -117,7 +115,7 @@ Configuration:
 ##################################################
   CompatibilityOptions:
     # The event priority which SV should use for the specific event.
-    # If another plugin overrides SV's join/leave settings, setting the priorities to MONITOR can help.
+    # If another plugin overrides SV's join/leave messages setting the priorities to MONITOR can help.
     # Allowed values: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
     PlayerJoinEventPriority: HIGH # <- Set this to "HIGH" if you use Essentials to modify join messages
     PlayerQuitEventPriority: HIGHEST
