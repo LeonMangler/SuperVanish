@@ -26,7 +26,7 @@ Configuration:
     # Should this plugin remind players who join the server invisible?
     # You can change this message in the messages.yml file.
     RemindInvisiblePlayersOnJoin: true
-    # Should invisible players have a message above their action bar which tells them that they're invisible?
+    # Should invisible players have a message on their screen which tells them that they're invisible?
     # You can change this message in the messages.yml file. Requires ProtocolLib.
     DisplayActionBarsToInvisiblePlayers: true
 ##################################################

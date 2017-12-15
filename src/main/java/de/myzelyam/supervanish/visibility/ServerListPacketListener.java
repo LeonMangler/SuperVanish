@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 public class ServerListPacketListener extends PacketAdapter {
@@ -56,12 +57,16 @@ public class ServerListPacketListener extends PacketAdapter {
                 serverPing.setPlayersOnline(onlinePlayersCount - invisiblePlayersCount);
             }
             if (settings.getBoolean("Configuration.Serverlist.AdjustListOfLoggedInPlayers")) {
-                List<WrappedGameProfile> wrappedGameProfiles = new ArrayList<>();
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    WrappedGameProfile profile = WrappedGameProfile
-                            .fromPlayer(onlinePlayer);
-                    if (!invisiblePlayers.contains(onlinePlayer))
-                        wrappedGameProfiles.add(profile);
+                List<WrappedGameProfile> wrappedGameProfiles = new ArrayList<>(serverPing.getPlayers());
+                Iterator<WrappedGameProfile> iterator = wrappedGameProfiles.iterator();
+                while (iterator.hasNext()) {
+                    WrappedGameProfile profile = iterator.next();
+                    for (Player onlineInvisiblePlayer : invisiblePlayers) {
+                        if (profile.getUUID().equals(onlineInvisiblePlayer.getUniqueId())) {
+                            iterator.remove();
+                            break;
+                        }
+                    }
                 }
                 serverPing.setPlayers(wrappedGameProfiles);
             }

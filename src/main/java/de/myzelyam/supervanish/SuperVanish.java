@@ -88,7 +88,15 @@ public class SuperVanish extends JavaPlugin {
     public void onEnable() {
         try {
             VanishAPI.setPlugin(this);
-
+        } catch (NoSuchMethodError e) {
+            if (Bukkit.getPluginManager().getPlugin("PremiumVanish") != null) {
+                getLogger().severe("PremiumVanish is meant to be a replacement for SuperVanish, " +
+                        "you can't use both at the same time. SuperVanish will not work.");
+                getServer().getPluginManager().disablePlugin(this);
+            } else e.printStackTrace();
+            return;
+        }
+        try {
             prepareConfig();
             registerEvents();
             visibilityAdjuster = new VisibilityAdjuster(this);
@@ -123,7 +131,10 @@ public class SuperVanish extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        VanishAPI.setPlugin(null);
+        try {
+            VanishAPI.setPlugin(null);
+        } catch (NoSuchMethodError ignored) {
+        }
         PlayerCache.getPlayerCacheMap().clear();
     }
 
@@ -195,7 +206,7 @@ public class SuperVanish extends JavaPlugin {
             pluginManager.registerEvents(new GeneralEventListener(this), this);
             // world change event
             pluginManager.registerEvents(new WorldChangeEvent(this), this);
-            // plugin hooks
+            // plugin hooksag
             String currentHook = "Unknown";
             try {
                 if (pluginManager.isPluginEnabled("TrailGUI") && settings
@@ -359,8 +370,8 @@ public class SuperVanish extends JavaPlugin {
                                 .getPluginManager().getPlugin("Essentials");
                         User u = ess.getUser(specifiedPlayer);
                         if (u != null)
-                            if (u.getNickname() != null)
-                                msg = msg.replace("%nick", u.getNickname());
+                            msg = msg.replace("%nick", u.getNickname() != null ? u.getNickname() :
+                                    specifiedPlayer.getName());
                     }
                     // replace general variables
                     msg = msg
