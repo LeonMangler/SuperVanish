@@ -1,0 +1,34 @@
+image: maven:3-jdk-9-slim
+
+cache:
+  paths:
+  - .m2/repository
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+  - apt update
+  - apt install wget -y
+  - wget https://gitlab.com/cubekrowd/mavenrepo/raw/master/build2.sh
+  - bash build2.sh
+  artifacts:
+    paths:
+    - "*.jar"
+
+deploy:
+  stage: deploy
+  script:
+  - apt update
+  - apt install wget -y
+  - wget https://gitlab.com/cubekrowd/mavenrepo/raw/master/deploy1.sh
+  - bash deploy1.sh
+  only:
+  - master
