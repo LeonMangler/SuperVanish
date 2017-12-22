@@ -1,486 +1,289 @@
 /*
- *  This Source Code Form is subject to the terms of the Mozilla Public
- *   License, v. 2.0. If a copy of the MPL was not distributed with this
- *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright © 2015, Leon Mangler and the SuperVanish contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package de.myzelyam.supervanish;
 
-import com.earth2me.essentials.Essentials;
-import com.earth2me.essentials.User;
+import com.comphenix.protocol.ProtocolLibrary;
 
 import de.myzelyam.api.vanish.VanishAPI;
-import de.myzelyam.supervanish.cmd.CommandMgr;
-import de.myzelyam.supervanish.config.MessagesFile;
-import de.myzelyam.supervanish.config.SettingsFile;
-import de.myzelyam.supervanish.events.GeneralEventListener;
+import de.myzelyam.supervanish.commands.VanishCommand;
+import de.myzelyam.supervanish.config.ConfigMgr;
+import de.myzelyam.supervanish.events.GeneralEventHandler;
 import de.myzelyam.supervanish.events.JoinEvent;
+import de.myzelyam.supervanish.events.LoginEvent;
+import de.myzelyam.supervanish.events.PlayerBlockModifyEventHandler;
 import de.myzelyam.supervanish.events.QuitEvent;
 import de.myzelyam.supervanish.events.WorldChangeEvent;
-import de.myzelyam.supervanish.hooks.CitizensHook;
-import de.myzelyam.supervanish.hooks.SuperTrailsHook;
-import de.myzelyam.supervanish.hooks.TrailGUIHook;
-import de.myzelyam.supervanish.utils.PlayerCache;
-import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
+import de.myzelyam.supervanish.features.FeatureMgr;
+import de.myzelyam.supervanish.hooks.PluginHookMgr;
+import de.myzelyam.supervanish.net.UpdateNotifier;
+import de.myzelyam.supervanish.utils.ExceptionLogger;
+import de.myzelyam.supervanish.utils.VersionUtil;
 import de.myzelyam.supervanish.visibility.ActionBarMgr;
-import de.myzelyam.supervanish.visibility.ForcedInvisibilityTask;
+import de.myzelyam.supervanish.visibility.FileVanishStateMgr;
 import de.myzelyam.supervanish.visibility.ServerListPacketListener;
-import de.myzelyam.supervanish.visibility.SilentChestListeners_v3;
-import de.myzelyam.supervanish.visibility.TablistPacketMgr;
-import de.myzelyam.supervanish.visibility.TeamMgr;
-import de.myzelyam.supervanish.visibility.VisibilityAdjuster;
-
-import net.milkbowl.vault.chat.Chat;
+import de.myzelyam.supervanish.visibility.VisibilityChanger;
+import de.myzelyam.supervanish.visibility.hiders.PreventionHider;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static java.util.logging.Level.SEVERE;
+import lombok.Getter;
 
-public class SuperVanish extends JavaPlugin {
+public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
 
-    private static final String[] NON_REQUIRED_SETTING_UPDATES = new String[]{"5.10.0"};
-    private static final String[] NON_REQUIRED_MESSAGE_UPDATES = new String[]{"5.9.2", "5.9.3", "5.9.4",
-            "5.9.5", "5.9.6", "5.9.7", "5.9.8", "5.10.0"};
-    public boolean requiresCfgUpdate = false;
-    public boolean requiresMsgUpdate = false;
-    public boolean packetNightVision = false;
+    public static final String[] NON_REQUIRED_SETTINGS_UPDATES = {},
+            NON_REQUIRED_MESSAGES_UPDATES = {};
 
-    public MessagesFile messagesFile;
-    public FileConfiguration messages;
-
-    public SettingsFile settingsFile;
-    public FileConfiguration settings;
-
-    private File playerDataFile = new File(
-            this.getDataFolder().getPath() + File.separator + "playerdata.yml");
-    public FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerDataFile);
-
-    private VisibilityAdjuster visibilityAdjuster;
+    @Getter
+    private boolean useProtocolLib;
+    @Getter
     private ActionBarMgr actionBarMgr;
-    private TeamMgr teamMgr;
-    private ProtocolLibPacketUtils protocolLibPacketUtils;
-    private TablistPacketMgr tablistPacketMgr;
+    @Getter
+    private FileVanishStateMgr vanishStateMgr;
+    @Getter
+    private VersionUtil versionUtil;
+    @Getter
+    private ConfigMgr configMgr;
+    @Getter
+    private FeatureMgr featureMgr;
+    @Getter
+    private PlaceholderConverter placeholderConverter;
+    @Getter
+    private VanishCommand command;
+    @Getter
+    private VisibilityChanger visibilityChanger;
+    @Getter
+    private UpdateNotifier updateNotifier;
+    @Getter
+    private LoginEvent loginEvent;
+    @Getter
+    private LayeredPermissionChecker layeredPermissionChecker;
+    private Set<VanishPlayer> vanishPlayers = new HashSet<>();
 
     @Override
     public void onEnable() {
         try {
-            VanishAPI.setPlugin(this);
-        } catch (NoSuchMethodError e) {
-            if (Bukkit.getPluginManager().getPlugin("PremiumVanish") != null) {
-                getLogger().severe("PremiumVanish is meant to be a replacement for SuperVanish, " +
-                        "you can't use both at the same time. SuperVanish will not work.");
-                getServer().getPluginManager().disablePlugin(this);
-            } else e.printStackTrace();
-            return;
+            useProtocolLib = getServer().getPluginManager().isPluginEnabled("ProtocolLib");
+            if (!useProtocolLib) log(Level.INFO,
+                    "Please install ProtocolLib to be able to use all SuperVanish features: " +
+                            "https://www.spigotmc.org/resources/protocollib.1997/");
+            configMgr = new ConfigMgr(this);
+            configMgr.prepareFiles();
+            placeholderConverter = new PlaceholderConverter(this);
+            layeredPermissionChecker = new LayeredPermissionChecker(this);
+            command = new VanishCommand(this);
+            versionUtil = new VersionUtil(this);
+            vanishStateMgr = new FileVanishStateMgr(this);
+            if (getSettings().getBoolean("MiscellaneousOptions.UpdateChecker.Enable", true))
+                updateNotifier = new UpdateNotifier(this);
+            visibilityChanger = new VisibilityChanger(new PreventionHider(this), this);
+            if (versionUtil.isOneDotXOrHigher(8) && useProtocolLib)
+                actionBarMgr = new ActionBarMgr(this);
+            if (useProtocolLib && ServerListPacketListener.isEnabled(this))
+                ServerListPacketListener.register(this);
+            registerEvents();
+            new PluginHookMgr(this);
+            featureMgr = new FeatureMgr(this);
+            featureMgr.enableFeatures();
+            if (!Bukkit.getOnlinePlayers().isEmpty())
+                onReload();
+        } catch (Exception e) {
+            logException(e);
         }
         try {
-            prepareConfig();
-            registerEvents();
-            visibilityAdjuster = new VisibilityAdjuster(this);
-            if (isOneDotXOrHigher(8))
-                teamMgr = new TeamMgr(this);
-            if (settings.getBoolean("Configuration.Players.SilentOpenChest")
-                    && isOneDotXOrHigher(8)) {
-                new SilentChestListeners_v3(this);
-            }
-
-            if (getServer().getPluginManager().getPlugin("ProtocolLib") != null) {
-                protocolLibPacketUtils = new ProtocolLibPacketUtils(this);
-                packetNightVision = true;
-                if (isOneDotXOrHigher(8))
-                    actionBarMgr = new ActionBarMgr(this);
-                new ServerListPacketListener(this).register();
-                if (settings.getBoolean("Configuration.Tablist.MarkVanishedPlayersAsSpectators")
-                        && isOneDotXOrHigher(8)) {
-                    tablistPacketMgr = new TablistPacketMgr(this);
-                    tablistPacketMgr.registerListener();
-                }
-            } else Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[SuperVanish]" +
-                    " Please install ProtocolLib to be able to use all SuperVanish features:" +
-                    " https://www.spigotmc.org/resources/protocollib.1997/");
-
-            new ForcedInvisibilityTask(this).start();
-            checkForReload();
-        } catch (Exception e) {
-            printException(e);
+            VanishAPI.setPlugin(this);
+        } catch (NoSuchMethodError ignored) {
+            // API already loaded by other plugin
         }
     }
 
     @Override
     public void onDisable() {
         try {
+            if (featureMgr != null) featureMgr.disableFeatures();
+            vanishPlayers.clear();
             VanishAPI.setPlugin(null);
-        } catch (NoSuchMethodError ignored) {
-        }
-        PlayerCache.getPlayerCacheMap().clear();
-    }
-
-    private void prepareConfig() {
-        try {
-            // messages
-            messagesFile = new MessagesFile();
-            messagesFile.saveDefaultConfig();
-            this.messages = messagesFile.getConfig();
-            // config
-            settingsFile = new SettingsFile();
-            settingsFile.saveDefaultConfig();
-            this.settings = settingsFile.getConfig();
-            // player data
-            playerData.options().header("SuperVanish v" + getDescription().getVersion()
-                    + " - Player data");
-            playerData.options().copyHeader(true);
-            savePlayerData();
-            // check for config updates
-            checkConfig();
-        } catch (Exception e) {
-            printException(e);
-        }
-    }
-
-    public void savePlayerData() {
-        try {
-            playerData.save(playerDataFile);
-        } catch (IOException e) {
-            printException(e);
-        }
-    }
-
-    private void checkForReload() {
-        try {
-            Collection<Player> invisiblePlayers = getOnlineInvisiblePlayers();
-            // action bars
-            if (getServer().getPluginManager().getPlugin("ProtocolLib") != null
-                    && settings.getBoolean(
-                    "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")
-                    && !isOneDotX(7) && actionBarMgr != null) {
-                for (Player p : invisiblePlayers) {
-                    actionBarMgr.addActionBar(p);
-                }
+        } catch (Throwable e) {
+            if (e instanceof ThreadDeath || e instanceof VirtualMachineError) throw e;
+            if (!(e instanceof NoClassDefFoundError | e instanceof NoSuchMethodError)) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            printException(e);
         }
     }
 
-    private EventPriority getEventPriority(Class<? extends Event> clazz) {
+    private void onReload() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            boolean itemPickUps = getPlayerData().getBoolean(
+                    "PlayerData." + player.getUniqueId() + ".itemPickUps",
+                    getSettings().getBoolean("InvisibilityFeatures.DefaultPickUpItemsOption"));
+            boolean vanished = vanishStateMgr.isVanished(player.getUniqueId());
+            createVanishPlayer(player, itemPickUps);
+            if (vanished) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+                    if (!hasPermissionToSee(onlinePlayer, player))
+                        visibilityChanger.getHider().setHidden(player, onlinePlayer, true);
+            }
+            if (getSettings().getBoolean("MessageOptions.DisplayActionBar")
+                    && vanished && actionBarMgr != null) {
+                actionBarMgr.addActionBar(player);
+            }
+        }
+    }
+
+    public void reload() {
+        getServer().getScheduler().cancelTasks(this);
+        HandlerList.unregisterAll(this);
+        if (useProtocolLib)
+            ProtocolLibrary.getProtocolManager().removePacketListeners(this);
+        onDisable();
+        onEnable();
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        return this.command.tabComplete(command, sender, alias, args);
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        this.command.execute(command, sender, label, args);
+        return true;
+    }
+
+    private void registerEvents() {
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new GeneralEventHandler(this), this);
+        pluginManager.registerEvents(new PlayerBlockModifyEventHandler(this), this);
+        pluginManager.registerEvents(new WorldChangeEvent(this), this);
+        pluginManager.registerEvents(loginEvent = new LoginEvent(this), this);
+        JoinEvent joinEvent = new JoinEvent(this);
+        pluginManager.registerEvent(PlayerJoinEvent.class, joinEvent,
+                getEventPriority(PlayerJoinEvent.class), joinEvent, this, false);
+        QuitEvent quitEvent = new QuitEvent(this);
+        pluginManager.registerEvent(PlayerQuitEvent.class, quitEvent,
+                getEventPriority(PlayerQuitEvent.class), quitEvent, this, false);
+    }
+
+    private EventPriority getEventPriority(Class<? extends Event> eventClass) {
         try {
-            String eventName = clazz.getSimpleName();
-            String configSetting = settings.getString("Configuration.CompatibilityOptions."
-                    + eventName + "Priority");
-            if (configSetting == null)
-                return EventPriority.NORMAL;
-            return EventPriority.valueOf(configSetting);
+            String eventName = eventClass.getSimpleName();
+            String configString = getSettings().getString("CompatibilityOptions." + eventName + "Priority");
+            if (configString == null) return EventPriority.NORMAL;
+            EventPriority priority = EventPriority.valueOf(configString);
+            return priority;
         } catch (Exception e) {
-            printException(e);
+            logException(e);
             return EventPriority.NORMAL;
         }
     }
 
-    private void registerEvents() {
-        try {
-            PluginManager pluginManager = this.getServer().getPluginManager();
-            // general
-            pluginManager.registerEvents(new GeneralEventListener(this), this);
-            // world change event
-            pluginManager.registerEvents(new WorldChangeEvent(this), this);
-            // plugin hooksag
-            String currentHook = "Unknown";
-            try {
-                if (pluginManager.isPluginEnabled("TrailGUI") && settings
-                        .getBoolean("Configuration.Hooks.EnableTrailGUIHook", true)) {
-                    currentHook = "TrailGUI";
-                    TrailGUIHook.replaceMoveListener();
-                }
-                if (pluginManager.isPluginEnabled("SuperTrails") && settings.getBoolean(
-                        "Configuration.Hooks.EnableSuperTrailsHook", true)) {
-                    currentHook = "SuperTrails";
-                    new SuperTrailsHook(this);
-                }
-                if (pluginManager.isPluginEnabled("Citizens") && settings.getBoolean(
-                        "Configuration.Hooks.EnableCitizensHook", true)) {
-                    currentHook = "Citizens";
-                    new CitizensHook(this);
-                }
-            } catch (Throwable throwable) {
-                if (throwable instanceof ThreadDeath || throwable instanceof VirtualMachineError)
-                    throw throwable;
-                getLogger().log(Level.WARNING, "[SuperVanish] Failed to hook into " + currentHook
-                        + ", please report this if you are using the latest version of that plugin: "
-                        + throwable.getMessage());
-                // just continue normally, don't let another plugin break SV!
-            }
-            // join event
-            JoinEvent joinEvent = new JoinEvent(this);
-            pluginManager.registerEvent(PlayerJoinEvent.class, joinEvent,
-                    getEventPriority(PlayerJoinEvent.class), joinEvent, this,
-                    false);
-            // quit event
-            QuitEvent quitEvent = new QuitEvent(this);
-            pluginManager.registerEvent(PlayerQuitEvent.class, quitEvent,
-                    getEventPriority(PlayerQuitEvent.class), quitEvent, this,
-                    false);
-        } catch (Exception e) {
-            printException(e);
-        }
+    public String replacePlaceholders(String msg, Object... additionalPlayerInfo) {
+        return placeholderConverter.replacePlaceholders(msg, additionalPlayerInfo);
     }
 
-    public void printException(Exception e) {
-        Logger logger = getLogger();
-        try {
-            logger.log(SEVERE, "Unknown Exception occurred!");
-            if (requiresCfgUpdate || requiresMsgUpdate) {
-                logger.log(SEVERE,
-                        "You have an outdated configuration,");
-                logger.log(SEVERE,
-                        "regenerating it by using '/sv updatecfg' might fix this problem.");
-            } else
-                logger.log(SEVERE, "Please report this issue!");
-            logger.log(SEVERE, "Message: ");
-            logger.log(SEVERE, "  " + e.getMessage());
-            logger.log(SEVERE, "General information: ");
-            StringBuilder plugins = new StringBuilder();
-            for (Plugin plugin : Bukkit.getServer().getPluginManager()
-                    .getPlugins()) {
-                if (plugin.getName().equalsIgnoreCase("SuperVanish"))
-                    continue;
-                plugins.append(plugin.getName()).append(" v")
-                        .append(plugin.getDescription().getVersion()).append(", ");
-            }
-            logger.log(SEVERE, "  ServerVersion: "
-                    + getServer().getVersion());
-            logger.log(SEVERE, "  PluginVersion: "
-                    + getDescription().getVersion());
-            logger.log(SEVERE, "  ServerPlugins: " + plugins);
-            logger.log(SEVERE, "StackTrace: ");
-            e.printStackTrace();
-            logger.log(SEVERE, "Please include this information");
-            logger.log(SEVERE, "if you report the issue.");
-        } catch (Exception e2) {
-            logger.log(SEVERE,
-                    "An exception occurred while trying to print a detailed stacktrace, "
-                            + "printing an undetailed stacktrace of both exceptions:");
-            logger.log(SEVERE, "ORIGINAL EXCEPTION:");
-            e.printStackTrace();
-            logger.log(SEVERE, "SECOND EXCEPTION:");
-            e2.printStackTrace();
-        }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel,
-                             String[] args) {
-        new CommandMgr(this, cmd, sender, args, cmdLabel);
-        return true;
-    }
-
-    public void checkConfig() {
-        try {
-            String currentCfgVersion = settings.getString("ConfigVersion");
-            String newestVersion = getDescription().getVersion();
-            String currentMsgsVersion = messages.getString("MessagesVersion");
-            this.requiresMsgUpdate = fileRequiresRecreation(currentMsgsVersion, false);
-            this.requiresCfgUpdate = fileRequiresRecreation(currentCfgVersion, true);
-            if (newestVersion.equals(currentCfgVersion))
-                this.requiresCfgUpdate = false;
-            if (newestVersion.equals(currentMsgsVersion))
-                this.requiresMsgUpdate = false;
-        } catch (Exception e) {
-            printException(e);
-        }
-    }
-
-    private boolean fileRequiresRecreation(String currentVersion, boolean isSettingsFile) {
-        if (currentVersion == null)
-            return true;
-        for (String ignoredVersion : isSettingsFile ? NON_REQUIRED_SETTING_UPDATES
-                : NON_REQUIRED_MESSAGE_UPDATES) {
-            if (currentVersion.equalsIgnoreCase(ignoredVersion))
-                return false;
-        }
-        return true;
-    }
-
-    public String convertString(String msg, Object unspecifiedPlayer) {
-        try {
-            replaceVariables:
-            {
-                if (unspecifiedPlayer instanceof OfflinePlayer
-                        && !(unspecifiedPlayer instanceof Player)) {
-                    // offline player
-                    OfflinePlayer specifiedPlayer = (OfflinePlayer) unspecifiedPlayer;
-                    // remove Vault prefix and suffix
-                    if (getServer().getPluginManager().getPlugin("Vault") != null) {
-                        msg = msg.replace("%prefix", "").replace("%suffix", "");
-                    }
-                    // replace essentials nick names
-                    if (getServer().getPluginManager()
-                            .getPlugin("Essentials") != null) {
-                        msg = msg.replace("%nick", specifiedPlayer.getName());
-                    }
-                    // replace general variables
-                    msg = msg.replace("%d", specifiedPlayer.getName())
-                            .replace("%p", specifiedPlayer.getName())
-                            .replace("%t", specifiedPlayer.getName());
-                    break replaceVariables;
-                }
-                if (unspecifiedPlayer instanceof Player) {
-                    // player
-                    Player specifiedPlayer = (Player) unspecifiedPlayer;
-                    // replace Vault prefix and suffix
-                    if (getServer().getPluginManager().getPlugin("Vault") != null) {
-                        RegisteredServiceProvider<Chat> rsp = getServer()
-                                .getServicesManager().getRegistration(Chat.class);
-                        if (rsp != null) {
-                            Chat chat = rsp.getProvider();
-                            if (chat != null) {
-                                if (chat.getPlayerPrefix(specifiedPlayer) != null)
-                                    msg = msg.replace("%prefix", chat.getPlayerPrefix(specifiedPlayer));
-                                if (chat.getPlayerSuffix(specifiedPlayer) != null)
-                                    msg = msg.replace("%suffix", chat.getPlayerSuffix(specifiedPlayer));
-                            }
-                        }
-                    }
-                    // replace essentials nick names
-                    if (getServer().getPluginManager()
-                            .getPlugin("Essentials") != null) {
-                        Essentials ess = (Essentials) Bukkit.getServer()
-                                .getPluginManager().getPlugin("Essentials");
-                        User u = ess.getUser(specifiedPlayer);
-                        if (u != null)
-                            msg = msg.replace("%nick", u.getNickname() != null ? u.getNickname() :
-                                    specifiedPlayer.getName());
-                    }
-                    // replace general variables
-                    msg = msg
-                            .replace("%d",
-                                    "" + specifiedPlayer.getDisplayName())
-                            .replace("%p", "" + specifiedPlayer.getName())
-                            .replace("%t",
-                                    "" + specifiedPlayer.getPlayerListName());
-                    break replaceVariables;
-                }
-                if (unspecifiedPlayer instanceof CommandSender) {
-                    // console
-                    // remove Vault prefixes
-                    if (getServer().getPluginManager().getPlugin("Vault") != null) {
-                        msg = msg.replace("%prefix", "").replace("%suffix", "");
-                    }
-                    // replace general variables
-                    msg = msg.replace("%d", "Console").replace("%p", "Console")
-                            .replace("%t", "Console");
-                }
-            }
-            // add color
-            msg = ChatColor.translateAlternateColorCodes('&', msg);
-            // return replaced message
-            return msg;
-        } catch (Exception e) {
-            printException(e);
-            return "SV-Error occurred; more information in console";
-        }
-    }
-
-    public boolean canSee(Player viewer, Player viewed) {
-        if (viewer == null) throw new IllegalArgumentException("viewer cannot be null");
-        if (!playerData.getStringList("InvisiblePlayers").contains(viewed.getUniqueId().toString()))
-            return true;
-        boolean enableSeePermission = getConfig().getBoolean("Configuration.Players.EnableSeePermission");
-        if (!enableSeePermission) return false;
-        int viewerLevel = PlayerCache.fromPlayer(viewer, this).getSeePermissionLevel();
-        if (viewerLevel == 0) return false;
-        int viewedLevel = PlayerCache.fromPlayer(viewed, this).getUsePermissionLevel();
-        return viewerLevel >= viewedLevel;
-    }
-
-    public String getMsg(String path) {
-        String message = messages.getString("Messages." + path);
+    public String getMessage(String path) {
+        String message = getMessages().getString("Messages." + path);
         if (message == null) {
-            // get default value if not present
-            message = messagesFile.getDefaultConfig().getString("Messages." + path);
+            message = configMgr.getMessagesFile().getDefaultConfig().getString("Messages." + path);
         }
         return message;
     }
 
-    public boolean isOneDotX(int majorRelease) {
-        String version = getServer().getClass().getPackage().getName()
-                .replace(".", ",").split(",")[3];
-        return version.contains("v1_" + majorRelease + "_R");
-    }
-
-    public boolean isOneDotXOrHigher(int majorRelease) {
-        String version = getServer().getClass().getPackage().getName()
-                .replace(".", ",").split(",")[3];
-        for (int i = majorRelease; i < 20; i++)
-            if (version.contains("v1_" + i + "_R")) return true;
-        return version.contains("v2_");
-    }
-
-    // override the standard Config API
-    @Override
-    public FileConfiguration getConfig() {
-        return settings;
-    }
-
-    @Override
-    public void saveDefaultConfig() {
-        settingsFile.saveDefaultConfig();
-    }
-
-    public List<String> getAllInvisiblePlayers() {
-        return playerData.getStringList("InvisiblePlayers");
-    }
-
-    public Collection<Player> getOnlineInvisiblePlayers() {
-        Collection<Player> onlineInvisiblePlayers = new HashSet<>();
-        List<String> allInvisiblePlayers = getAllInvisiblePlayers();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (allInvisiblePlayers.contains(player.getUniqueId().toString())) {
-                onlineInvisiblePlayers.add(player);
+    public VanishPlayer getVanishPlayer(Player player) {
+        for (VanishPlayer vanishPlayer : vanishPlayers) {
+            if (vanishPlayer.getPlayer().equals(player)) {
+                return vanishPlayer;
             }
         }
-        return onlineInvisiblePlayers;
+        return null;
     }
 
-    public ActionBarMgr getActionBarMgr() {
-        return actionBarMgr;
+    public void createVanishPlayer(Player player, boolean itemPickUps) {
+        VanishPlayer vanishPlayer = new VanishPlayer(player, this, itemPickUps);
+        vanishPlayers.add(vanishPlayer);
     }
 
-    public VisibilityAdjuster getVisibilityAdjuster() {
-        return visibilityAdjuster;
+    public void removeVanishPlayer(VanishPlayer vanishPlayer) {
+        vanishPlayers.remove(vanishPlayer);
     }
 
-    public ProtocolLibPacketUtils getProtocolLibPacketUtils() {
-        return protocolLibPacketUtils;
+    public void sendMessage(CommandSender p, String messagesYmlPath, Object... additionalPlayerInfo) {
+        String message;
+        if (!messagesYmlPath.contains(" "))
+            message = getMessage(messagesYmlPath);
+        else message = messagesYmlPath;
+        if (message.equalsIgnoreCase("") || messagesYmlPath.equalsIgnoreCase(""))
+            return;
+        message = replacePlaceholders(message, additionalPlayerInfo);
+        p.sendMessage(message);
     }
 
-    public TeamMgr getTeamMgr() {
-        return teamMgr;
+    public boolean canSee(Player viewer, Player viewed) {
+        return !visibilityChanger.getHider().isHidden(viewed, viewer);
     }
 
-    public TablistPacketMgr getTablistPacketMgr() {
-        return tablistPacketMgr;
+    public boolean hasPermissionToVanish(CommandSender sender) {
+        return layeredPermissionChecker.hasPermissionToVanish(sender);
+    }
+
+    public boolean hasPermissionToSee(Player viewer, Player viewed) {
+        return layeredPermissionChecker.hasPermissionToSee(viewer, viewed);
+    }
+
+    public int getLayeredPermissionLevel(CommandSender sender, String permission) {
+        return layeredPermissionChecker.getLayeredPermissionLevel(sender, permission);
+    }
+
+    public FileConfiguration getSettings() {
+        return configMgr.getSettings();
+    }
+
+    public FileConfiguration getMessages() {
+        return configMgr.getMessages();
+    }
+
+    public FileConfiguration getPlayerData() {
+        return configMgr.getPlayerData();
+    }
+
+    @Override
+    public FileConfiguration getConfig() {
+        return getSettings();
+    }
+
+    @Override
+    public void log(Level level, String msg) {
+        getLogger().log(level, msg);
+    }
+
+    @Override
+    public void log(Level level, String msg, Throwable ex) {
+        getLogger().log(level, msg, ex);
+    }
+
+    @Override
+    public void logException(Throwable e) {
+        ExceptionLogger.logException(e, this);
     }
 }

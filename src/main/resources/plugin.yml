@@ -2,53 +2,57 @@ name: SuperVanish
 main: de.myzelyam.supervanish.SuperVanish
 author: MyzelYam
 description: Advanced /vanish plugin which makes other players think that you're not on the server
-version: 5.10.1
+version: 6.0.0
 website: https://www.spigotmc.org/resources/supervanish-be-invisible.1331/
 softdepend:
 - ProtocolLib
+- LibsDisguises
+- DisguiseCraft
 - dynmap
 - Essentials
 - TrailGUI
-- Citizens
 - SuperTrails
+- PlaceholderAPI
+- CustomParticleEffects
+- Citizens
+- NametagEdit
+- MVdWPlaceholderAPI
 - Vault
 commands:
   sv:
     usage: /sv
     description: SuperVanish's main command
-    aliases: [v, supervanish, vanish, vlist]
-  vlogin:
-    usage: /vlogin
-    description: Broadcasts a login-message
-    aliases: [svlogin]
-  vlogout:
-    usage: /vlogout
-    description: Broadcasts a logout-message
-    aliases: [svlogout]
+    aliases: [supervanish, v, vanish]
 permissions:
   sv.*:
     children:
-    - sv.use
-    - sv.see
-    - sv.reload
-    - sv.login
-    - sv.logout
-    - sv.others
-    - sv.list
-    - sv.fly
-    - sv.toggleitempickups
-    - sv.updatecfg
-    - sv.joinvanished
+      sv.use: true
+      sv.see: true
+      sv.reload: true
+      sv.logout: true
+      sv.login: true
+      sv.others: true
+      sv.list: true
+      sv.keepfly: true
+      sv.toggleitems: true
+      sv.recreatefiles: true
+      sv.notoggle: true
+      sv.joinvanished: true
+      sv.notify: true
+      sv.breakblocks: true
+      sv.placeblocks: true
+      sv.damage: true
+      sv.stacktrace: true
+    description: Grants you all SuperVanish permissions
   supervanish.*:
     children:
-    - sv.use
-    - sv.see
-    - sv.reload
-    - sv.logout
-    - sv.login
-    - sv.others
-    - sv.list
-    - sv.fly
-    - sv.toggleitempickups
-    - sv.updatecfg
-    - sv.joinvanished
+      sv.*: true
+    description: Grants you all SuperVanish permissions
+  sv.see:
+    description: You can see other vanished players
+  sv.notoggle:
+    description: Other players cannot hide/show you if you're online
+  sv.keepfly:
+    description: You can always keep flying when you reappear
+  sv.joinvanished:
+    description: You always join vanished (must be enabled in config)

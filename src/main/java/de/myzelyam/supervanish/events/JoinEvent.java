@@ -1,93 +1,91 @@
 /*
- *  This Source Code Form is subject to the terms of the Mozilla Public
- *   License, v. 2.0. If a copy of the MPL was not distributed with this
- *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright © 2015, Leon Mangler and the SuperVanish contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.hooks.EssentialsHook;
-import de.myzelyam.supervanish.utils.PlayerCache;
-import de.myzelyam.supervanish.utils.ProtocolLibPacketUtils;
+import de.myzelyam.supervanish.features.Broadcast;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.EventExecutor;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
-import java.util.List;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class JoinEvent implements EventExecutor, Listener {
+
     private final SuperVanish plugin;
 
     public JoinEvent(SuperVanish plugin) {
         this.plugin = plugin;
     }
 
-    private FileConfiguration getSettings() {
-        return plugin.settings;
-    }
-
-    @SuppressWarnings("deprecation")
     @Override
-    public void execute(Listener listener, Event event) {
+    public void execute(Listener l, Event event) {
         try {
             if (event instanceof PlayerJoinEvent) {
                 PlayerJoinEvent e = (PlayerJoinEvent) event;
                 final Player p = e.getPlayer();
-                PlayerCache.fromPlayer(p, plugin);
-                final List<String> invisiblePlayers = plugin.getAllInvisiblePlayers();
-
-                if (getSettings().getBoolean("Configuration.Players.AutoVanishOnJoin", false)
-                        && p.hasPermission("sv.joinvanished")
-                        && !invisiblePlayers.contains(p.getUniqueId().toString())) {
-                    invisiblePlayers.add(p.getUniqueId().toString());
-                    plugin.playerData.set("InvisiblePlayers", invisiblePlayers);
-                    plugin.savePlayerData();
-                }
-
                 // vanished:
-                if (invisiblePlayers.contains(p.getUniqueId().toString())) {
-                    if (getSettings().getBoolean(
-                            "Configuration.Messages.HideNormalJoinAndLeaveMessagesWhileInvisible", true)) {
+                if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
+                    // Join message
+                    if (plugin.getSettings().getBoolean("MessageOptions.HideRealJoinQuitMessages")) {
                         e.setJoinMessage(null);
+                        Broadcast.announceSilentJoin(p, plugin);
                     }
-                    if (plugin.getServer().getPluginManager()
-                            .getPlugin("Essentials") != null
-                            && getSettings().getBoolean("Configuration.Hooks.EnableEssentialsHook")) {
-                        EssentialsHook.hidePlayer(p);
+                    // collision
+                    try {
+                        //noinspection deprecation
+                        p.getPlayer().spigot().setCollidesWithEntities(false);
+                    } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
                     }
-                    if (getSettings().getBoolean("Configuration.Messages.RemindInvisiblePlayersOnJoin")) {
-                        p.sendMessage(plugin.convertString(
-                                plugin.getMsg("RemindingMessage"), p));
+                    // reminding message
+                    if (plugin.getSettings().getBoolean("MessageOptions.RemindVanishedOnJoin")) {
+                        plugin.sendMessage(p, "RemindingMessage", p);
                     }
-                    plugin.getVisibilityAdjuster().getHider().hideToAll(p);
-                    p.setMetadata("vanished", new FixedMetadataValue(plugin, true));
-                    if (plugin.getActionBarMgr() != null
-                            && getSettings().getBoolean(
-                            "Configuration.Messages.DisplayActionBarsToInvisiblePlayers")) {
+                    // re-add action bar
+                    if (plugin.getActionBarMgr() != null && plugin.getSettings().getBoolean(
+                            "MessageOptions.DisplayActionBar")) {
                         plugin.getActionBarMgr().addActionBar(p);
                     }
-                    if (plugin.packetNightVision && getSettings().getBoolean(
-                            "Configuration.Players.AddNightVision"))
-                        plugin.getProtocolLibPacketUtils().sendAddPotionEffect(p, new PotionEffect(
-                                PotionEffectType.NIGHT_VISION,
-                                ProtocolLibPacketUtils.INFINITE_POTION_DURATION, 0));
-                    if (plugin.getTeamMgr() != null)
-                        plugin.getTeamMgr().setCantPush(p);
+                    // adjust fly
+                    if (plugin.getSettings().getBoolean("InvisibilityFeatures.Fly.Enable")) {
+                        p.setAllowFlight(true);
+                    }
+                    // metadata
+                    p.setMetadata("vanished", new FixedMetadataValue(plugin, true));
+                } else {
+                    // not vanished:
+                    // metadata
+                    p.removeMetadata("vanished", plugin);
                 }
-
                 // not necessarily vanished:
-                plugin.getVisibilityAdjuster().getHider().hideAllInvisibleTo(p);
+                // recreate files msg
+                if ((p.hasPermission("sv.recreatecfg") || p.hasPermission("sv.recreatefiles"))
+                        && (plugin.getConfigMgr().isSettingsUpdateRequired()
+                        || plugin.getConfigMgr().isMessagesUpdateRequired())) {
+                    String currentVersion = plugin.getDescription().getVersion();
+                    boolean isDismissed =
+                            plugin.getPlayerData().getBoolean("PlayerData." + p.getUniqueId() + ".dismissed."
+                                    + currentVersion.replace(".", "_"), false);
+                    if (!isDismissed)
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                plugin.sendMessage(p, "RecreationRequiredMsg", p);
+                            }
+                        }.runTaskLater(plugin, 1);
+                }
             }
         } catch (Exception er) {
-            plugin.printException(er);
+            plugin.logException(er);
         }
     }
 }

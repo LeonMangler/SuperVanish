@@ -1,7 +1,9 @@
 /*
- *  This Source Code Form is subject to the terms of the Mozilla Public
- *   License, v. 2.0. If a copy of the MPL was not distributed with this
- *   file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright © 2015, Leon Mangler and the SuperVanish contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package de.myzelyam.supervanish.visibility;
@@ -18,60 +20,61 @@ import de.myzelyam.supervanish.SuperVanish;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 public class ServerListPacketListener extends PacketAdapter {
 
     private final SuperVanish plugin;
 
-    private final FileConfiguration settings;
-
     public ServerListPacketListener(SuperVanish plugin) {
         //noinspection deprecation
         super(plugin, ListenerPriority.NORMAL, PacketType.Status.Server.OUT_SERVER_INFO);
         this.plugin = plugin;
-        settings = plugin.settings;
     }
 
-    public void register() {
-        if ((!settings.getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers"))
-                && (!settings.getBoolean("Configuration.Serverlist.AdjustListOfLoggedInPlayers")))
-            return;
-        ProtocolLibrary.getProtocolManager().addPacketListener(this);
+    public static void register(SuperVanish plugin) {
+        ProtocolLibrary.getProtocolManager().addPacketListener(new ServerListPacketListener(plugin));
+    }
+
+    public static boolean isEnabled(SuperVanish plugin) {
+        final FileConfiguration config = plugin.getSettings();
+        return config.getBoolean(
+                "ExternalInvisibility.ServerList.AdjustAmountOfOnlinePlayers")
+                || config.getBoolean(
+                "ExternalInvisibility.ServerList.AdjustListOfLoggedInPlayers");
     }
 
     @Override
     public void onPacketSending(PacketEvent e) {
         try {
-            WrappedServerPing serverPing = e.getPacket()
-                    .getServerPings().read(0);
-            Collection<Player> invisiblePlayers = this.plugin.getOnlineInvisiblePlayers();
-            int invisiblePlayersCount = invisiblePlayers.size();
-            int onlinePlayersCount = Bukkit.getOnlinePlayers().size();
-            if (settings.getBoolean("Configuration.Serverlist.AdjustAmountOfOnlinePlayers")) {
-                serverPing.setPlayersOnline(onlinePlayersCount - invisiblePlayersCount);
+            final FileConfiguration settings = plugin.getSettings();
+            if (!settings.getBoolean("ExternalInvisibility.ServerList.AdjustAmountOfOnlinePlayers")
+                    && !settings.getBoolean("ExternalInvisibility.ServerList.AdjustListOfLoggedInPlayers"))
+                return;
+            WrappedServerPing ping = e.getPacket().getServerPings().read(0);
+            Collection<UUID> onlineVanishedPlayers = plugin.getVanishStateMgr().getOnlineVanishedPlayers();
+            int vanishedPlayersCount = plugin.getVanishStateMgr().getOnlineVanishedPlayers().size(),
+                    playerCount = Bukkit.getOnlinePlayers().size();
+            if (settings.getBoolean("ExternalInvisibility.ServerList.AdjustAmountOfOnlinePlayers")) {
+                ping.setPlayersOnline(playerCount - vanishedPlayersCount);
             }
-            if (settings.getBoolean("Configuration.Serverlist.AdjustListOfLoggedInPlayers")) {
-                List<WrappedGameProfile> wrappedGameProfiles = new ArrayList<>(serverPing.getPlayers());
+            if (settings.getBoolean("ExternalInvisibility.ServerList.AdjustListOfLoggedInPlayers")) {
+                List<WrappedGameProfile> wrappedGameProfiles = new ArrayList<>(ping.getPlayers());
                 Iterator<WrappedGameProfile> iterator = wrappedGameProfiles.iterator();
                 while (iterator.hasNext()) {
-                    WrappedGameProfile profile = iterator.next();
-                    for (Player onlineInvisiblePlayer : invisiblePlayers) {
-                        if (profile.getUUID().equals(onlineInvisiblePlayer.getUniqueId())) {
-                            iterator.remove();
-                            break;
-                        }
+                    if (onlineVanishedPlayers.contains(iterator.next().getUUID())) {
+                        iterator.remove();
                     }
                 }
-                serverPing.setPlayers(wrappedGameProfiles);
+                ping.setPlayers(wrappedGameProfiles);
             }
-        } catch (Exception ex) {
-            plugin.printException(ex);
+        } catch (Exception er) {
+            plugin.logException(er);
         }
     }
 }

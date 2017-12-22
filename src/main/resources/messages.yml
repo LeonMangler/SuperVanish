@@ -1,43 +1,72 @@
-# SuperVanish v5.10.1 - Messages
+# SuperVanish v6.0.0 - Messages
+#
 # Information:
-# You can use the & character for color codes. Example: '&cThe color of this text would be red!'
-# You can use %p to get the player's name. Example: '&4&l%p, you aren't allowed to execute this command!'
-# %p returns in 'HideOtherMessage', 'AlreadyInvisibleMessage',
-#'AlreadyVisibleMessage' and 'ShowOtherMessage' the name of the given player.
-# You can use %d to get the player's displayname. Example: '&6Your displayname: &c%d'
-# You can use %t to get the player's tabname (This is the name of the player in the playerlist [TAB]).
-# You can use %l to get a list of invisible players. (Only in 'ListMessage' available)
-# You can use %prefix to get the player's prefix (Requires Vault).
-# You can use %suffix to get the player's suffix (Requires Vault).
-# You can use %nick to get the player's nickname (Requires Essentials).
+# <..> means that .. is required; [..] means that .. is optional and can be left out; | inside [] or <> stands for 'OR'
+# You can use the & character for color codes; Example: '&cThe color of this text would be red!'
+# You can use %p% to get the player's name; Example: '&4&l%p%, you aren't allowed to execute this command!'
+# You can use %other% to get the name of the target or cause
+# You can use %d% to get the player's display name; if you use Essentials then the display name contains the prefix too
+# You can use %tab% to get the player's name in the player list (TAB)
+# You can use %prefix% to get the player's prefix (Requires Vault)
+# You can use %suffix% to get the player's suffix (Requires Vault)
+# You can use %group% to get the player's group (Requires Vault)
+# You can use %nick% to get the player's nickname (Requires Essentials)
+# Some messages allow different, unique variables too
+#
+# NOTE: You can get WAY more placeholders by installing PlaceholderAPI or MVdWPlaceholderAPI
+#
+# Empty messages will not be sent
+# Using \n starts a new line
+#
 # Important:
-# You must put your messages in quotes if you use colorcodes and/or special characters like colons! Example: 'Hi: &6%p'
+# You must double single quotes if you want to use them inside a message.
+# You must NOT use any tab characters inside this file (indent key) otherwise YAML will spam your console with errors!
+# !! If there are errors in the console after editing this file paste it into an online YAML parser to see if
+# there are any YAML syntax errors !!
 Messages:
-  NoPermissionMessage: '&4Denied access! You are not allowed to do this.'
-  VanishMessage: '&e%p left the game.'
-  ReappearMessage: '&e%p joined the game.'
-  VanishMessageWithPermission: '&a[SV] %p vanished.'
-  ReappearMessageWithPermission: '&a[SV] %p reappeared.'
+  NoPermission: '&4Denied access! You are not allowed to do this.'
+  InvalidUsage: '&cInvalid usage, you can use &6/sv help&c for a list of commands.'
+  VanishMessage: '&e%p% left the game.'
+  ReappearMessage: '&e%p% joined the game.'
+  VanishMessageWithPermission: '&a[SV] %p% vanished.'
+  ReappearMessageWithPermission: '&a[SV] %p% reappeared.'
   OnVanish: '&aYou are now invisible!'
   OnReappear: '&aYou are no longer invisible!'
-  OnVanishWhileInvisible: '&cYou are already invisible!'
-  OnReappearWhileVisible: '&cYou are not invisible!'
-  InvalidUsageMessage: '&cInvalid usage! /sv [reload|list|tipu|updateCfg] [Player]'
+  OnVanishCausedByOtherPlayer: '&a%other% hid you, you are now invisible!'
+  OnReappearCausedByOtherPlayer: '&a%other% showed you, you are now visible!'
+  AlreadyVanishedError: '&cYou are already invisible!'
+  NotVanishedError: '&cYou are not invisible!'
+  SilentJoinMessageForAdmins: '&a[SV] %p% joined silently.'
+  SilentQuitMessageForAdmins: '&a[SV] %p% left silently.'
   RemindingMessage: '&aYou are still invisible!'
-  ListMessage: '&aInvisible Players:&f %l'
+  ListMessagePrefix: '&aInvisible Players:&f '
   ActionBarMessage: '&aYou are invisible to other players!'
-  HideOtherMessage: '&aPlayer &e%p&a is now invisible!'
-  ShowOtherMessage: '&aPlayer &e%p&a is now visible!'
-  AlreadyInvisibleMessage: '&cPlayer &e%p&c is already invisible!'
-  AlreadyVisibleMessage: '&cPlayer &e%p&c is already visible!'
-  ConfigReloadedMessage: '&aSuccessfully reloaded the configuration. &cPlease note that some options require a server restart to be changed.'
-  InvalidSenderMessage: '&cYou must be a player to execute this command!'
-  PlayerNotOnlineMessage: '&cThat player is not online!'
+  HideOtherMessage: '&aPlayer &e%other%&a is now invisible!'
+  ShowOtherMessage: '&aPlayer &e%other%&a is now visible!'
+  CannotHideOtherPlayer: '&cYou''re not allowed to change %other%''s visibility!'
+  AlreadyInvisibleMessage: '&cPlayer &e%other%&c is already invisible!'
+  AlreadyVisibleMessage: '&cPlayer &e%other%&c is already visible!'
+  PluginReloaded: '&aSuccessfully reloaded SuperVanish (%time%ms)!'
+  InvalidSender: '&cYou must be a player to execute this command!'
+  PlayerNotOnline: '&cThat player is not online!'
+  PlayerNonExistent: '&cThat player doesn''t exist!'
   ToggledPickingUpItemsOn: '&ePicking up items is now turned &aON&e.'
   ToggledPickingUpItemsOff: '&ePicking up items is now turned &cOFF&e.'
-  UpdateWarningMessage: '&cWarning! Updating %updates resets %changes. Please use ''&e/sv updatecfg confirm&c'' to continue.'
-  UpdatedConfigMessage: '&aSuccessfully updated %updates! Please check %changes.'
-  NoConfigUpdateAvailableMessage: '&eYour SuperVanish-files are up to date!'
-  DynmapFakeJoin: '%d joined'
-  DynmapFakeQuit: '%d left'
-MessagesVersion: 5.10.1
+  UpdateWarning: '&cWarning! Recreating %updates% resets %changes%. Please use &e/sv recreatefiles confirm&c if you''d like to continue.'
+  RecreatedConfig: '&aSuccessfully recreated %updates%! Please check %changes%.'
+  NoConfigUpdateAvailable: '&eYour SuperVanish-files are up to date!'
+  RecreationRequiredMsg: '&c[SV] Your SuperVanish-files are not up to date, you can use &e/sv recreatefiles&c to recreate them
+  or use /sv recreatefiles dismiss to dismiss this message.
+  Recreating SuperVanish''s files gives you access to newer settings and features of the plugin.'
+  DismissedRecreationWarning: '&eYou are no longer receiving notifications about this recreation.'
+  UndismissedRecreationWarning: '&eYou are now receiving notifications about this recreation.'
+  PrintedStacktrace: '&eSuccessfully created a stacktrace, see console!'
+  EntityHitDenied: '&c[SV] You can''t hit players or mobs in vanish!'
+  BlockPlaceDenied: '&c[SV] You can''t place blocks in vanish!'
+  BlockBreakDenied: '&c[SV] You can''t break blocks in vanish!'
+  PluginOutdated: '&c[SV] Your current version of SuperVanish is outdated. New version: ''%new%''; Currently: ''%current%'''
+  DynmapFakeJoin: '%d% joined'
+  DynmapFakeQuit: '%d% quit'
+  HelpHeader: "&a<---------------&e SuperVanish-Help &a--------------->"
+  HelpFormat: "&6%usage% &7- &b%description% &c(%permission%)"
+MessagesVersion: 6.0.0
