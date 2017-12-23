@@ -55,7 +55,7 @@ public class PlaceholderConverter {
                     ? ((Player) additionalPlayerInfoList.get(1)).getName()
                     : additionalPlayerInfoList.get(1));
         }
-        // newlines
+        //noinspection ConstantConditions
         msg = msg.replace("\\n", "\n");
         // replace sender specific variables
         replaceVariables:
@@ -67,7 +67,8 @@ public class PlaceholderConverter {
                 // MVdWPlaceholderAPI
                 if (Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")
                         && plugin.getSettings().getBoolean("HookOptions.EnableMVdWPlaceholderAPIHook", true)) {
-                    msg = PlaceholderAPI.replacePlaceholders(specifiedPlayer, msg);
+                    String replaced = PlaceholderAPI.replacePlaceholders(specifiedPlayer, msg);
+                    msg = replaced == null ? msg : replaced;
                 }
                 // replace essentials nick names
                 if (Bukkit.getPluginManager()
@@ -89,12 +90,15 @@ public class PlaceholderConverter {
                 // PlaceholderAPI
                 if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
                         && plugin.getSettings().getBoolean("HookOptions.EnablePlaceholderAPIHook", true)) {
-                    msg = PlaceholderAPIHook.translatePlaceholders(msg, specifiedPlayer);
+                    String replaced = PlaceholderAPIHook.translatePlaceholders(msg, specifiedPlayer);
+                    //noinspection ConstantConditions
+                    msg = replaced == null ? msg : replaced;
                 }
                 // MVdWPlaceholderAPI
                 if (Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")
                         && plugin.getSettings().getBoolean("HookOptions.EnableMVdWPlaceholderAPIHook", true)) {
-                    msg = PlaceholderAPI.replacePlaceholders(specifiedPlayer, msg);
+                    String replaced = PlaceholderAPI.replacePlaceholders(specifiedPlayer, msg);
+                    msg = replaced == null ? msg : replaced;
                 }
                 // replace essentials nick names
                 if (Bukkit.getPluginManager().getPlugin("Essentials") != null) {
