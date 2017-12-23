@@ -31,9 +31,6 @@ public class MVdWPlaceholderAPIHook extends PluginHook {
 
     @Override
     public void onPluginEnable(Plugin plugin) {
-        PlaceholderAPI.getCustomPlaceholders().remove("supervanish_isvanished");
-        PlaceholderAPI.getCustomPlaceholders().remove("supervanish_vanishedplayers");
-        PlaceholderAPI.getCustomPlaceholders().remove("supervanish_playercount");
         PlaceholderAPI.registerPlaceholder(superVanish, "supervanish_isvanished",
                 new PlaceholderReplacer() {
                     @Override
