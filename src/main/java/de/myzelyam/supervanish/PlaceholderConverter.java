@@ -117,20 +117,23 @@ public class PlaceholderConverter {
                             .getServicesManager().getRegistration(Chat.class);
                     Permission permAPI = permService != null ? permService.getProvider() : null;
                     Chat chatAPI = chatService != null ? chatService.getProvider() : null;
-                    if (permAPI != null) {
-                        String group = permAPI.getPrimaryGroup(specifiedPlayer);
-                        if (group != null)
-                            msg = msg.replace("%group%", group);
-                    }
-                    if (chatAPI != null) {
-                        String prefix = chatAPI.getPlayerPrefix(specifiedPlayer);
-                        String suffix = chatAPI.getPlayerSuffix(specifiedPlayer);
-                        if (prefix != null) {
-                            msg = msg.replace("%prefix%", prefix);
+                    try {
+                        if (permAPI != null) {
+                            String group = permAPI.getPrimaryGroup(specifiedPlayer);
+                            if (group != null)
+                                msg = msg.replace("%group%", group);
                         }
-                        if (suffix != null) {
-                            msg = msg.replace("%suffix%", suffix);
+                        if (chatAPI != null) {
+                            String prefix = chatAPI.getPlayerPrefix(specifiedPlayer);
+                            String suffix = chatAPI.getPlayerSuffix(specifiedPlayer);
+                            if (prefix != null) {
+                                msg = msg.replace("%prefix%", prefix);
+                            }
+                            if (suffix != null) {
+                                msg = msg.replace("%suffix%", suffix);
+                            }
                         }
+                    } catch (UnsupportedOperationException ignored) {
                     }
                 }
                 // replace general variables
