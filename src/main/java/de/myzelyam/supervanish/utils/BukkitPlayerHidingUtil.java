@@ -3,7 +3,6 @@ package de.myzelyam.supervanish.utils;
 import de.myzelyam.supervanish.SuperVanish;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class BukkitPlayerHidingUtil {
 
@@ -27,12 +26,14 @@ public class BukkitPlayerHidingUtil {
     }
 
     public static boolean isNewPlayerHidingAPISupported(Player testPlayer) {
+        return false; // New API doesn't seem to work with SuperVanish
+    /*
         Class<? extends Player> playerClass = testPlayer.getClass();
         try {
             playerClass.getMethod("hidePlayer", Plugin.class, Player.class);
         } catch (NoSuchMethodException e) {
             return false;
         }
-        return true;
+        return true;*/
     }
 }

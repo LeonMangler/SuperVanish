@@ -50,7 +50,7 @@ public class PreventionHider extends PlayerHider implements Runnable {
                 return;
             }
             for (Player viewer : playerHiddenFromPlayersMap.get(hidden)) {
-                BukkitPlayerHidingUtil.showPlayer(hidden, viewer, plugin);
+                BukkitPlayerHidingUtil.hidePlayer(hidden, viewer, plugin);
             }
         }
     }
