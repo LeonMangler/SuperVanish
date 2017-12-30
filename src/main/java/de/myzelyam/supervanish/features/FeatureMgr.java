@@ -9,11 +9,13 @@
 package de.myzelyam.supervanish.features;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.Requirement;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,29 +27,38 @@ import lombok.Data;
 
 public class FeatureMgr {
 
-    public static final Map<String, FeatureInfo> REGISTERED_FEATURES
-            = new HashMap<String, FeatureInfo>() {{
-        put("SilentOpenChest", new FeatureInfo(SilentOpenChest.class,
-                Collections.singletonList("ProtocolLib")));
-        put("NightVision", new FeatureInfo(NightVision.class,
-                Collections.singletonList("ProtocolLib")));
-        put("VanishIndication", new FeatureInfo(VanishIndication.class,
-                Collections.singletonList("ProtocolLib")));
-        put("Broadcast", new FeatureInfo(Broadcast.class));
-    }};
+    private static Requirement<FeatureInfo> protocolLibInstalled = new Requirement<FeatureInfo>() {
+        @Override
+        public boolean fulfilledBy(FeatureInfo featureInfo) {
+            return Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
+        }
+    }, oneDotEightOrHigher = new Requirement<FeatureInfo>() {
+        @Override
+        public boolean fulfilledBy(FeatureInfo featureInfo) {
+            return featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8);
+        }
+    };
+    private final Map<String, FeatureInfo> registeredFeatures = new HashMap<>();
+    private final Set<Feature> activeFeatures = new HashSet<>();
     private final SuperVanish plugin;
-    private Set<Feature> activeFeatures = new HashSet<>();
 
     public FeatureMgr(SuperVanish plugin) {
         this.plugin = plugin;
+        registeredFeatures.put("SilentOpenChest", new FeatureInfo(SilentOpenChest.class, plugin,
+                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
+        registeredFeatures.put("NightVision", new FeatureInfo(NightVision.class, plugin,
+                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
+        registeredFeatures.put("VanishIndication", new FeatureInfo(VanishIndication.class, plugin,
+                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
+        registeredFeatures.put("Broadcast", new FeatureInfo(Broadcast.class, plugin));
     }
 
     public void enableFeatures() {
         featureLoop:
-        for (String id : REGISTERED_FEATURES.keySet()) {
-            FeatureInfo featureInfo = REGISTERED_FEATURES.get(id);
-            for (String dependency : featureInfo.getDependencies()) {
-                if (!Bukkit.getPluginManager().isPluginEnabled(dependency)) continue featureLoop;
+        for (String id : registeredFeatures.keySet()) {
+            FeatureInfo featureInfo = registeredFeatures.get(id);
+            for (Requirement<FeatureInfo> requirement : featureInfo.getRequirements()) {
+                if (!requirement.fulfilledBy(featureInfo)) continue featureLoop;
             }
             Feature feature;
             try {
@@ -89,15 +100,18 @@ public class FeatureMgr {
     @Data
     private static class FeatureInfo {
         private final Class<? extends Feature> featureClass;
-        private final Collection<String> dependencies;
+        private final Collection<Requirement<FeatureInfo>> requirements;
+        private final SuperVanish plugin;
 
-        FeatureInfo(Class<? extends Feature> featureClass, Collection<String> dependencies) {
+        FeatureInfo(Class<? extends Feature> featureClass, SuperVanish plugin,
+                    Collection<Requirement<FeatureInfo>> requirements) {
             this.featureClass = featureClass;
-            this.dependencies = dependencies;
+            this.requirements = requirements;
+            this.plugin = plugin;
         }
 
-        FeatureInfo(Class<? extends Feature> featureClass) {
-            this(featureClass, Collections.<String>emptySet());
+        FeatureInfo(Class<? extends Feature> featureClass, SuperVanish plugin) {
+            this(featureClass, plugin, Collections.<Requirement<FeatureInfo>>emptySet());
         }
     }
 }
