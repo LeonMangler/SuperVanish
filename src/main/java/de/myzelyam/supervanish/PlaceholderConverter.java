@@ -42,7 +42,7 @@ public class PlaceholderConverter {
                 msg != null, additionalPlayerInfo != null);
         //noinspection ConstantConditions
         Validation.checkIsTrue(additionalPlayerInfo.length > 0);
-        // // check vararg
+        // check vararg
         final List<Object> additionalPlayerInfoList = Arrays
                 .asList(additionalPlayerInfo);
         Object unspecifiedPlayer = additionalPlayerInfoList.get(0);
@@ -159,7 +159,6 @@ public class PlaceholderConverter {
         }
         // convert color codes
         msg = ChatColor.translateAlternateColorCodes('&', msg);
-        // return converted message
         return msg;
     }
 }

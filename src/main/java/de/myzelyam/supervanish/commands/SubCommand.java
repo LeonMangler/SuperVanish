@@ -24,9 +24,6 @@ public abstract class SubCommand implements Executable {
         this.plugin = plugin;
     }
 
-    /**
-     * Can cause lag if mysql is enabled
-     */
     protected Collection<UUID> getAllVanishedPlayers() {
         return plugin.getVanishStateMgr().getVanishedPlayers();
     }

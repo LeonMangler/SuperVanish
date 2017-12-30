@@ -83,7 +83,6 @@ public class UpdateNotifier {
     }
 
     private void notifyAdmins() {
-        // notify admins
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             notifyPlayer(p);
         }
