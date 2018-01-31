@@ -216,7 +216,13 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
                 return vanishPlayer;
             }
         }
-        return null;
+        // ensure that there is always a vanish player
+        boolean itemPickUps = getPlayerData().getBoolean(
+                "PlayerData." + player.getUniqueId() + ".itemPickUps",
+                getSettings().getBoolean("InvisibilityFeatures.DefaultPickUpItemsOption"));
+        final VanishPlayer vanishPlayer = new VanishPlayer(player, this, itemPickUps);
+        vanishPlayers.add(vanishPlayer);
+        return vanishPlayer;
     }
 
     public void createVanishPlayer(Player player, boolean itemPickUps) {
