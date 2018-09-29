@@ -10,7 +10,6 @@ package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,7 +19,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerBlockModifyEventHandler implements Listener {
@@ -39,14 +40,13 @@ public class PlayerBlockModifyEventHandler implements Listener {
             if (e.getAction().equals(Action.PHYSICAL)) {
                 if (!plugin.getSettings().getBoolean("InvisibilityFeatures.DisablePressurePlates"))
                     return;
-                Material blockType = e.getClickedBlock().getType();
-                if (blockType == Material.STONE_PLATE
-                        || blockType == Material.GOLD_PLATE
-                        || blockType == Material.IRON_PLATE
-                        || blockType == Material.WOOD_PLATE
-                        || blockType == Material.TRIPWIRE) {
-                    e.setCancelled(true);
-                }
+                String material = e.getClickedBlock().getType().toString();
+                List<String> disallowedMaterials = Arrays.asList("STONE_PLATE", "GOLD_PLATE", "IRON_PLATE",
+                        "WOOD_PLATE"/* <- LEGACY*/, "TRIPWIRE", "PRESSURE_PLATE");
+                for (String disallowedMaterial : disallowedMaterials)
+                    if (material.equals(disallowedMaterial) || material.contains(disallowedMaterial)) {
+                        e.setCancelled(true);
+                    }
             }
         } catch (Exception er) {
             plugin.logException(er);

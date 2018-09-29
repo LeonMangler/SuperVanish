@@ -68,9 +68,14 @@ public class SilentOpenChest extends Feature {
                 shulkerBoxes.addAll(Arrays.asList(BLACK_SHULKER_BOX, BLUE_SHULKER_BOX, BROWN_SHULKER_BOX,
                         CYAN_SHULKER_BOX, GRAY_SHULKER_BOX, GREEN_SHULKER_BOX, LIGHT_BLUE_SHULKER_BOX,
                         LIME_SHULKER_BOX, MAGENTA_SHULKER_BOX, ORANGE_SHULKER_BOX, PINK_SHULKER_BOX,
-                        PURPLE_SHULKER_BOX, RED_SHULKER_BOX, SILVER_SHULKER_BOX, WHITE_SHULKER_BOX,
+                        PURPLE_SHULKER_BOX, RED_SHULKER_BOX, WHITE_SHULKER_BOX,
                         YELLOW_SHULKER_BOX));
-            } catch (NoSuchFieldError ignored) {
+                try {
+                    shulkerBoxes.add(LIGHT_GRAY_SHULKER_BOX);
+                } catch (NoSuchFieldError e) {
+                    shulkerBoxes.add(Material.valueOf("SILVER_SHULKER_BOX"));
+                }
+            } catch (NoSuchFieldError | IllegalArgumentException ignored) {
             }
         }
     }

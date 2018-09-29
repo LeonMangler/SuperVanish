@@ -11,7 +11,6 @@ package de.myzelyam.supervanish.events;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.VanishPlayer;
 
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -117,7 +116,7 @@ public class GeneralEventHandler implements Listener {
         try {
             if (!plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId())) return;
             if (e.getAction() != Action.PHYSICAL) return;
-            if (e.getClickedBlock() != null && e.getClickedBlock().getType() == Material.SOIL)
+            if (e.getClickedBlock() != null && e.getClickedBlock().getType().toString().matches("SOIL|FARMLAND"))
                 e.setCancelled(true);
         } catch (Exception er) {
             plugin.logException(er);
