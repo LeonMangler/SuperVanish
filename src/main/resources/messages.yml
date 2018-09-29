@@ -26,8 +26,8 @@
 Messages:
   NoPermission: '&4Denied access! You are not allowed to do this.'
   InvalidUsage: '&cInvalid usage, you can use &6/sv help&c for a list of commands.'
-  VanishMessage: '&e%p% left the game.'
-  ReappearMessage: '&e%p% joined the game.'
+  VanishMessage: '&e%p% left the game'
+  ReappearMessage: '&e%p% joined the game'
   VanishMessageWithPermission: '&a[SV] %p% vanished.'
   ReappearMessageWithPermission: '&a[SV] %p% reappeared.'
   OnVanish: '&aYou are now invisible!'
