@@ -136,12 +136,12 @@ HookOptions:
   # Should SV hook into SuperTrails and disable trails while you're vanished?
   EnableSuperTrailsHook: true
   # Should SV hook into PlaceholderAPI and add new placeholders to SV + register its own ones for other plugins?
-  # Own ones: isvanished, vanishedplayers, playercount, bungeeplayercount
+  # Own ones: isvanished, vanishedplayers, playercount
   # Format: %supervanish_<placeholder>%
   EnablePlaceholderAPIHook: true
   # Should SV hook into MVdWPlaceholderAPI and add new placeholders to SV + register its own ones for other
   # plugins?
-  # Own ones: isvanished, vanishedplayers, playercount, bungeeplayercount
+  # Own ones: isvanished, vanishedplayers, playercount
   # Format: {supervanish_<placeholder>}
   EnableMVdWPlaceholderAPIHook: true
   # Should SV stop NPCs from greeting or talking about hidden players?
