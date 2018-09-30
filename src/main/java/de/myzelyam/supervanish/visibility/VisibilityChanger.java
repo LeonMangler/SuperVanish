@@ -85,6 +85,8 @@ public class VisibilityChanger {
             if (plugin.getActionBarMgr() != null && config.getBoolean("MessageOptions.DisplayActionBar")) {
                 plugin.getActionBarMgr().addActionBar(player);
             }
+            // sleep state
+            player.setSleepingIgnored(true);
             // chat message
             if (hiderName == null)
                 plugin.sendMessage(player, "OnVanish", player);
@@ -127,6 +129,8 @@ public class VisibilityChanger {
             if (plugin.getActionBarMgr() != null && config.getBoolean("MessageOptions.DisplayActionBar")) {
                 plugin.getActionBarMgr().removeActionBar(player);
             }
+            // sleep state
+            player.setSleepingIgnored(false);
             // state
             plugin.getVanishStateMgr().setVanishedState(player.getUniqueId(),
                     player.getName(), false, showerName);

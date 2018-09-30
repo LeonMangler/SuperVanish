@@ -55,6 +55,8 @@ public class JoinEvent implements EventExecutor, Listener {
                             "MessageOptions.DisplayActionBar")) {
                         plugin.getActionBarMgr().addActionBar(p);
                     }
+                    // sleep state
+                    p.setSleepingIgnored(true);
                     // adjust fly
                     if (plugin.getSettings().getBoolean("InvisibilityFeatures.Fly.Enable")) {
                         p.setAllowFlight(true);
