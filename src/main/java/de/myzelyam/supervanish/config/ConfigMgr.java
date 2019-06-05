@@ -36,7 +36,6 @@ public class ConfigMgr {
         fileMgr = new FileMgr(plugin);
     }
 
-    @SuppressWarnings("unchecked")
     public void prepareFiles() {
         // messages
         messagesFile = (ConfigurableFile) fileMgr.addFile("messages", FileMgr.FileType.CONFIG);

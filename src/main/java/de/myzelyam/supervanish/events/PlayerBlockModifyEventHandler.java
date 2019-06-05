@@ -37,7 +37,7 @@ public class PlayerBlockModifyEventHandler implements Listener {
         try {
             if (!plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()))
                 return;
-            if (e.getAction().equals(Action.PHYSICAL)) {
+            if (e.getAction().equals(Action.PHYSICAL) && e.getClickedBlock() != null) {
                 if (!plugin.getSettings().getBoolean("InvisibilityFeatures.DisablePressurePlates"))
                     return;
                 String material = e.getClickedBlock().getType().toString();

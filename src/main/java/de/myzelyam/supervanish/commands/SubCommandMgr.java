@@ -88,7 +88,6 @@ public class SubCommandMgr {
                     || args[0].equalsIgnoreCase("rccfg")
                     || args[0].equalsIgnoreCase("recreateconfig")
                     || args[0].equalsIgnoreCase("rcconfig")
-                    || args[0].equalsIgnoreCase("recreate")
                     || args[0].equalsIgnoreCase("updatecfg")
                     || args[0].equalsIgnoreCase("recreate")
                     || args[0].equalsIgnoreCase("recreatefiles")

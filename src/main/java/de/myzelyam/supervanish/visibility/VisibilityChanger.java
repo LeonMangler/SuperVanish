@@ -95,7 +95,7 @@ public class VisibilityChanger {
             // change collision
             try {
                 //noinspection deprecation
-                player.getPlayer().spigot().setCollidesWithEntities(false);
+                player.spigot().setCollidesWithEntities(false);
             } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
             }
             // call post event
@@ -142,7 +142,7 @@ public class VisibilityChanger {
             // adjust collision
             try {
                 //noinspection deprecation
-                player.getPlayer().spigot().setCollidesWithEntities(true);
+                player.spigot().setCollidesWithEntities(true);
             } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
             }
             // fly

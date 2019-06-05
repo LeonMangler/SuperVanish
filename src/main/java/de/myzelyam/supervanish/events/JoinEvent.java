@@ -43,7 +43,7 @@ public class JoinEvent implements EventExecutor, Listener {
                     // collision
                     try {
                         //noinspection deprecation
-                        p.getPlayer().spigot().setCollidesWithEntities(false);
+                        p.spigot().setCollidesWithEntities(false);
                     } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
                     }
                     // reminding message

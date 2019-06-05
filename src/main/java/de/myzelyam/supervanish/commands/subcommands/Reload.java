@@ -30,9 +30,9 @@ public class Reload extends SubCommand {
             plugin.reload();
             if (!Bukkit.getPluginManager().isPluginEnabled(plugin)) {
                 p.sendMessage(ChatColor.RED +
-                        "Failed to reload SuperVanish since it failed to restart itself " +
-                        "(Probably because of invalid MySQL credentials). More information is in the " +
-                        "console. (" + (System.currentTimeMillis() - before) + "ms)");
+                        "Failed to reload SuperVanish since it failed to restart itself. " +
+                        "More information is in the console. ("
+                        + (System.currentTimeMillis() - before) + "ms)");
                 return;
             }
             plugin.sendMessage(p, plugin.getMessage("PluginReloaded").replace("%time%",

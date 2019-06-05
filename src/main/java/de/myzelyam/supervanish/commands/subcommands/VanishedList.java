@@ -35,7 +35,7 @@ public class VanishedList extends SubCommand {
             StringBuilder stringBuilder = new StringBuilder();
             List<UUID> allInvisiblePlayerUUIDs = ImmutableList.copyOf(getAllVanishedPlayers());
             if (allInvisiblePlayerUUIDs.isEmpty()) {
-                stringBuilder = stringBuilder.append("none");
+                stringBuilder.append("none");
             }
             for (int i = 0; i < allInvisiblePlayerUUIDs.size(); i++) {
                 UUID playerUUID = allInvisiblePlayerUUIDs.get(i);
@@ -43,9 +43,10 @@ public class VanishedList extends SubCommand {
                 if (Bukkit.getPlayer(playerUUID) == null) {
                     name = name + ChatColor.RED + "[offline]" + ChatColor.WHITE;
                 }
-                stringBuilder = stringBuilder.append(name);
-                if (i != allInvisiblePlayerUUIDs.size() - 1)
-                    stringBuilder = stringBuilder.append(ChatColor.GREEN).append(", ").append(ChatColor.WHITE);
+                stringBuilder.append(name);
+                if (i != allInvisiblePlayerUUIDs.size() - 1) {
+                    stringBuilder.append(ChatColor.GREEN).append(", ").append(ChatColor.WHITE);
+                }
             }
             listMessage = listMessage.replace("%l", stringBuilder.toString());
             plugin.sendMessage(sender, listMessage, sender);

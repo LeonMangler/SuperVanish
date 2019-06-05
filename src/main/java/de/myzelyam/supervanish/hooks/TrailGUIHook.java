@@ -28,7 +28,7 @@ public class TrailGUIHook extends PluginHook {
 
     @Override
     public void onPluginEnable(Plugin plugin) {
-        if (plugin == null || !(plugin instanceof TrailGUI)) {
+        if (!(plugin instanceof TrailGUI)) {
             superVanish.log(Level.WARNING,
                     "Failed to hook into TrailGUI. (PluginNotFound)");
             return;

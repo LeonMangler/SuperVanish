@@ -50,7 +50,7 @@ public class QuitEvent implements EventExecutor, Listener {
                         // collision
                         try {
                             //noinspection deprecation
-                            p.getPlayer().spigot().setCollidesWithEntities(true);
+                            p.spigot().setCollidesWithEntities(true);
                         } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
                         }
                         // check if it should handle the quit msg
