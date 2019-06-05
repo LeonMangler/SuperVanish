@@ -53,8 +53,8 @@ import lombok.Getter;
 public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
 
     public static final String[] NON_REQUIRED_SETTINGS_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3",
-            "6.0.4", "6.0.5"},
-            NON_REQUIRED_MESSAGES_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.0.5"};
+            "6.0.4", "6.0.5", "6.1.0"},
+            NON_REQUIRED_MESSAGES_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.0.5", "6.1.0"};
 
     @Getter
     private boolean useProtocolLib;
