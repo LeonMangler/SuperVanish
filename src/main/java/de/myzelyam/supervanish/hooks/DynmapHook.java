@@ -12,7 +12,6 @@ import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,60 +21,56 @@ import org.dynmap.bukkit.DynmapPlugin;
 
 public class DynmapHook extends PluginHook {
 
+    private final boolean sendJoinLeave;
+    private final SuperVanish superVanish;
+
     public DynmapHook(SuperVanish superVanish) {
         super(superVanish);
+        this.superVanish = superVanish;
+        sendJoinLeave
+                = superVanish.getSettings().getBoolean("HookOptions.DynmapSendJoinLeaveMessages")
+                && !superVanish.getMessage("DynmapFakeJoin").equals("");
     }
-
-    private void adjustVisibility(Player p, boolean hide) {
-        try {
-            DynmapPlugin dynmap = (DynmapPlugin) Bukkit.getPluginManager()
-                    .getPlugin("dynmap");
-            SuperVanish plugin = superVanish;
-            boolean sendJoinLeave
-                    = superVanish.getSettings().getBoolean("HookOptions.DynmapSendJoinLeaveMessages")
-                    && !plugin.getMessage("DynmapFakeJoin").equals("");
-            if (hide) {
-                dynmap.setPlayerVisiblity(p, false);
-                if (sendJoinLeave)
-                    dynmap.sendBroadcastToWeb("",
-                            plugin.replacePlaceholders(plugin.getMessage("DynmapFakeQuit"), p));
-            } else {
-                dynmap.setPlayerVisiblity(p, true);
-                if (sendJoinLeave)
-                    dynmap.sendBroadcastToWeb("",
-                            plugin.replacePlaceholders(plugin.getMessage("DynmapFakeJoin"), p));
-            }
-        } catch (Exception e) {
-            superVanish.logException(e);
-        }
-    }
-
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVanish(PlayerHideEvent e) {
         Player p = e.getPlayer();
-        adjustVisibility(p, true);
+        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+
+        dynmap.setPlayerVisiblity(p, false);
+        if (sendJoinLeave)
+            dynmap.sendBroadcastToWeb("",
+                    superVanish.replacePlaceholders(superVanish.getMessage("DynmapFakeQuit"), p));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onReappear(PlayerShowEvent e) {
         Player p = e.getPlayer();
-        adjustVisibility(p, false);
+        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+
+        dynmap.setPlayerVisiblity(p, true);
+        if (sendJoinLeave)
+            dynmap.sendBroadcastToWeb("",
+                    superVanish.replacePlaceholders(superVanish.getMessage("DynmapFakeJoin"), p));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
+        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+
         if (superVanish.getVanishStateMgr().isVanished(p.getUniqueId())) {
-            adjustVisibility(p, true);
+            dynmap.setPlayerVisiblity(p, false);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
+        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+
         if (superVanish.getVanishStateMgr().isVanished(p.getUniqueId())) {
-            adjustVisibility(p, false);
+            dynmap.setPlayerVisiblity(p, true);
         }
     }
 }
