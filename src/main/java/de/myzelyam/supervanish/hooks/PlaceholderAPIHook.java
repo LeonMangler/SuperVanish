@@ -72,7 +72,7 @@ public class PlaceholderAPIHook extends PluginHook {
                                 .getOnlineVanishedPlayers()) {
                             Player onlineVanished = Bukkit.getPlayer(uuid);
                             if (onlineVanished == null) continue;
-                            if (!superVanish.canSee(p, onlineVanished)) playercount--;
+                            if (p == null || !superVanish.canSee(p, onlineVanished)) playercount--;
                         }
                         return playercount + "";
                     }
