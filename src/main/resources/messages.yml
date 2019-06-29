@@ -39,7 +39,7 @@ Messages:
   SilentJoinMessageForAdmins: '&a[SV] %p% joined silently.'
   SilentQuitMessageForAdmins: '&a[SV] %p% left silently.'
   RemindingMessage: '&aYou are still invisible!'
-  ListMessagePrefix: '&aInvisible Players:&f '
+  ListMessagePrefix: '&aInvisible Players:&f %l'
   ActionBarMessage: '&aYou are invisible to other players!'
   HideOtherMessage: '&aPlayer &e%other%&a is now invisible!'
   ShowOtherMessage: '&aPlayer &e%other%&a is now visible!'
