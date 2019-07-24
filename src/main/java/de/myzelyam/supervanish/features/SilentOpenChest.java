@@ -75,6 +75,9 @@ public class SilentOpenChest extends Feature {
                 } catch (NoSuchFieldError e) {
                     shulkerBoxes.add(Material.valueOf("SILVER_SHULKER_BOX"));
                 }
+                if (plugin.getVersionUtil().isOneDotXOrHigher(14)) {
+                    shulkerBoxes.add(Material.valueOf("BARREL"));
+                }
             } catch (NoSuchFieldError | IllegalArgumentException ignored) {
             }
         }
