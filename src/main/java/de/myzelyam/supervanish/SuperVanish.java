@@ -156,10 +156,12 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     public void reload() {
         getServer().getScheduler().cancelTasks(this);
         HandlerList.unregisterAll(this);
+
         if (useProtocolLib)
             ProtocolLibrary.getProtocolManager().removePacketListeners(this);
-        onDisable();
-        onEnable();
+
+        getServer().getPluginManager().disablePlugin(this);
+        getServer().getPluginManager().enablePlugin(this);
     }
 
     @Override
