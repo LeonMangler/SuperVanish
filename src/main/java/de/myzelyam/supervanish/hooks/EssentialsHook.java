@@ -10,12 +10,10 @@ package de.myzelyam.supervanish.hooks;
 
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
-
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.commands.CommandAction;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -105,7 +103,7 @@ public class EssentialsHook extends PluginHook {
         if (superVanish.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId())) return;
         String command = e.getMessage().toLowerCase(Locale.ENGLISH).split(" ")[0].replace("/", "")
                 .toLowerCase(Locale.ENGLISH);
-        if (command.contains(":")) command = command.split(":")[1];
+        if (command.split(":").length > 1) command = command.split(":")[1];
         if (command.equals("supervanish") || command.equals("sv")
                 || command.equals("v") || command.equals("vanish")) {
             final User user = essentials.getUser(e.getPlayer());
