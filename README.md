@@ -1,11 +1,11 @@
 # SuperVanish
 Website: https://www.spigotmc.org/resources/supervanish-be-invisible.1331/
 
-Bukkit-Plugin for Spigot/CraftBukkit (Minecraft-Server software)
+Bukkit-Plugin for Spigot/CraftBukkit (modded Minecraft server)
 
 Allows server admins to be completely invisible and undetectable for other players, which helps them with their administrative work.
 
-Feel free to create Pull Requests if you think that you can improve SuperVanish!
+Feel free to create Pull Requests if you'd like to improve SuperVanish! Please report issues on SpigotMC via PM!
 
 ## Maven Repository
 ```
