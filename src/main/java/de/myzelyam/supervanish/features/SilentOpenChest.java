@@ -8,18 +8,16 @@
 
 package de.myzelyam.supervanish.features;
 
-import com.google.common.collect.ImmutableList;
-
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
-
+import com.google.common.collect.ImmutableList;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
-
+import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -31,23 +29,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import lombok.Data;
+import java.util.*;
 
 import static com.comphenix.protocol.PacketType.Play.Server.*;
 import static org.bukkit.Material.*;
@@ -73,12 +60,19 @@ public class SilentOpenChest extends Feature {
                 try {
                     shulkerBoxes.add(LIGHT_GRAY_SHULKER_BOX);
                 } catch (NoSuchFieldError e) {
+                    // old name
                     shulkerBoxes.add(Material.valueOf("SILVER_SHULKER_BOX"));
+                }
+                try {
+                    shulkerBoxes.add(SHULKER_BOX);
+                } catch (NoSuchFieldError ignored) {
+                    // no standard shulker box in old versions
                 }
                 if (plugin.getVersionUtil().isOneDotXOrHigher(14)) {
                     shulkerBoxes.add(Material.valueOf("BARREL"));
                 }
             } catch (NoSuchFieldError | IllegalArgumentException ignored) {
+                // no shulker box support in very old versions
             }
         }
     }
@@ -160,7 +154,7 @@ public class SilentOpenChest extends Feature {
         if (p.getGameMode() == GameMode.SPECTATOR) return;
         //noinspection deprecation
         if (p.isSneaking() && p.getItemInHand() != null
-                && p.getItemInHand().getType().isBlock()
+                && (p.getItemInHand().getType().isBlock() || p.getItemInHand().getType() == ITEM_FRAME)
                 && p.getItemInHand().getType() != Material.AIR)
             return;
         Block block = e.getClickedBlock();
