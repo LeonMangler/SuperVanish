@@ -8,8 +8,6 @@
 
 package de.myzelyam.supervanish.features;
 
-import com.google.common.collect.ImmutableList;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -20,11 +18,10 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
-
+import com.google.common.collect.ImmutableList;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.PostPlayerHideEvent;
 import de.myzelyam.supervanish.SuperVanish;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -112,28 +109,32 @@ public class VanishIndication extends Feature {
                                 event.getPacket().getPlayerInfoDataLists().read(0));
                         Player receiver = event.getPlayer();
                         for (PlayerInfoData infoData : ImmutableList.copyOf(infoDataList)) {
-                            if (!VanishIndication.this.plugin.getVisibilityChanger().getHider()
-                                    .isHidden(infoData.getProfile().getUUID(), receiver)
-                                    && VanishIndication.this.plugin.getVanishStateMgr()
-                                    .isVanished(infoData.getProfile().getUUID())) {
-                                if (!receiver.getUniqueId().equals(infoData.getProfile().getUUID()))
-                                    if (infoData.getGameMode() != EnumWrappers.NativeGameMode.SPECTATOR) {
-                                        int latency;
-                                        try {
-                                            latency = infoData.getLatency();
-                                        } catch (NoSuchMethodError e) {
-                                            latency = 21;
+                            try {
+                                if (!VanishIndication.this.plugin.getVisibilityChanger().getHider()
+                                        .isHidden(infoData.getProfile().getUUID(), receiver)
+                                        && VanishIndication.this.plugin.getVanishStateMgr()
+                                        .isVanished(infoData.getProfile().getUUID())) {
+                                    if (!receiver.getUniqueId().equals(infoData.getProfile().getUUID()))
+                                        if (infoData.getGameMode() != EnumWrappers.NativeGameMode.SPECTATOR) {
+                                            int latency;
+                                            try {
+                                                latency = infoData.getLatency();
+                                            } catch (NoSuchMethodError e) {
+                                                latency = 21;
+                                            }
+                                            if (event.getPacket().getPlayerInfoAction().read(0)
+                                                    != EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE) {
+                                                continue;
+                                            }
+                                            PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(),
+                                                    latency, EnumWrappers.NativeGameMode.SPECTATOR,
+                                                    infoData.getDisplayName());
+                                            infoDataList.remove(infoData);
+                                            infoDataList.add(newData);
                                         }
-                                        if (event.getPacket().getPlayerInfoAction().read(0)
-                                                != EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE) {
-                                            continue;
-                                        }
-                                        PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(),
-                                                latency, EnumWrappers.NativeGameMode.SPECTATOR,
-                                                infoData.getDisplayName());
-                                        infoDataList.remove(infoData);
-                                        infoDataList.add(newData);
-                                    }
+                                }
+                            } catch (UnsupportedOperationException ignored) {
+                                // Ignore temporary players
                             }
                         }
                         event.getPacket().getPlayerInfoDataLists().write(0, infoDataList);
