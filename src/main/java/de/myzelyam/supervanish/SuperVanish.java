@@ -9,16 +9,10 @@
 package de.myzelyam.supervanish;
 
 import com.comphenix.protocol.ProtocolLibrary;
-
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.commands.VanishCommand;
 import de.myzelyam.supervanish.config.ConfigMgr;
-import de.myzelyam.supervanish.events.GeneralEventHandler;
-import de.myzelyam.supervanish.events.JoinEvent;
-import de.myzelyam.supervanish.events.LoginEvent;
-import de.myzelyam.supervanish.events.PlayerBlockModifyEventHandler;
-import de.myzelyam.supervanish.events.QuitEvent;
-import de.myzelyam.supervanish.events.WorldChangeEvent;
+import de.myzelyam.supervanish.events.*;
 import de.myzelyam.supervanish.features.FeatureMgr;
 import de.myzelyam.supervanish.hooks.PluginHookMgr;
 import de.myzelyam.supervanish.net.UpdateNotifier;
@@ -29,7 +23,7 @@ import de.myzelyam.supervanish.visibility.FileVanishStateMgr;
 import de.myzelyam.supervanish.visibility.ServerListPacketListener;
 import de.myzelyam.supervanish.visibility.VisibilityChanger;
 import de.myzelyam.supervanish.visibility.hiders.PreventionHider;
-
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -48,14 +42,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import lombok.Getter;
-
 public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
 
     public static final String[] NON_REQUIRED_SETTINGS_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3",
-            "6.0.4", "6.0.5", "6.1.0", "6.1.1", "6.1.2", "6.1.3"},
+            "6.0.4", "6.0.5", "6.1.0", "6.1.1", "6.1.2", "6.1.3", "6.1.4"},
             NON_REQUIRED_MESSAGES_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.0.5", "6.1.0",
-                    "6.1.1", "6.1.2", "6.1.3"};
+                    "6.1.1", "6.1.2", "6.1.3", "6.1.4"};
 
     @Getter
     private boolean useProtocolLib;
