@@ -136,7 +136,7 @@
             <groupId>org.dynmap</groupId>
             <artifactId>Dynmap</artifactId>
             <scope>system</scope>
-            <systemPath>${basedir}/dependencies/Dynmap-3.0-beta-4-spigot.jar</systemPath>
+            <systemPath>${basedir}/dependencies/Dynmap-3.0.1-spigot.jar</systemPath>
             <version>1.0</version>
         </dependency>
         <!--SuperTrails-->
