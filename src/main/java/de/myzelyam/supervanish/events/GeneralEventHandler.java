@@ -10,6 +10,7 @@ package de.myzelyam.supervanish.events;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.VanishPlayer;
+import de.myzelyam.supervanish.features.Broadcast;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -23,6 +24,8 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerDeathEvent;
+
 
 public class GeneralEventHandler implements Listener {
 
@@ -47,6 +50,20 @@ public class GeneralEventHandler implements Listener {
                     plugin.sendMessage(p, "EntityHitDenied", p);
                     e.setCancelled(true);
                 }
+            }
+        } catch (Exception er) {
+            plugin.logException(er);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerDeath(PlayerDeathEvent e){
+        try {
+            if (!(e.getEntity() instanceof Player)) return;
+            Player p = (Player) e.getEntity();
+            if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
+                e.setDeathMessage(null);
+                Broadcast.announceSilentDeath(p, plugin);
             }
         } catch (Exception er) {
             plugin.logException(er);
