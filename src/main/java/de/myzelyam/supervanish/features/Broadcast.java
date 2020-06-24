@@ -37,11 +37,12 @@ public class Broadcast extends Feature {
 
     public static void announceSilentDeath(Player p, SuperVanish plugin) {
         if (plugin.getSettings().getBoolean("MessageOptions.AnnounceDeathToAdmins", true)) {
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (p == onlinePlayer)
-                continue;
-            if (plugin.canSee(onlinePlayer, p)) {
-                plugin.sendMessage(onlinePlayer, "SilentDeathMessage", p, onlinePlayer);
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                if (p == onlinePlayer)
+                    continue;
+                if (plugin.canSee(onlinePlayer, p)) {
+                    plugin.sendMessage(onlinePlayer, "SilentDeathMessage", p, onlinePlayer);
+                }
             }
         }
     }
