@@ -12,6 +12,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.FieldAccessException;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.google.common.collect.ImmutableList;
@@ -268,7 +269,11 @@ public class SilentOpenChest extends Feature {
                             } else if (event.getPacketType() == GAME_STATE_CHANGE) {
                                 if (SilentOpenChest.this.plugin.getVanishStateMgr().isVanished(
                                         event.getPlayer().getUniqueId())) {
-                                    if (event.getPacket().getIntegers().read(0) != 3) return;
+                                    try {
+                                        if (event.getPacket().getIntegers().read(0) != 3) return;
+                                    } catch (FieldAccessException e) {
+                                        // TODO find alternative for newer versions
+                                    }
                                     if (!hasSilentlyOpenedChest(event.getPlayer())) return;
                                     event.setCancelled(true);
                                 }
