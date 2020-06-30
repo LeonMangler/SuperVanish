@@ -11,18 +11,13 @@ package de.myzelyam.supervanish.events;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.VanishPlayer;
 import de.myzelyam.supervanish.features.Broadcast;
-
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
@@ -57,12 +52,14 @@ public class GeneralEventHandler implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerDeath(PlayerDeathEvent e){
+    public void onPlayerDeath(PlayerDeathEvent e) {
         try {
             Player p = e.getEntity();
             if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
+                String deathMessage = e.getDeathMessage();
                 e.setDeathMessage(null);
-                Broadcast.announceSilentDeath(p, plugin);
+                if (deathMessage != null)
+                    Broadcast.announceSilentDeath(p, plugin, deathMessage);
             }
         } catch (Exception er) {
             plugin.logException(er);

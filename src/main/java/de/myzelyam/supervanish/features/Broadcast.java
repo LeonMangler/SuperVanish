@@ -11,7 +11,6 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.PostPlayerHideEvent;
 import de.myzelyam.supervanish.SuperVanish;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,13 +34,15 @@ public class Broadcast extends Feature {
         }
     }
 
-    public static void announceSilentDeath(Player p, SuperVanish plugin) {
+    public static void announceSilentDeath(Player p, SuperVanish plugin, String deathMessage) {
         if (plugin.getSettings().getBoolean("MessageOptions.AnnounceDeathToAdmins", true)) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 if (p == onlinePlayer)
                     continue;
                 if (plugin.canSee(onlinePlayer, p)) {
-                    plugin.sendMessage(onlinePlayer, "SilentDeathMessage", p, onlinePlayer);
+                    String message = plugin.getMessage("SilentDeathMessage")
+                            .replace("%deathmsg%", deathMessage);
+                    plugin.sendMessage(onlinePlayer, message, p, onlinePlayer);
                 }
             }
         }
