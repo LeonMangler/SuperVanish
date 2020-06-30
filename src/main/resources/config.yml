@@ -91,6 +91,9 @@ MessageOptions:
   # If the setting above is turned on, should players with the permission 'sv.see' get
   # a message when an invisible player joins/quits?
   AnnounceRealJoinQuitToAdmins: true
+  # If the setting above is turned on, should players with the permission 'sv.see' get
+  # a message when an invisible player dies
+  AnnounceDeathToAdmins: true
   # Should SV remind players who join the server vanished of being invisible (in chat)?
   # You can change the message in the messages.yml file.
   RemindVanishedOnJoin: true

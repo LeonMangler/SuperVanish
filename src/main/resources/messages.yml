@@ -38,6 +38,7 @@ Messages:
   NotVanishedError: '&cYou are not invisible!'
   SilentJoinMessageForAdmins: '&a[SV] %p% joined silently.'
   SilentQuitMessageForAdmins: '&a[SV] %p% left silently.'
+  SilentDeathMessage: '&a[SV] %p% has died'
   RemindingMessage: '&aYou are still invisible!'
   ListMessagePrefix: '&aInvisible Players:&f %l'
   ActionBarMessage: '&aYou are invisible to other players!'
