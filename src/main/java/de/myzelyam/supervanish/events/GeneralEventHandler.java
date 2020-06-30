@@ -59,8 +59,7 @@ public class GeneralEventHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDeath(PlayerDeathEvent e){
         try {
-            if (!(e.getEntity() instanceof Player)) return;
-            Player p = (Player) e.getEntity();
+            Player p = e.getEntity();
             if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
                 e.setDeathMessage(null);
                 Broadcast.announceSilentDeath(p, plugin);
