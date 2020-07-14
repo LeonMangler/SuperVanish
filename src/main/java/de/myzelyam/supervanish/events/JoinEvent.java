@@ -11,6 +11,7 @@ package de.myzelyam.supervanish.events;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.features.Broadcast;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -35,6 +36,10 @@ public class JoinEvent implements EventExecutor, Listener {
                 final Player p = e.getPlayer();
                 // vanished:
                 if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
+                    // hide self
+                    for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+                        if (!plugin.hasPermissionToSee(onlinePlayer, p))
+                            plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
                     // Join message
                     if (plugin.getSettings().getBoolean("MessageOptions.HideRealJoinQuitMessages")) {
                         e.setJoinMessage(null);
@@ -85,6 +90,11 @@ public class JoinEvent implements EventExecutor, Listener {
                             }
                         }.runTaskLater(plugin, 1);
                 }
+                // hide others
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+                    if (plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())
+                            && !plugin.hasPermissionToSee(p, onlinePlayer))
+                        plugin.getVisibilityChanger().getHider().setHidden(onlinePlayer, p, true);
             }
         } catch (Exception er) {
             plugin.logException(er);
