@@ -11,17 +11,17 @@ Feel free to create Pull Requests if you'd like to improve SuperVanish! Please r
 ```
  <repositories>
         <repository>
-            <id>cubekrowd-repo</id>
-            <url>https://mavenrepo.cubekrowd.net/artifactory/repo/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
     <dependencies>
         <!-- SuperVanish -->
         <dependency>
-            <groupId>de.myzelyam</groupId>
+            <groupId>com.github.MyzelYam</groupId>
             <artifactId>SuperVanish</artifactId>
-            <version>6.1.6</version>
+            <version>Tag</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
