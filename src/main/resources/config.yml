@@ -1,4 +1,4 @@
-# SuperVanish v6.1.6 - Configuration
+# SuperVanish v6.1.7 - Configuration
 
 ############# Invisibility Features ##############
 InvisibilityFeatures:
@@ -172,4 +172,4 @@ MiscellaneousOptions:
     NotifyAdmins: true
 
 ################# Do Not Touch ###################
-ConfigVersion: 6.1.6
+ConfigVersion: 6.1.7
