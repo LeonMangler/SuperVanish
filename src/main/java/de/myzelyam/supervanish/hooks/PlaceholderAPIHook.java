@@ -12,6 +12,7 @@ import de.myzelyam.supervanish.SuperVanish;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -21,12 +22,11 @@ public class PlaceholderAPIHook extends PluginHook {
 
     public PlaceholderAPIHook(SuperVanish superVanish) {
         super(superVanish);
-        PlaceholderAPI.registerExpansion(new SVPlaceholderExpansion());
-
+        new SVPlaceholderExpansion().register();
     }
 
     public static String translatePlaceholders(String msg, Player p) {
-        return PlaceholderAPI.setPlaceholders(p, msg);
+        return PlaceholderAPI.setPlaceholders((OfflinePlayer) p, msg);
     }
 
     public class SVPlaceholderExpansion extends PlaceholderExpansion {
@@ -57,14 +57,19 @@ public class PlaceholderAPIHook extends PluginHook {
         }
 
         @Override
-        public String onPlaceholderRequest(Player p, String id) {
+        public String onRequest(OfflinePlayer op, String id) {
             try {
+                Player p;
+                if (op instanceof Player)
+                    p = (Player) op;
+                else
+                    p = null;
                 if (id.equalsIgnoreCase("isvanished")
                         || id.equalsIgnoreCase("isinvisible")
                         || id.equalsIgnoreCase("vanished")
                         || id.equalsIgnoreCase("invisible"))
-                    return superVanish.getVanishStateMgr().isVanished(p.getUniqueId()) ? "Yes"
-                            : "No";
+                    return p != null && superVanish.getVanishStateMgr().isVanished(p.getUniqueId())
+                            ? "Yes" : "No";
                 if (id.equalsIgnoreCase("onlinevanishedplayers")
                         || id.equalsIgnoreCase("onlinevanished")
                         || id.equalsIgnoreCase("invisibleplayers")
