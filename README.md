@@ -21,7 +21,7 @@ Feel free to create Pull Requests if you'd like to improve SuperVanish! Please r
         <dependency>
             <groupId>com.github.MyzelYam</groupId>
             <artifactId>SuperVanish</artifactId>
-            <version>Tag</version>
+            <version>6.1.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
