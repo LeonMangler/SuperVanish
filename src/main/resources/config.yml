@@ -1,4 +1,4 @@
-# SuperVanish v6.1.8 - Configuration
+# SuperVanish v6.2.0 - Configuration
 
 ############# Invisibility Features ##############
 InvisibilityFeatures:
@@ -21,6 +21,8 @@ InvisibilityFeatures:
   DisablePush: false
   # Should vanished players pick up items by default? This can be changed individually with /sv tipu
   DefaultPickUpItemsOption: false
+  # Should SV modify tablist packets to prevent the server from leaking who is online?
+  ModifyTablistPackets: true
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
@@ -172,4 +174,4 @@ MiscellaneousOptions:
     NotifyAdmins: true
 
 ################# Do Not Touch ###################
-ConfigVersion: 6.1.8
+ConfigVersion: 6.2.0

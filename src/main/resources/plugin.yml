@@ -2,7 +2,7 @@ name: SuperVanish
 main: de.myzelyam.supervanish.SuperVanish
 author: MyzelYam
 description: Advanced /vanish plugin which makes other players think that you're not on the server
-version: 6.1.8
+version: 6.2.0
 api-version: 1.13
 website: https://www.spigotmc.org/resources/supervanish-be-invisible.1331/
 softdepend:

@@ -10,7 +10,7 @@ package de.myzelyam.supervanish.visibility.hiders;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.BukkitPlayerHidingUtil;
-
+import de.myzelyam.supervanish.visibility.hiders.modules.PlayerInfoModule;
 import org.bukkit.entity.Player;
 
 public class PreventionHider extends PlayerHider implements Runnable {
@@ -20,16 +20,25 @@ public class PreventionHider extends PlayerHider implements Runnable {
     public PreventionHider(SuperVanish plugin) {
         super(plugin);
         taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 1, 1).getTaskId();
+        if (plugin.isUseProtocolLib()
+                && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
+            PlayerInfoModule.register(plugin, this);
     }
 
     @Override
-    public boolean setHidden(Player player, Player viewer, boolean hidden) {
-        if (super.setHidden(player, viewer, hidden)) {
-            if (hidden) BukkitPlayerHidingUtil.hidePlayer(player, viewer, plugin);
-            else BukkitPlayerHidingUtil.showPlayer(player, viewer, plugin);
-            return true;
+    public boolean setHidden(Player player, Player viewer, boolean hide) {
+        boolean wasHidden = isHidden(player, viewer);
+
+        if (!wasHidden && hide && player != viewer) {
+            BukkitPlayerHidingUtil.hidePlayer(player, viewer, plugin);
         }
-        return false;
+
+        boolean stateChanged = super.setHidden(player, viewer, hide);
+
+        if (wasHidden && !hide && player != viewer) {
+            BukkitPlayerHidingUtil.showPlayer(player, viewer, plugin);
+        }
+        return stateChanged;
     }
 
     @Override
