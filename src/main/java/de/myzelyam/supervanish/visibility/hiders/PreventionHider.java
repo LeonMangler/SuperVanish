@@ -20,7 +20,7 @@ public class PreventionHider extends PlayerHider implements Runnable {
     public PreventionHider(SuperVanish plugin) {
         super(plugin);
         taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 1, 1).getTaskId();
-        if (plugin.isUseProtocolLib()
+        if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
             PlayerInfoModule.register(plugin, this);
     }
