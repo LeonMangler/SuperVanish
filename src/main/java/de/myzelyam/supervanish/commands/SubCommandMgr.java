@@ -9,18 +9,7 @@
 package de.myzelyam.supervanish.commands;
 
 import de.myzelyam.supervanish.SuperVanish;
-import de.myzelyam.supervanish.commands.subcommands.BroadcastLogin;
-import de.myzelyam.supervanish.commands.subcommands.BroadcastLogout;
-import de.myzelyam.supervanish.commands.subcommands.InvalidUsage;
-import de.myzelyam.supervanish.commands.subcommands.PrintStacktrace;
-import de.myzelyam.supervanish.commands.subcommands.RecreateFiles;
-import de.myzelyam.supervanish.commands.subcommands.Reload;
-import de.myzelyam.supervanish.commands.subcommands.ShowHelp;
-import de.myzelyam.supervanish.commands.subcommands.ToggleItemPickups;
-import de.myzelyam.supervanish.commands.subcommands.VanishOther;
-import de.myzelyam.supervanish.commands.subcommands.VanishSelf;
-import de.myzelyam.supervanish.commands.subcommands.VanishedList;
-
+import de.myzelyam.supervanish.commands.subcommands.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -145,6 +134,9 @@ public class SubCommandMgr {
                                       String alias, String[] args) {
         // don't provide any help at all if user doesn't have permission to
         // execute '/sv help'
+        if (!CommandAction.hasAnyCmdPermission(sender, plugin)) {
+            return Collections.emptyList();
+        }
         if (args.length == 1) {
             String toComplete = args[0];
             // didn't start to type first argument
