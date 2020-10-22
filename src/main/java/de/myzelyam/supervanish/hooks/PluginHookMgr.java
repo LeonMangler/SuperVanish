@@ -10,6 +10,7 @@ package de.myzelyam.supervanish.hooks;
 
 import de.myzelyam.supervanish.SuperVanish;
 
+import de.myzelyam.supervanish.hooks.discordsrv.DiscordSRVHook;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

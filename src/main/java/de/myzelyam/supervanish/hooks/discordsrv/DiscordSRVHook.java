@@ -1,20 +1,20 @@
-package de.myzelyam.supervanish.hooks;
+package de.myzelyam.supervanish.hooks.discordsrv;
 
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
-import github.scarsz.discordsrv.listeners.PlayerJoinLeaveListener;
+import de.myzelyam.supervanish.hooks.PluginHook;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class DiscordSRVHook extends PluginHook {
-	private final PlayerJoinLeaveListener fakeListener;
+	private final FakePlayerJoinLeaveListener fakeListener;
 
 	public DiscordSRVHook(SuperVanish superVanish) {
 		super(superVanish);
-		fakeListener = new PlayerJoinLeaveListener();
+		fakeListener = new FakePlayerJoinLeaveListener();
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
