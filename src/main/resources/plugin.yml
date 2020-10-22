@@ -19,6 +19,7 @@ softdepend:
 - NametagEdit
 - MVdWPlaceholderAPI
 - Vault
+- DiscordSRV
 commands:
   sv:
     usage: /sv

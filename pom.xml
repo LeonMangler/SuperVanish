@@ -63,6 +63,10 @@
             <id>placeholderapi-repo</id>
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
     <dependencies>
         <!--Spigot API-->
@@ -148,5 +152,11 @@
             <artifactId>placeholderapi</artifactId>
             <version>2.10.6</version>
         </dependency>
+        <!--DiscordSRV-->
+    	<dependency>
+        	<groupId>com.github.DiscordSRV</groupId>
+        	<artifactId>DiscordSRV</artifactId>
+        	<version>v1.20.0</version>
+    	</dependency>
     </dependencies>
 </project>

@@ -34,6 +34,7 @@ public class PluginHookMgr implements Listener {
         put("SuperTrails", SuperTrailsHook.class);
         put("TrailGUI", TrailGUIHook.class);
         put("MVdWPlaceholderAPI", MVdWPlaceholderAPIHook.class);
+        put("DiscordSRV", DiscordSRVHook.class);
     }};
     private final SuperVanish plugin;
     private Set<PluginHook> activeHooks = new HashSet<>();
