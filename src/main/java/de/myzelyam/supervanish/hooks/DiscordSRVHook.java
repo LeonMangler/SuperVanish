@@ -14,7 +14,7 @@ public class DiscordSRVHook extends PluginHook {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVanish(PlayerHideEvent e) {
-        DiscordSRV.getPlugin().sendJoinMessage(e.getPlayer(), e.getPlayer().getName() + "left the game");
+        DiscordSRV.getPlugin().sendLeaveMessage(e.getPlayer(), e.getPlayer().getName() + "left the game");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
