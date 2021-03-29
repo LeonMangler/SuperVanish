@@ -21,7 +21,7 @@ Feel free to create Pull Requests if you'd like to improve SuperVanish! Please r
         <dependency>
             <groupId>com.github.LeonMangler</groupId>
             <artifactId>SuperVanish</artifactId>
-            <version>6.2.0</version>
+            <version>6.2.1</version>
         </dependency>
     </dependencies>
 ```
