@@ -32,13 +32,33 @@ public class SubCommandMgr {
         try {
             // invalid usage by default
             Executable executable = new InvalidUsage(plugin);
-            // vanish self
+            // vanish self #1
             if (args.length == 0) {
                 if (sender instanceof Player)
                     executable = new VanishSelf(plugin);
                 executable.execute(cmd, sender, args, label);
                 return;
             }
+            // vanish other
+            if ((args[0].equalsIgnoreCase("on")
+                    || args[0].equalsIgnoreCase("off")
+                    || args[0].equalsIgnoreCase("vanish")
+                    || args[0].equalsIgnoreCase("reappear")
+                    || args[0].equalsIgnoreCase("enable")
+                    || args[0].equalsIgnoreCase("disable"))
+                    && args.length > 1
+                    || Bukkit.getPlayer(args[0]) != null) {
+                executable = Bukkit.getPlayer(args[0]) != null
+                        && !(args[0].equalsIgnoreCase("on")
+                        || args[0].equalsIgnoreCase("off")
+                        || args[0].equalsIgnoreCase("vanish")
+                        || args[0].equalsIgnoreCase("reappear")
+                        || args[0].equalsIgnoreCase("enable")
+                        || args[0].equalsIgnoreCase("disable"))
+                        ? new VanishOther(Bukkit.getPlayer(args[0]), plugin)
+                        : new VanishOther(plugin);
+            }
+            // vanish self #2
             if ((args[0].equalsIgnoreCase("on")
                     || args[0].equalsIgnoreCase("off")
                     || args[0].equalsIgnoreCase("vanish")
@@ -104,25 +124,6 @@ public class SubCommandMgr {
             }
             if (args[0].equalsIgnoreCase("logout")) {
                 executable = new BroadcastLogout(plugin);
-            }
-            // vanish other
-            if ((args[0].equalsIgnoreCase("on")
-                    || args[0].equalsIgnoreCase("off")
-                    || args[0].equalsIgnoreCase("vanish")
-                    || args[0].equalsIgnoreCase("reappear")
-                    || args[0].equalsIgnoreCase("enable")
-                    || args[0].equalsIgnoreCase("disable"))
-                    && args.length > 1
-                    || Bukkit.getPlayer(args[0]) != null) {
-                executable = Bukkit.getPlayer(args[0]) != null
-                        && !(args[0].equalsIgnoreCase("on")
-                        || args[0].equalsIgnoreCase("off")
-                        || args[0].equalsIgnoreCase("vanish")
-                        || args[0].equalsIgnoreCase("reappear")
-                        || args[0].equalsIgnoreCase("enable")
-                        || args[0].equalsIgnoreCase("disable"))
-                        ? new VanishOther(Bukkit.getPlayer(args[0]), plugin)
-                        : new VanishOther(plugin);
             }
             executable.execute(cmd, sender, args, label);
         } catch (Exception e) {
