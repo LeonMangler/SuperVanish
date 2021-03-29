@@ -19,10 +19,9 @@ Feel free to create Pull Requests if you'd like to improve SuperVanish! Please r
     <dependencies>
         <!-- SuperVanish -->
         <dependency>
-            <groupId>com.github.MyzelYam</groupId>
+            <groupId>com.github.LeonMangler</groupId>
             <artifactId>SuperVanish</artifactId>
             <version>6.2.0</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 ```
