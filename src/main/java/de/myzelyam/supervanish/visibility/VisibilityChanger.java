@@ -15,16 +15,15 @@ import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.Validation;
 import de.myzelyam.supervanish.visibility.hiders.PlayerHider;
-
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.logging.Level;
-
-import lombok.Getter;
 
 public class VisibilityChanger {
 
@@ -97,6 +96,15 @@ public class VisibilityChanger {
                 //noinspection deprecation
                 player.spigot().setCollidesWithEntities(false);
             } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
+            }
+            // stop player from being a mob target
+            if (config.getBoolean("InvisibilityFeatures.DisableMobTarget")) {
+                player.getWorld().getEntities().stream()
+                        .filter(ent -> ent instanceof Mob)
+                        .map(ent -> (Mob) ent)
+                        .filter(mob -> mob.getTarget() != null)
+                        .filter(mob -> player.getUniqueId().equals(mob.getTarget().getUniqueId()))
+                        .forEach(mob -> mob.setTarget(null));
             }
             // call post event
             PostPlayerHideEvent e2 = new PostPlayerHideEvent(player, silent);
