@@ -11,7 +11,9 @@ package de.myzelyam.supervanish.events;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.VanishPlayer;
 import de.myzelyam.supervanish.features.Broadcast;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,6 +22,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.server.TabCompleteEvent;
+
+import java.util.Iterator;
+import java.util.Objects;
 
 
 public class GeneralEventHandler implements Listener {
@@ -131,6 +137,29 @@ public class GeneralEventHandler implements Listener {
             if (e.getAction() != Action.PHYSICAL) return;
             if (e.getClickedBlock() != null && e.getClickedBlock().getType().toString().matches("SOIL|FARMLAND"))
                 e.setCancelled(true);
+        } catch (Exception er) {
+            plugin.logException(er);
+        }
+    }
+
+    @EventHandler
+    public void onTabComplete(TabCompleteEvent e) {
+        try {
+            if (!(e.getSender() instanceof Player)) return;
+            Player p = (Player) e.getSender();
+            Iterator<String> it = e.getCompletions().iterator();
+            while (it.hasNext()) {
+                String completion = it.next();
+                boolean allowedCompletion = plugin.getVanishStateMgr().getOnlineVanishedPlayers().stream()
+                        .map(Bukkit::getPlayer).filter(Objects::nonNull)
+                        .filter(vanishedPlayer -> !plugin.canSee(p, vanishedPlayer))
+                        .map(HumanEntity::getName)
+                        .noneMatch(name -> name.equalsIgnoreCase(completion));
+                if (!allowedCompletion) {
+                    it.remove();
+                }
+            }
+
         } catch (Exception er) {
             plugin.logException(er);
         }
