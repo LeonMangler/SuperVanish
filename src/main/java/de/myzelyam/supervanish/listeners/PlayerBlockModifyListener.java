@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package de.myzelyam.supervanish.events;
+package de.myzelyam.supervanish.listeners;
 
 import de.myzelyam.supervanish.SuperVanish;
 
@@ -24,11 +24,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerBlockModifyEventHandler implements Listener {
+public class PlayerBlockModifyListener implements Listener {
 
     private final SuperVanish plugin;
 
-    public PlayerBlockModifyEventHandler(SuperVanish plugin) {
+    public PlayerBlockModifyListener(SuperVanish plugin) {
         this.plugin = plugin;
     }
 

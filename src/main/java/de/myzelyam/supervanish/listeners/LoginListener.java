@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package de.myzelyam.supervanish.events;
+package de.myzelyam.supervanish.listeners;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.commands.CommandAction;
@@ -19,11 +19,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 
-public class LoginEvent implements Listener {
+public class LoginListener implements Listener {
 
     private final SuperVanish plugin;
 
-    public LoginEvent(SuperVanish plugin) {
+    public LoginListener(SuperVanish plugin) {
         this.plugin = plugin;
     }
 

@@ -12,7 +12,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.commands.VanishCommand;
 import de.myzelyam.supervanish.config.ConfigMgr;
-import de.myzelyam.supervanish.events.*;
+import de.myzelyam.supervanish.listeners.*;
 import de.myzelyam.supervanish.features.FeatureMgr;
 import de.myzelyam.supervanish.hooks.PluginHookMgr;
 import de.myzelyam.supervanish.net.UpdateNotifier;
@@ -72,7 +72,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     @Getter
     private UpdateNotifier updateNotifier;
     @Getter
-    private LoginEvent loginEvent;
+    private LoginListener loginListener;
     @Getter
     private LayeredPermissionChecker layeredPermissionChecker;
     private Set<VanishPlayer> vanishPlayers = new HashSet<>();
@@ -169,19 +169,19 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
 
     private void registerEvents() {
         PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(new GeneralEventHandler(this), this);
-        pluginManager.registerEvents(new PlayerBlockModifyEventHandler(this), this);
-        pluginManager.registerEvents(new WorldChangeEvent(this), this);
+        pluginManager.registerEvents(new GeneralListener(this), this);
+        pluginManager.registerEvents(new PlayerBlockModifyListener(this), this);
+        pluginManager.registerEvents(new WorldChangeListener(this), this);
         if (versionUtil.isOneDotXOrHigher(10)) {
             pluginManager.registerEvents(new TabCompleteListener(this), this);
         }
-        pluginManager.registerEvents(loginEvent = new LoginEvent(this), this);
-        JoinEvent joinEvent = new JoinEvent(this);
-        pluginManager.registerEvent(PlayerJoinEvent.class, joinEvent,
-                getEventPriority(PlayerJoinEvent.class), joinEvent, this, false);
-        QuitEvent quitEvent = new QuitEvent(this);
-        pluginManager.registerEvent(PlayerQuitEvent.class, quitEvent,
-                getEventPriority(PlayerQuitEvent.class), quitEvent, this, false);
+        pluginManager.registerEvents(loginListener = new LoginListener(this), this);
+        JoinListener joinListener = new JoinListener(this);
+        pluginManager.registerEvent(PlayerJoinEvent.class, joinListener,
+                getEventPriority(PlayerJoinEvent.class), joinListener, this, false);
+        QuitListener quitListener = new QuitListener(this);
+        pluginManager.registerEvent(PlayerQuitEvent.class, quitListener,
+                getEventPriority(PlayerQuitEvent.class), quitListener, this, false);
     }
 
     private EventPriority getEventPriority(Class<? extends Event> eventClass) {

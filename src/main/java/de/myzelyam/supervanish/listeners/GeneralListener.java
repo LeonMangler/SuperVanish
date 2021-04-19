@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package de.myzelyam.supervanish.events;
+package de.myzelyam.supervanish.listeners;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.VanishPlayer;
@@ -22,13 +22,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
 
-public class GeneralEventHandler implements Listener {
+public class GeneralListener implements Listener {
 
     private final SuperVanish plugin;
 
     private final FileConfiguration config;
 
-    public GeneralEventHandler(SuperVanish plugin) {
+    public GeneralListener(SuperVanish plugin) {
         this.plugin = plugin;
         config = plugin.getSettings();
     }
