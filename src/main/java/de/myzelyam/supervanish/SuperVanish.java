@@ -172,6 +172,9 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
         pluginManager.registerEvents(new GeneralEventHandler(this), this);
         pluginManager.registerEvents(new PlayerBlockModifyEventHandler(this), this);
         pluginManager.registerEvents(new WorldChangeEvent(this), this);
+        if (versionUtil.isOneDotXOrHigher(10)) {
+            pluginManager.registerEvents(new TabCompleteListener(this), this);
+        }
         pluginManager.registerEvents(loginEvent = new LoginEvent(this), this);
         JoinEvent joinEvent = new JoinEvent(this);
         pluginManager.registerEvent(PlayerJoinEvent.class, joinEvent,
