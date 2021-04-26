@@ -44,6 +44,7 @@ permissions:
       sv.placeblocks: true
       sv.damage: true
       sv.stacktrace: true
+      sv.silentchest: true
     description: Grants you all SuperVanish permissions
   supervanish.*:
     children:
@@ -57,3 +58,5 @@ permissions:
     description: You can always keep flying when you reappear
   sv.joinvanished:
     description: You always join vanished (must be enabled in config)
+  sv.silentchest:
+    description: You can open chests silently

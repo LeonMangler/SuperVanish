@@ -11,7 +11,9 @@ InvisibilityFeatures:
   # Should SV prevent mobs from targeting invisible players?
   DisableMobTarget: true
   # Should invisible players open chests and shulker boxes without the animation and sound?
-  # (This makes them go into spectator mode temporarily; Requires ProtocolLib)
+  # This makes them go into spectator mode temporarily. It's better to only give access to this feature
+  # to staff members since a server crash can cause players to stay in spectator mode.
+  # Permission: sv.silentchest
   OpenChestsSilently: true
   # Should invisible players not be able to trigger pressure plates and tripwire?
   # If this feature is enabled invisible players can't trigger pressure plates and tripwire.
