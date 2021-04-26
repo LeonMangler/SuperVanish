@@ -44,11 +44,17 @@ public class ActionBarMgr {
             public void run() {
                 for (Player p : actionBars) {
                     try {
-                        sendActionBar(p, plugin.replacePlaceholders(
-                                plugin.getMessage("ActionBarMessage"), p));
+                        sendActionBar(p, plugin.replacePlaceholders(plugin.getMessage("ActionBarMessage"), p));
                     } catch (Exception e) {
                         cancel();
                         plugin.logException(e);
+                        plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
+                                "dev-build of ProtocolLib and that your server is up-to-date! This error likely " +
+                                "happened inside of ProtocolLib code which is out of SuperVanish's control. It's part " +
+                                "of an optional feature module and can be removed safely by disabling " +
+                                "DisplayActionBar in the config file. Please report this " +
+                                "error if you can reproduce it on an up-to-date server with only latest " +
+                                "ProtocolLib and latest SV installed.");
                     }
                 }
             }
@@ -56,23 +62,28 @@ public class ActionBarMgr {
     }
 
     private void sendActionBar(Player p, String bar) {
-        String json = "{\"text\": \"" + ChatColor.translateAlternateColorCodes('&', bar) + "\"}";
-        WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
-        PacketContainer chatMsg = new PacketContainer(PacketType.Play.Server.CHAT);
-        chatMsg.getChatComponents().write(0, msg);
-        if (plugin.getVersionUtil().isOneDotXOrHigher(12))
-            try {
-                chatMsg.getChatTypes().write(0, EnumWrappers.ChatType.GAME_INFO);
-            } catch (NoSuchMethodError e) {
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText
-                        ("SuperVanish: Please update ProtocolLib"));
-            }
-        else
-            chatMsg.getBytes().write(0, (byte) 2);
         try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(p, chatMsg);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet " + chatMsg, e);
+            Class.forName("net.md_5.bungee.api.chat.ComponentBuilder");
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(bar));
+        } catch (ClassNotFoundException er) {
+            String json = "{\"text\": \"" + ChatColor.translateAlternateColorCodes('&', bar) + "\"}";
+            WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
+            PacketContainer chatMsg = new PacketContainer(PacketType.Play.Server.CHAT);
+            chatMsg.getChatComponents().write(0, msg);
+            if (plugin.getVersionUtil().isOneDotXOrHigher(12))
+                try {
+                    chatMsg.getChatTypes().write(0, EnumWrappers.ChatType.GAME_INFO);
+                } catch (NoSuchMethodError e) {
+                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText
+                            ("SuperVanish: Please update ProtocolLib"));
+                }
+            else
+                chatMsg.getBytes().write(0, (byte) 2);
+            try {
+                ProtocolLibrary.getProtocolManager().sendServerPacket(p, chatMsg);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException("Cannot send packet " + chatMsg, e);
+            }
         }
     }
 

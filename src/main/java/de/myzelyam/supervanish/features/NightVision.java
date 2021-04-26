@@ -10,11 +10,9 @@ package de.myzelyam.supervanish.features;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,9 +25,12 @@ import org.bukkit.potion.PotionEffectType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
-import static com.comphenix.protocol.PacketType.Play.Server.*;
+import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_EFFECT;
+import static com.comphenix.protocol.PacketType.Play.Server.REMOVE_ENTITY_EFFECT;
 
 public class NightVision extends Feature implements Runnable {
+
+    private boolean suppressErrors = false;
 
     public static final int INFINITE_POTION_EFFECT_LENGTH = 32767;
 
@@ -107,6 +108,18 @@ public class NightVision extends Feature implements Runnable {
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
         } catch (InvocationTargetException e) {
             throw new RuntimeException("Cannot send packet", e);
+        } catch (Exception | NoClassDefFoundError e) {
+            if (!suppressErrors) {
+                plugin.logException(e);
+                plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
+                        "dev-build of ProtocolLib and that your server is up-to-date! This error likely " +
+                        "happened inside of ProtocolLib code which is out of SuperVanish's control. It's part " +
+                        "of an optional feature module and can be removed safely by disabling " +
+                        "NightVisionEffect in the config file. Please report this " +
+                        "error if you can reproduce it on an up-to-date server with only latest " +
+                        "ProtocolLib and latest SV installed.");
+                suppressErrors = true;
+            }
         }
     }
 
@@ -132,6 +145,18 @@ public class NightVision extends Feature implements Runnable {
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
         } catch (InvocationTargetException e) {
             throw new RuntimeException("Cannot send packet", e);
+        } catch (Exception | NoClassDefFoundError e) {
+            if (!suppressErrors) {
+                plugin.logException(e);
+                plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
+                        "dev-build of ProtocolLib and that your server is up-to-date! This error likely " +
+                        "happened inside of ProtocolLib code which is out of SuperVanish's control. It's part " +
+                        "of an optional feature module and can be removed safely by disabling " +
+                        "NightVisionEffect in the config file. Please report this " +
+                        "error if you can reproduce it on an up-to-date server with only latest " +
+                        "ProtocolLib and latest SV installed.");
+                suppressErrors = true;
+            }
         }
     }
 }

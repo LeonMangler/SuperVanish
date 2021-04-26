@@ -26,6 +26,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import be.maximvdw.placeholderapi.PlaceholderAPI;
 
@@ -158,6 +160,16 @@ public class PlaceholderConverter {
             }
         }
         // convert color codes
+        if (plugin.getVersionUtil().isOneDotXOrHigher(16)) {
+            Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+            Matcher matcher = pattern.matcher(msg);
+
+            while (matcher.find()) {
+                String color = msg.substring(matcher.start(), matcher.end());
+                msg = msg.replace(color, net.md_5.bungee.api.ChatColor.of(color) + "");
+                matcher = pattern.matcher(msg);
+            }
+        }
         msg = ChatColor.translateAlternateColorCodes('&', msg);
         return msg;
     }

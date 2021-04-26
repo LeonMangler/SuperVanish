@@ -35,7 +35,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static com.comphenix.protocol.PacketType.Play.Server.PLAYER_INFO;
 
-public class VanishIndication extends Feature {
+public class VanishIndication extends Feature
+    private boolean suppressErrors = false;
 
     public VanishIndication(SuperVanish plugin) {
         super(plugin);
@@ -61,12 +62,7 @@ public class VanishIndication extends Feature {
         final Player p = e.getPlayer();
         for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (!plugin.getVisibilityChanger().getHider().isHidden(p, onlinePlayer) && p != onlinePlayer) {
-                delay(new Runnable() {
-                    @Override
-                    public void run() {
-                        sendPlayerInfoChangeGameModePacket(onlinePlayer, p, false);
-                    }
-                });
+                delay(() -> sendPlayerInfoChangeGameModePacket(onlinePlayer, p, false));
             }
         }
     }
@@ -74,24 +70,21 @@ public class VanishIndication extends Feature {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
-        delay(new Runnable() {
-            @Override
-            public void run() {
-                // tell others that p is a spectator
-                if (plugin.getVanishStateMgr().isVanished(p.getUniqueId()))
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                        if (!plugin.getVisibilityChanger().getHider().isHidden(p, onlinePlayer)
-                                && p != onlinePlayer) {
-                            sendPlayerInfoChangeGameModePacket(onlinePlayer, p, true);
-                        }
-                    }
-                // tell p that others are spectators
+        delay(() -> {
+            // tell others that p is a spectator
+            if (plugin.getVanishStateMgr().isVanished(p.getUniqueId()))
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (!plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())) continue;
-                    if (!plugin.getVisibilityChanger().getHider().isHidden(onlinePlayer, p)
+                    if (!plugin.getVisibilityChanger().getHider().isHidden(p, onlinePlayer)
                             && p != onlinePlayer) {
-                        sendPlayerInfoChangeGameModePacket(p, onlinePlayer, true);
+                        sendPlayerInfoChangeGameModePacket(onlinePlayer, p, true);
                     }
+                }
+            // tell p that others are spectators
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                if (!plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())) continue;
+                if (!plugin.getVisibilityChanger().getHider().isHidden(onlinePlayer, p)
+                        && p != onlinePlayer) {
+                    sendPlayerInfoChangeGameModePacket(p, onlinePlayer, true);
                 }
             }
         });
@@ -103,41 +96,54 @@ public class VanishIndication extends Feature {
                 new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO) {
                     @Override
                     public void onPacketSending(PacketEvent event) {
-                        // multiple events share same packet object
-                        event.setPacket(event.getPacket().shallowClone());
-                        List<PlayerInfoData> infoDataList = new ArrayList<>(
-                                event.getPacket().getPlayerInfoDataLists().read(0));
-                        Player receiver = event.getPlayer();
-                        for (PlayerInfoData infoData : ImmutableList.copyOf(infoDataList)) {
-                            try {
-                                if (!VanishIndication.this.plugin.getVisibilityChanger().getHider()
-                                        .isHidden(infoData.getProfile().getUUID(), receiver)
-                                        && VanishIndication.this.plugin.getVanishStateMgr()
-                                        .isVanished(infoData.getProfile().getUUID())) {
-                                    if (!receiver.getUniqueId().equals(infoData.getProfile().getUUID()))
-                                        if (infoData.getGameMode() != EnumWrappers.NativeGameMode.SPECTATOR) {
-                                            int latency;
-                                            try {
-                                                latency = infoData.getLatency();
-                                            } catch (NoSuchMethodError e) {
-                                                latency = 21;
+                        try {
+                            // multiple events share same packet object
+                            event.setPacket(event.getPacket().shallowClone());
+                            List<PlayerInfoData> infoDataList = new ArrayList<>(
+                                    event.getPacket().getPlayerInfoDataLists().read(0));
+                            Player receiver = event.getPlayer();
+                            for (PlayerInfoData infoData : ImmutableList.copyOf(infoDataList)) {
+                                try {
+                                    if (!VanishIndication.this.plugin.getVisibilityChanger().getHider()
+                                            .isHidden(infoData.getProfile().getUUID(), receiver)
+                                            && VanishIndication.this.plugin.getVanishStateMgr()
+                                            .isVanished(infoData.getProfile().getUUID())) {
+                                        if (!receiver.getUniqueId().equals(infoData.getProfile().getUUID()))
+                                            if (infoData.getGameMode() != EnumWrappers.NativeGameMode.SPECTATOR) {
+                                                int latency;
+                                                try {
+                                                    latency = infoData.getLatency();
+                                                } catch (NoSuchMethodError e) {
+                                                    latency = 21;
+                                                }
+                                                if (event.getPacket().getPlayerInfoAction().read(0)
+                                                        != EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE) {
+                                                    continue;
+                                                }
+                                                PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(),
+                                                        latency, EnumWrappers.NativeGameMode.SPECTATOR,
+                                                        infoData.getDisplayName());
+                                                infoDataList.remove(infoData);
+                                                infoDataList.add(newData);
                                             }
-                                            if (event.getPacket().getPlayerInfoAction().read(0)
-                                                    != EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE) {
-                                                continue;
-                                            }
-                                            PlayerInfoData newData = new PlayerInfoData(infoData.getProfile(),
-                                                    latency, EnumWrappers.NativeGameMode.SPECTATOR,
-                                                    infoData.getDisplayName());
-                                            infoDataList.remove(infoData);
-                                            infoDataList.add(newData);
-                                        }
+                                    }
+                                } catch (UnsupportedOperationException ignored) {
                                 }
-                            } catch (UnsupportedOperationException ignored) {
-                                // Ignore temporary players
+                            }
+                            event.getPacket().getPlayerInfoDataLists().write(0, infoDataList);
+                        } catch (Exception | NoClassDefFoundError e) {
+                            if (!suppressErrors) {
+                                VanishIndication.this.plugin.logException(e);
+                                plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
+                                        "dev-build of ProtocolLib and that your server is up-to-date! This error likely " +
+                                        "happened inside of ProtocolLib code which is out of SuperVanish's control. It's part " +
+                                        "of an optional feature module and can be removed safely by disabling " +
+                                        "MarkVanishedPlayersAsSpectators in the config file. Please report this " +
+                                        "error if you can reproduce it on an up-to-date server with only latest " +
+                                        "ProtocolLib and latest SV installed.");
+                                suppressErrors = true;
                             }
                         }
-                        event.getPacket().getPlayerInfoDataLists().write(0, infoDataList);
                     }
                 });
     }
