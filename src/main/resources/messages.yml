@@ -3,6 +3,7 @@
 # Information:
 # <..> means that .. is required; [..] means that .. is optional and can be left out; | inside [] or <> stands for 'OR'
 # You can use the & character for color codes; Example: '&cThe color of this text would be red!'
+# You can use #XXXXXX for HEX color codes. Example: '#663EF6This text would be purple!'
 # You can use %p% to get the player's name; Example: '&4&l%p%, you aren't allowed to execute this command!'
 # You can use %other% to get the name of the target or cause
 # You can use %d% to get the player's display name; if you use Essentials then the display name contains the prefix too
