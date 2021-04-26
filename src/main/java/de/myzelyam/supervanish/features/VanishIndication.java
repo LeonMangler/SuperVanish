@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static com.comphenix.protocol.PacketType.Play.Server.PLAYER_INFO;
 
-public class VanishIndication extends Feature
+public class VanishIndication extends Feature {
     private boolean suppressErrors = false;
 
     public VanishIndication(SuperVanish plugin) {
