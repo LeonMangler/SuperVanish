@@ -21,7 +21,7 @@ import java.util.UUID;
 
 public class VanishOther extends SubCommand {
 
-    private Player specifiedPlayer;
+    private final Player specifiedPlayer;
 
     public VanishOther(SuperVanish plugin) {
         this(null, plugin);

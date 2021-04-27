@@ -17,11 +17,9 @@ import java.util.List;
 
 public class VanishCommand {
 
-    private final SuperVanish plugin;
     private final SubCommandMgr subCommandMgr;
 
     public VanishCommand(SuperVanish plugin) {
-        this.plugin = plugin;
         subCommandMgr = new SubCommandMgr(plugin);
     }
 

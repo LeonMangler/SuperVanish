@@ -120,11 +120,11 @@ public enum CommandAction {
         return list;
     }
 
-    public static boolean hasAnyCmdPermission(CommandSender sender, SuperVanish plugin) {
+    public static boolean hasNoCmdPermission(CommandSender sender, SuperVanish plugin) {
         for (CommandAction action : CommandAction.values())
             if (action.checkPermission(sender, plugin))
-                return true;
-        return false;
+                return false;
+        return true;
     }
 
     public boolean checkPermission(CommandSender sender, SuperVanish plugin) {

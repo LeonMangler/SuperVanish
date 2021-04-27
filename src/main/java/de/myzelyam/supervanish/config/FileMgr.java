@@ -17,7 +17,7 @@ import java.util.Map;
 public class FileMgr {
 
     private final SuperVanishPlugin plugin;
-    private Map<String, PluginFile<?>> files;
+    private final Map<String, PluginFile<?>> files;
 
     public FileMgr(SuperVanishPlugin plugin) {
         this.plugin = plugin;

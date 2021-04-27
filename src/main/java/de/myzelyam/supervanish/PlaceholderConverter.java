@@ -93,7 +93,6 @@ public class PlaceholderConverter {
                 if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
                         && plugin.getSettings().getBoolean("HookOptions.EnablePlaceholderAPIHook", true)) {
                     String replaced = PlaceholderAPIHook.translatePlaceholders(msg, specifiedPlayer);
-                    //noinspection ConstantConditions
                     msg = replaced == null ? msg : replaced;
                 }
                 // MVdWPlaceholderAPI

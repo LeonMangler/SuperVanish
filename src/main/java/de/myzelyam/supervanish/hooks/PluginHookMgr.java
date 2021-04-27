@@ -36,7 +36,7 @@ public class PluginHookMgr implements Listener {
         put("MVdWPlaceholderAPI", MVdWPlaceholderAPIHook.class);
     }};
     private final SuperVanish plugin;
-    private Set<PluginHook> activeHooks = new HashSet<>();
+    private final Set<PluginHook> activeHooks = new HashSet<>();
 
     public PluginHookMgr(SuperVanish plugin) {
         this.plugin = plugin;

@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 
 public class PreventionHider extends PlayerHider implements Runnable {
 
-    private int taskId;
+    private final int taskId;
 
     public PreventionHider(SuperVanish plugin) {
         super(plugin);

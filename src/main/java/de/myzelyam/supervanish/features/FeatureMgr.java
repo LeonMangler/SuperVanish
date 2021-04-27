@@ -27,12 +27,13 @@ import lombok.Data;
 
 public class FeatureMgr {
 
-    private static Requirement<FeatureInfo> protocolLibInstalled = new Requirement<FeatureInfo>() {
+    private static final Requirement<FeatureInfo> protocolLibInstalled = new Requirement<FeatureInfo>() {
         @Override
         public boolean fulfilledBy(FeatureInfo featureInfo) {
             return Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
         }
-    }, oneDotEightOrHigher = new Requirement<FeatureInfo>() {
+    };
+    private static final Requirement<FeatureInfo> oneDotEightOrHigher = new Requirement<FeatureInfo>() {
         @Override
         public boolean fulfilledBy(FeatureInfo featureInfo) {
             return featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8);

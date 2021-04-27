@@ -15,15 +15,12 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedServerPing;
-
 import de.myzelyam.supervanish.SuperVanish;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,12 +62,7 @@ public class ServerListPacketListener extends PacketAdapter {
             }
             if (settings.getBoolean("ExternalInvisibility.ServerList.AdjustListOfLoggedInPlayers")) {
                 List<WrappedGameProfile> wrappedGameProfiles = new ArrayList<>(ping.getPlayers());
-                Iterator<WrappedGameProfile> iterator = wrappedGameProfiles.iterator();
-                while (iterator.hasNext()) {
-                    if (onlineVanishedPlayers.contains(iterator.next().getUUID())) {
-                        iterator.remove();
-                    }
-                }
+                wrappedGameProfiles.removeIf(wrappedGameProfile -> onlineVanishedPlayers.contains(wrappedGameProfile.getUUID()));
                 ping.setPlayers(wrappedGameProfiles);
             }
         } catch (Exception er) {

@@ -4,11 +4,9 @@ import de.myzelyam.supervanish.SuperVanish;
 
 public class VersionUtil {
 
-    private final SuperVanish plugin;
     private final String version;
 
     public VersionUtil(SuperVanish plugin) {
-        this.plugin = plugin;
         version = plugin.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
     }
 

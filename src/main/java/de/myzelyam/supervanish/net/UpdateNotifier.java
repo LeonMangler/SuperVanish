@@ -54,7 +54,7 @@ public class UpdateNotifier {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (!isUpToDate())
+                        if (isOutdated())
                             notifyPlayer(e.getPlayer());
                     }
                 }.runTaskLater(plugin, 2);
@@ -62,13 +62,13 @@ public class UpdateNotifier {
         }, plugin);
     }
 
-    public boolean isUpToDate() {
+    public boolean isOutdated() {
         try {
             if (latestVersion == null) throw new NumberFormatException();
             int comparision = plugin.getVersionUtil().compareVersions(currentVersion, latestVersion);
-            return comparision >= 0;
+            return comparision < 0;
         } catch (NumberFormatException e) {
-            return currentVersion.equals(latestVersion);
+            return !currentVersion.equals(latestVersion);
         }
     }
 
@@ -102,12 +102,12 @@ public class UpdateNotifier {
             @Override
             public void run() {
                 String latestVersion = fetchLatestVersion();
-                UpdateNotifier.this.latestVersion = latestVersion.equals("Error")
+                latestVersion = latestVersion.equals("Error")
                         ? UpdateNotifier.this.latestVersion == null
                         ? currentVersion
                         : UpdateNotifier.this.latestVersion
                         : latestVersion;
-                if (!isUpToDate())
+                if (isOutdated())
                     new BukkitRunnable() {
                         @Override
                         public void run() {

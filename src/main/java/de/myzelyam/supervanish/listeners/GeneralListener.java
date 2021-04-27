@@ -19,7 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 
 
 public class GeneralListener implements Listener {
@@ -37,7 +36,6 @@ public class GeneralListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent e) {
         try {
             if (!(e.getDamager() instanceof Player)) return;
-            if (e.getEntity() == null) return;
             Player p = (Player) e.getDamager();
             if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
                 if (config.getBoolean("RestrictiveOptions.PreventHittingEntities")
@@ -109,9 +107,14 @@ public class GeneralListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onItemPickUp(PlayerPickupItemEvent e) {
+    public void onItemPickUp(EntityPickupItemEvent e) {
+        if(!(e.getEntity() instanceof Player))
+            return;
+
+        Player player = ((Player) e.getEntity());
+
         try {
-            VanishPlayer vanishPlayer = plugin.getVanishPlayer(e.getPlayer());
+            VanishPlayer vanishPlayer = plugin.getVanishPlayer(player);
             if (vanishPlayer == null || !vanishPlayer.isOnlineVanished()) return;
             if (!vanishPlayer.hasItemPickUpsEnabled())
                 e.setCancelled(true);
