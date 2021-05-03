@@ -13,12 +13,9 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-
 import de.myzelyam.supervanish.SuperVanish;
-
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,7 +42,7 @@ public class ActionBarMgr {
                 for (Player p : actionBars) {
                     try {
                         sendActionBar(p, plugin.replacePlaceholders(plugin.getMessage("ActionBarMessage"), p));
-                    } catch (Exception e) {
+                    } catch (Exception | NoSuchMethodError | NoClassDefFoundError e) {
                         cancel();
                         plugin.logException(e);
                         plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
@@ -65,7 +62,7 @@ public class ActionBarMgr {
         try {
             Class.forName("net.md_5.bungee.api.chat.ComponentBuilder");
             p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(bar));
-        } catch (ClassNotFoundException er) {
+        } catch (ClassNotFoundException | NoSuchMethodError | NoClassDefFoundError er) {
             String json = "{\"text\": \"" + ChatColor.translateAlternateColorCodes('&', bar) + "\"}";
             WrappedChatComponent msg = WrappedChatComponent.fromJson(json);
             PacketContainer chatMsg = new PacketContainer(PacketType.Play.Server.CHAT);
