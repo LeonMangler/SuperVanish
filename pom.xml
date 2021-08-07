@@ -37,7 +37,7 @@
         <repository>
             <id>mvdw-software-repo</id>
             <name>MVdW Public Repositories</name>
-            <url>http://repo.mvdw-software.be/content/groups/public/</url>
+            <url>https://repo.mvdw-software.be/content/groups/public/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
@@ -49,15 +49,15 @@
         </repository>
         <repository>
             <id>dmulloy2-repo</id>
-            <url>http://repo.dmulloy2.net/content/groups/public/</url>
+            <url>https://repo.dmulloy2.net/content/groups/public/</url>
         </repository>
         <repository>
             <id>vault-repo</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+            <url>https://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
         <repository>
             <id>citizens-repo</id>
-            <url>http://repo.citizensnpcs.co</url>
+            <url>https://repo.citizensnpcs.co</url>
         </repository>
         <repository>
             <id>placeholderapi-repo</id>
