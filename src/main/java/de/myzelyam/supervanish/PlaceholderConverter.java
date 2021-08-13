@@ -161,7 +161,7 @@ public class PlaceholderConverter {
         }
         // convert color codes
         if (plugin.getVersionUtil().isOneDotXOrHigher(16)) {
-            Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+            Pattern pattern = Pattern.compile("&?#[a-fA-F0-9]{6}");
             Matcher matcher = pattern.matcher(msg);
 
             while (matcher.find()) {
