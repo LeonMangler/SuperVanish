@@ -37,7 +37,7 @@
         <repository>
             <id>mvdw-software-repo</id>
             <name>MVdW Public Repositories</name>
-            <url>http://repo.mvdw-software.be/content/groups/public/</url>
+            <url>https://repo.mvdw-software.com/content/groups/public/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
@@ -45,23 +45,23 @@
         </repository>
         <repository>
             <id>essentials-repo</id>
-            <url>https://ci.ender.zone/plugin/repository/everything/</url>
+            <url>https://repo.essentialsx.net/releases</url>
         </repository>
         <repository>
             <id>dmulloy2-repo</id>
-            <url>http://repo.dmulloy2.net/content/groups/public/</url>
+            <url>https://repo.dmulloy2.net/nexus/repository/public/</url>
         </repository>
         <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
         <repository>
             <id>citizens-repo</id>
-            <url>http://repo.citizensnpcs.co</url>
+            <url>https://repo.citizensnpcs.co/</url>
         </repository>
         <repository>
             <id>placeholderapi-repo</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -79,12 +79,18 @@
             <version>1.18.20</version>
             <scope>provided</scope>
         </dependency>
-        <!--Essentials API-->
+        <!--EssentialsX API-->
         <dependency>
-            <groupId>net.ess3</groupId>
+            <groupId>net.essentialsx</groupId>
             <artifactId>EssentialsX</artifactId>
-            <version>2.17.2</version>
+            <version>2.19.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bstats</groupId>
+                    <artifactId>bstats-bukkit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--ProtocolLib-->
         <dependency>
@@ -94,16 +100,26 @@
         </dependency>
         <!--Vault API-->
         <dependency>
-            <groupId>net.milkbowl.vault</groupId>
+            <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.7</version>
+            <version>1.7.1</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>craftbukkit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--Citizens API-->
         <dependency>
             <groupId>net.citizensnpcs</groupId>
             <artifactId>citizensapi</artifactId>
-            <version>2.0.25-SNAPSHOT</version>
+            <version>2.0.28-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <!--TrailGUI-->
@@ -135,6 +151,7 @@
             <groupId>be.maximvdw</groupId>
             <artifactId>MVdWPlaceholderAPI</artifactId>
             <version>3.1.1-SNAPSHOT</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.spigotmc</groupId>
@@ -146,7 +163,7 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.10.6</version>
+            <version>2.10.10</version>
         </dependency>
     </dependencies>
 </project>
