@@ -50,6 +50,13 @@ repositories {
             includeGroup("me.clip")
         }
     }
+    maven {
+        name = "dynmap-repo"
+        url = uri("https://repo.mikeprimm.com")
+        content {
+            includeGroup("us.dynmap")
+        }
+    }
     maven("https://jitpack.io")
 }
 
@@ -73,7 +80,7 @@ dependencies {
     // TrailGUI
     compileOnly(files("dependencies/TrailGUI-5.15-SNAPSHOT.jar"))
     // Dynmap
-    compileOnly(files("dependencies/Dynmap-3.0-beta-4-spigot.jar"))
+    compileOnly("us.dynmap:DynmapCoreAPI:3.0")
     // SuperTrails
     compileOnly(files("dependencies/SuperTrails.jar"))
     // MVdWPlaceholderAPI
