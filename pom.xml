@@ -6,7 +6,7 @@
 
     <groupId>de.myzelyam</groupId>
     <artifactId>SuperVanish</artifactId>
-    <version>6.2.6-2</version>
+    <version>6.2.6-4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -99,8 +99,8 @@
         <!--ProtocolLib-->
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib-API</artifactId>
-            <version>4.4.0-SNAPSHOT</version>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.7.0</version>
             <scope>provided</scope>
         </dependency>
         <!--Vault API-->
