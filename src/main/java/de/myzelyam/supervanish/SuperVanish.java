@@ -75,7 +75,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     private LoginListener loginListener;
     @Getter
     private LayeredPermissionChecker layeredPermissionChecker;
-    private Set<VanishPlayer> vanishPlayers = new HashSet<>();
+    private final Set<VanishPlayer> vanishPlayers = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -189,8 +189,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
             String eventName = eventClass.getSimpleName();
             String configString = getSettings().getString("CompatibilityOptions." + eventName + "Priority");
             if (configString == null) return EventPriority.NORMAL;
-            EventPriority priority = EventPriority.valueOf(configString);
-            return priority;
+            return EventPriority.valueOf(configString);
         } catch (Exception e) {
             logException(e);
             return EventPriority.NORMAL;

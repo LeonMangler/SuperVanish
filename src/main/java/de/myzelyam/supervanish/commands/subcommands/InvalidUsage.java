@@ -23,7 +23,7 @@ public class InvalidUsage extends SubCommand {
 
     @Override
     public void execute(Command cmd, CommandSender sender, String[] args, String label) {
-        if (!CommandAction.hasAnyCmdPermission(sender, plugin)) {
+        if (CommandAction.hasNoCmdPermission(sender, plugin)) {
             plugin.sendMessage(sender, "NoPermission", sender);
             return;
         }

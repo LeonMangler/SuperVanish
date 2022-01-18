@@ -22,7 +22,7 @@ import java.util.Locale;
 
 public class SubCommandMgr {
 
-    private SuperVanish plugin;
+    private final SuperVanish plugin;
 
     public SubCommandMgr(SuperVanish plugin) {
         this.plugin = plugin;
@@ -135,7 +135,7 @@ public class SubCommandMgr {
                                       String alias, String[] args) {
         // don't provide any help at all if user doesn't have permission to
         // execute '/sv help'
-        if (!CommandAction.hasAnyCmdPermission(sender, plugin)) {
+        if (CommandAction.hasNoCmdPermission(sender, plugin)) {
             return Collections.emptyList();
         }
         if (args.length == 1) {

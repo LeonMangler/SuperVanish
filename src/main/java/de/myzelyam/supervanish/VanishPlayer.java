@@ -21,7 +21,7 @@ public class VanishPlayer {
 
     private final SuperVanish plugin;
     @Getter
-    private Player player;
+    private final Player player;
     @Setter
     private boolean itemPickUps;
     @Getter

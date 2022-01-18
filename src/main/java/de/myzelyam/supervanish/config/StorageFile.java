@@ -19,7 +19,7 @@ import java.io.IOException;
 public class StorageFile implements PluginFile<FileConfiguration> {
 
     private final SuperVanish plugin;
-    private String name;
+    private final String name;
     private File file;
     private FileConfiguration config;
 

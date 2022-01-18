@@ -23,8 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -149,8 +147,7 @@ public class SilentOpenChest extends Feature {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (p.getGameMode() == GameMode.SPECTATOR) return;
         //noinspection deprecation
-        if (p.isSneaking() && p.getItemInHand() != null
-                && (p.getItemInHand().getType().isBlock() || p.getItemInHand().getType() == ITEM_FRAME)
+        if (p.isSneaking() && (p.getItemInHand().getType().isBlock() || p.getItemInHand().getType() == ITEM_FRAME)
                 && p.getItemInHand().getType() != Material.AIR)
             return;
         Block block = e.getClickedBlock();
@@ -200,22 +197,6 @@ public class SilentOpenChest extends Feature {
     @Override
     public boolean isActive() {
         return plugin.getSettings().getBoolean("InvisibilityFeatures.OpenChestsSilently");
-    }
-
-    private boolean isShulkerBox(Inventory inv) {
-        try {
-            return inv.getType() == InventoryType.SHULKER_BOX;
-        } catch (NoSuchFieldError e) {
-            return false;
-        }
-    }
-
-    private boolean isShulkerBox(InventoryView inv) {
-        try {
-            return inv.getType() == InventoryType.SHULKER_BOX;
-        } catch (NoSuchFieldError e) {
-            return false;
-        }
     }
 
     public boolean hasSilentlyOpenedChest(Player p) {

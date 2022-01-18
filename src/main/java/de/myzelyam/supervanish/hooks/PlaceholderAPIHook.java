@@ -77,7 +77,7 @@ public class PlaceholderAPIHook extends PluginHook {
                         || id.equalsIgnoreCase("hiddenplayers")) {
                     Collection<UUID> onlineVanishedPlayers = superVanish.getVanishStateMgr()
                             .getOnlineVanishedPlayers();
-                    String playerListMessage = "";
+                    StringBuilder playerListMessage = new StringBuilder();
                     for (UUID uuid : onlineVanishedPlayers) {
                         Player onlineVanished = Bukkit.getPlayer(uuid);
                         if (onlineVanished == null) continue;
@@ -86,11 +86,11 @@ public class PlaceholderAPIHook extends PluginHook {
                                 && !superVanish.hasPermissionToSee(p, onlineVanished)) {
                             continue;
                         }
-                        playerListMessage = playerListMessage + onlineVanished.getName() + ", ";
+                        playerListMessage.append(onlineVanished.getName()).append(", ");
                     }
                     return playerListMessage.length() > 3
                             ? playerListMessage.substring(0, playerListMessage.length() - 2)
-                            : playerListMessage;
+                            : playerListMessage.toString();
                 }
                 if (id.equalsIgnoreCase("playercount")
                         || id.equalsIgnoreCase("onlineplayers")) {

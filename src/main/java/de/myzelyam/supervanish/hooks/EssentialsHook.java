@@ -33,7 +33,7 @@ public class EssentialsHook extends PluginHook {
 
     private final Set<UUID> preVanishHiddenPlayers = new HashSet<>();
     private Essentials essentials;
-    private BukkitRunnable forcedInvisibilityRunnable = new BukkitRunnable() {
+    private final BukkitRunnable forcedInvisibilityRunnable = new BukkitRunnable() {
 
         @Override
         public void run() {
@@ -76,9 +76,7 @@ public class EssentialsHook extends PluginHook {
     public void onJoin(PlayerJoinEvent e) {
         User user = essentials.getUser(e.getPlayer());
         if (user == null) return;
-        if (superVanish.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()) && !user.isHidden())
-            user.setHidden(true);
-        else user.setHidden(false);
+        user.setHidden(superVanish.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()) && !user.isHidden());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -110,12 +108,9 @@ public class EssentialsHook extends PluginHook {
             if (user == null || !user.isAfk()) return;
             user.setHidden(true);
             preVanishHiddenPlayers.add(e.getPlayer().getUniqueId());
-            superVanish.getServer().getScheduler().runTaskLater(superVanish, new Runnable() {
-                @Override
-                public void run() {
-                    if (preVanishHiddenPlayers.remove(e.getPlayer().getUniqueId())) {
-                        user.setHidden(false);
-                    }
+            superVanish.getServer().getScheduler().runTaskLater(superVanish, () -> {
+                if (preVanishHiddenPlayers.remove(e.getPlayer().getUniqueId())) {
+                    user.setHidden(false);
                 }
             }, 1);
         }
