@@ -31,7 +31,6 @@ public class PluginHookMgr implements Listener {
         put("Citizens", CitizensHook.class);
         put("PlaceholderAPI", PlaceholderAPIHook.class);
         put("dynmap", DynmapHook.class);
-        put("SuperTrails", SuperTrailsHook.class);
         put("TrailGUI", TrailGUIHook.class);
         put("MVdWPlaceholderAPI", MVdWPlaceholderAPIHook.class);
     }};
