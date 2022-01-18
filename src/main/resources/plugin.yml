@@ -12,7 +12,6 @@ softdepend:
 - dynmap
 - Essentials
 - TrailGUI
-- SuperTrails
 - PlaceholderAPI
 - CustomParticleEffects
 - Citizens

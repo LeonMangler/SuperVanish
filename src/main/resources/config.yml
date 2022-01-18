@@ -140,8 +140,6 @@ HookOptions:
   DynmapSendJoinLeaveMessages: true
   # Should SV hook into TrailGUI and disable trails while you're vanished?
   EnableTrailGUIHook: true
-  # Should SV hook into SuperTrails and disable trails while you're vanished?
-  EnableSuperTrailsHook: true
   # Should SV hook into PlaceholderAPI and add new placeholders to SV + register its own ones for other plugins?
   # Own ones: isvanished, vanishedplayers, playercount
   # Format: %supervanish_<placeholder>%
