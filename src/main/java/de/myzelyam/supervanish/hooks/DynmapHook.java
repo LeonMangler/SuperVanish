@@ -11,13 +11,12 @@ package de.myzelyam.supervanish.hooks;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.dynmap.bukkit.DynmapPlugin;
+import org.dynmap.DynmapAPI;
 
 public class DynmapHook extends PluginHook {
 
@@ -35,7 +34,7 @@ public class DynmapHook extends PluginHook {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVanish(PlayerHideEvent e) {
         Player p = e.getPlayer();
-        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+        DynmapAPI dynmap = (DynmapAPI) plugin;
 
         dynmap.setPlayerVisiblity(p, false);
         if (sendJoinLeave)
@@ -46,7 +45,7 @@ public class DynmapHook extends PluginHook {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onReappear(PlayerShowEvent e) {
         Player p = e.getPlayer();
-        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+        DynmapAPI dynmap = (DynmapAPI) plugin;
 
         dynmap.setPlayerVisiblity(p, true);
         if (sendJoinLeave)
@@ -57,7 +56,7 @@ public class DynmapHook extends PluginHook {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+        DynmapAPI dynmap = (DynmapAPI) plugin;
 
         if (superVanish.getVanishStateMgr().isVanished(p.getUniqueId())) {
             dynmap.setPlayerVisiblity(p, false);
@@ -67,7 +66,7 @@ public class DynmapHook extends PluginHook {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
-        DynmapPlugin dynmap = (DynmapPlugin) plugin;
+        DynmapAPI dynmap = (DynmapAPI) plugin;
 
         if (superVanish.getVanishStateMgr().isVanished(p.getUniqueId())) {
             dynmap.setPlayerVisiblity(p, true);
