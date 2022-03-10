@@ -24,6 +24,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_EFFECT;
 import static com.comphenix.protocol.PacketType.Play.Server.REMOVE_ENTITY_EFFECT;
@@ -34,8 +36,20 @@ public class NightVision extends Feature implements Runnable {
 
     public static final int INFINITE_POTION_EFFECT_LENGTH = 32767;
 
+    // Contains major, minor, and patch components.
+    // For example: {1, 18, 2} = version 1.18.2
+    private int[] mcVersionNumbers;
+
     public NightVision(SuperVanish plugin) {
         super(plugin);
+        Pattern pattern = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+).*$");
+        Matcher matcher = pattern.matcher(Bukkit.getBukkitVersion());
+        if (matcher.matches()) {
+            mcVersionNumbers = new int[3];
+            for (int index = 0; index < 3; index++) {
+                mcVersionNumbers[index] = Integer.parseInt(matcher.group(index + 1));
+            }
+        }
     }
 
     @Override
@@ -91,6 +105,22 @@ public class NightVision extends Feature implements Runnable {
         }
     }
 
+    private boolean isBelow1_18_2() {
+        if (mcVersionNumbers[0] < 1) {
+            return true;
+        }
+        if (mcVersionNumbers[0] > 1) {
+            return false;
+        }
+        if (mcVersionNumbers[1] < 18) {
+            return true;
+        }
+        if (mcVersionNumbers[1] > 18) {
+            return false;
+        }
+        return (mcVersionNumbers[2] < 2);
+    }
+
     private void sendAddPotionEffect(Player p, PotionEffect effect) {
         PacketContainer packet = new PacketContainer(ENTITY_EFFECT);
         //noinspection deprecation
@@ -99,11 +129,20 @@ public class NightVision extends Feature implements Runnable {
         int duration = effect.getDuration();
         int entityID = p.getEntityId();
         packet.getIntegers().write(0, entityID);
-        packet.getBytes().write(0, (byte) effectID);
-        packet.getBytes().write(1, (byte) amplifier);
-        packet.getIntegers().write(1, duration);
-        // hide particles in 1.9
-        packet.getBytes().write(2, (byte) 0);
+        // 1.18.1 and below
+        if (isBelow1_18_2()) {
+            packet.getBytes().write(0, (byte) effectID);
+            packet.getBytes().write(1, (byte) amplifier);
+            packet.getIntegers().write(1, duration);
+            // hide particles in 1.9
+            packet.getBytes().write(2, (byte) 0);
+        } else {
+            // 1.18.2 and higher
+            packet.getIntegers().write(1, effectID);
+            packet.getBytes().write(0, (byte) amplifier);
+            packet.getIntegers().write(2, duration);
+            packet.getBytes().write(1, (byte) 0);
+        }
         try {
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
         } catch (InvocationTargetException e) {
