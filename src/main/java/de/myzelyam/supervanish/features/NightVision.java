@@ -98,12 +98,22 @@ public class NightVision extends Feature implements Runnable {
         int amplifier = effect.getAmplifier();
         int duration = effect.getDuration();
         int entityID = p.getEntityId();
-        packet.getIntegers().write(0, entityID);
-        packet.getBytes().write(0, (byte) effectID);
-        packet.getBytes().write(1, (byte) amplifier);
-        packet.getIntegers().write(1, duration);
-        // hide particles in 1.9
-        packet.getBytes().write(2, (byte) 0);
+        // 1.18.2 changed effectID from byte to integer
+        if (plugin.getVersionUtil().isOneDotXOrHigher(18) && packet.getIntegers().size() >= 3) {
+            packet.getIntegers().write(0, entityID);
+            packet.getIntegers().write(1, effectID);
+            packet.getBytes().write(0, (byte) amplifier);
+            packet.getIntegers().write(2, duration);
+            // hide particles in 1.9
+            packet.getBytes().write(1, (byte) 0);
+        } else {
+            packet.getIntegers().write(0, entityID);
+            packet.getBytes().write(0, (byte) effectID);
+            packet.getBytes().write(1, (byte) amplifier);
+            packet.getIntegers().write(1, duration);
+            // hide particles in 1.9
+            packet.getBytes().write(2, (byte) 0);
+        }
         try {
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
         } catch (InvocationTargetException e) {
