@@ -17,7 +17,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.TabCompleteEvent;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TabCompleteListener implements Listener {
 
@@ -32,14 +36,16 @@ public class TabCompleteListener implements Listener {
         try {
             if (!(e.getSender() instanceof Player)) return;
             Player p = (Player) e.getSender();
+            Set<String> hiddenNames = plugin.getVanishStateMgr().getOnlineVanishedPlayers().stream()
+                    .map(Bukkit::getPlayer).filter(Objects::nonNull)
+                    .filter(vanishedPlayer -> !plugin.canSee(p, vanishedPlayer))
+                    .map(HumanEntity::getName)
+                    .map(name -> name.toLowerCase(Locale.ENGLISH))
+                    .collect(Collectors.toSet());
             Iterator<String> it = e.getCompletions().iterator();
             while (it.hasNext()) {
                 String completion = it.next();
-                boolean allowedCompletion = plugin.getVanishStateMgr().getOnlineVanishedPlayers().stream()
-                        .map(Bukkit::getPlayer).filter(Objects::nonNull)
-                        .filter(vanishedPlayer -> !plugin.canSee(p, vanishedPlayer))
-                        .map(HumanEntity::getName)
-                        .noneMatch(name -> name.equalsIgnoreCase(completion));
+                boolean allowedCompletion = !hiddenNames.contains(completion.toLowerCase(Locale.ENGLISH));
                 if (!allowedCompletion) {
                     it.remove();
                 }
