@@ -45,7 +45,8 @@ public class NightVision extends Feature implements Runnable {
 
     @Override
     public boolean isActive() {
-        return plugin.getSettings().getBoolean("InvisibilityFeatures.NightVisionEffect");
+        return !plugin.getVersionUtil().isOneDotXOrHigher(19)
+                && plugin.getSettings().getBoolean("InvisibilityFeatures.NightVisionEffect");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -92,32 +93,30 @@ public class NightVision extends Feature implements Runnable {
     }
 
     private void sendAddPotionEffect(Player p, PotionEffect effect) {
-        PacketContainer packet = new PacketContainer(ENTITY_EFFECT);
-        //noinspection deprecation
-        int effectID = effect.getType().getId();
-        int amplifier = effect.getAmplifier();
-        int duration = effect.getDuration();
-        int entityID = p.getEntityId();
-        // 1.18.2 changed effectID from byte to integer
-        if (plugin.getVersionUtil().isOneDotXOrHigher(18) && packet.getIntegers().size() >= 3) {
-            packet.getIntegers().write(0, entityID);
-            packet.getIntegers().write(1, effectID);
-            packet.getBytes().write(0, (byte) amplifier);
-            packet.getIntegers().write(2, duration);
-            // hide particles in 1.9
-            packet.getBytes().write(1, (byte) 0);
-        } else {
-            packet.getIntegers().write(0, entityID);
-            packet.getBytes().write(0, (byte) effectID);
-            packet.getBytes().write(1, (byte) amplifier);
-            packet.getIntegers().write(1, duration);
-            // hide particles in 1.9
-            packet.getBytes().write(2, (byte) 0);
-        }
         try {
+            PacketContainer packet = new PacketContainer(ENTITY_EFFECT);
+            //noinspection deprecation
+            int effectID = effect.getType().getId();
+            int amplifier = effect.getAmplifier();
+            int duration = effect.getDuration();
+            int entityID = p.getEntityId();
+            // 1.18.2 changed effectID from byte to integer
+            if (plugin.getVersionUtil().isOneDotXOrHigher(18) && packet.getIntegers().size() >= 3) {
+                packet.getIntegers().write(0, entityID);
+                packet.getIntegers().write(1, effectID);
+                packet.getBytes().write(0, (byte) amplifier);
+                packet.getIntegers().write(2, duration);
+                // hide particles in 1.9
+                packet.getBytes().write(1, (byte) 0);
+            } else {
+                packet.getIntegers().write(0, entityID);
+                packet.getBytes().write(0, (byte) effectID);
+                packet.getBytes().write(1, (byte) amplifier);
+                packet.getIntegers().write(1, duration);
+                // hide particles in 1.9
+                packet.getBytes().write(2, (byte) 0);
+            }
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet", e);
         } catch (Exception | NoClassDefFoundError e) {
             if (!suppressErrors) {
                 plugin.logException(e);
@@ -134,27 +133,25 @@ public class NightVision extends Feature implements Runnable {
     }
 
     private void sendRemovePotionEffect(Player p, PotionEffectType type) {
-        PacketContainer packet = new PacketContainer(REMOVE_ENTITY_EFFECT);
-        //noinspection deprecation
-        final int effectID = type.getId();
-        final int entityID = p.getEntityId();
-        // 1.7 and below
-        if (!plugin.getVersionUtil().isOneDotXOrHigher(8)) {
-            packet.getIntegers().write(0, entityID);
-            packet.getBytes().write(0, (byte) effectID);
-        } else if (plugin.getVersionUtil().isOneDotX(8)) {
-            // 1.8
-            packet.getIntegers().write(0, entityID);
-            packet.getIntegers().write(1, effectID);
-        } else {
-            // 1.9 and higher
-            packet.getEffectTypes().write(0, type);
-            packet.getIntegers().write(0, entityID);
-        }
         try {
+            PacketContainer packet = new PacketContainer(REMOVE_ENTITY_EFFECT);
+            //noinspection deprecation
+            final int effectID = type.getId();
+            final int entityID = p.getEntityId();
+            // 1.7 and below
+            if (!plugin.getVersionUtil().isOneDotXOrHigher(8)) {
+                packet.getIntegers().write(0, entityID);
+                packet.getBytes().write(0, (byte) effectID);
+            } else if (plugin.getVersionUtil().isOneDotX(8)) {
+                // 1.8
+                packet.getIntegers().write(0, entityID);
+                packet.getIntegers().write(1, effectID);
+            } else {
+                // 1.9 and higher
+                packet.getEffectTypes().write(0, type);
+                packet.getIntegers().write(0, entityID);
+            }
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet", e);
         } catch (Exception | NoClassDefFoundError e) {
             if (!suppressErrors) {
                 plugin.logException(e);
