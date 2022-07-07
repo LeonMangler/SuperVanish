@@ -149,9 +149,7 @@ public class SilentOpenChest extends Feature {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (p.getGameMode() == GameMode.SPECTATOR) return;
         //noinspection deprecation
-        if (p.isSneaking() && p.getItemInHand() != null
-                && (p.getItemInHand().getType().isBlock() || p.getItemInHand().getType() == ITEM_FRAME)
-                && p.getItemInHand().getType() != Material.AIR)
+        if (p.isSneaking() && p.getItemInHand().getType() != Material.AIR)
             return;
         Block block = e.getClickedBlock();
         if (block == null) return;
