@@ -37,6 +37,11 @@ public class FeatureMgr {
         public boolean fulfilledBy(FeatureInfo featureInfo) {
             return featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8);
         }
+    }, oneDotSeventeenOrHigher = new Requirement<FeatureInfo>() {
+        @Override
+        public boolean fulfilledBy(FeatureInfo featureInfo) {
+            return featureInfo.getPlugin().getVersionUtil().isOneDotX(17);
+        }
     };
     private final Map<String, FeatureInfo> registeredFeatures = new HashMap<>();
     private final Set<Feature> activeFeatures = new HashSet<>();
@@ -51,6 +56,8 @@ public class FeatureMgr {
         registeredFeatures.put("VanishIndication", new FeatureInfo(VanishIndication.class, plugin,
                 Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
         registeredFeatures.put("Broadcast", new FeatureInfo(Broadcast.class, plugin));
+        registeredFeatures.put("NoSculkSensorDetection", new FeatureInfo(NoSculkSensorDetection.class, plugin,
+                Collections.singletonList(oneDotSeventeenOrHigher)));
     }
 
     public void enableFeatures() {
