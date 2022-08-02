@@ -1,4 +1,4 @@
-# SuperVanish v6.2.9 - Messages
+# SuperVanish v6.2.10 - Messages
 #
 # Information:
 # <..> means that .. is required; [..] means that .. is optional and can be left out; | inside [] or <> stands for 'OR'
@@ -71,4 +71,4 @@ Messages:
   DynmapFakeQuit: '%d% quit'
   HelpHeader: "&a<---------------&e SuperVanish-Help &a--------------->"
   HelpFormat: "&6%usage% &7- &b%description% &c(%permission%)"
-MessagesVersion: 6.2.9
+MessagesVersion: 6.2.10

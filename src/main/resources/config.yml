@@ -1,4 +1,4 @@
-# SuperVanish v6.2.9 - Configuration
+# SuperVanish v6.2.10 - Configuration
 
 ############# Invisibility Features ##############
 InvisibilityFeatures:
@@ -25,6 +25,8 @@ InvisibilityFeatures:
   DefaultPickUpItemsOption: false
   # Should SV modify tablist packets to prevent the server from leaking who is online?
   ModifyTablistPackets: true
+  # Should vanished players be unable to trigger the vibration of a sculk sensor?
+  PreventSculkSensorActivation: true
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
@@ -174,4 +176,4 @@ MiscellaneousOptions:
     NotifyAdmins: true
 
 ################# Do Not Touch ###################
-ConfigVersion: 6.2.9
+ConfigVersion: 6.2.10

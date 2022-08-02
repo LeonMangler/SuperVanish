@@ -46,10 +46,11 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
 
     public static final String[] NON_REQUIRED_SETTINGS_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3",
             "6.0.4", "6.0.5", "6.1.0", "6.1.1", "6.1.2", "6.1.3", "6.1.4", "6.1.5", "6.1.6", "6.1.7",
-            "6.1.8", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.2.7", "6.2.8"},
+            "6.1.8", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.2.7", "6.2.8",
+            "6.2.9"},
             NON_REQUIRED_MESSAGES_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.0.5", "6.1.0",
                     "6.1.1", "6.1.2", "6.1.3", "6.1.4", "6.1.5", "6.1.6", "6.1.7", "6.1.8", "6.2.0", "6.2.1",
-                    "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.2.7", "6.2.8"};
+                    "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.2.7", "6.2.8", "6.2.9"};
 
     @Getter
     private boolean useProtocolLib;
@@ -174,6 +175,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
         pluginManager.registerEvents(new WorldChangeListener(this), this);
         if (versionUtil.isOneDotXOrHigher(10)) {
             pluginManager.registerEvents(new TabCompleteListener(this), this);
+            pluginManager.registerEvents(new SculkSensorListener(this), this);
         }
         pluginManager.registerEvents(loginListener = new LoginListener(this), this);
         JoinListener joinListener = new JoinListener(this);
