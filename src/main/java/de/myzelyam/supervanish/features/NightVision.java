@@ -45,8 +45,7 @@ public class NightVision extends Feature implements Runnable {
 
     @Override
     public boolean isActive() {
-        return !plugin.getVersionUtil().isOneDotXOrHigher(19)
-                && plugin.getSettings().getBoolean("InvisibilityFeatures.NightVisionEffect");
+        return plugin.getSettings().getBoolean("InvisibilityFeatures.NightVisionEffect");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
