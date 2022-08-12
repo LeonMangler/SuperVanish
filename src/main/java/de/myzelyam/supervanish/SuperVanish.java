@@ -175,7 +175,6 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
         pluginManager.registerEvents(new WorldChangeListener(this), this);
         if (versionUtil.isOneDotXOrHigher(10)) {
             pluginManager.registerEvents(new TabCompleteListener(this), this);
-            pluginManager.registerEvents(new SculkSensorListener(this), this);
         }
         pluginManager.registerEvents(loginListener = new LoginListener(this), this);
         JoinListener joinListener = new JoinListener(this);
