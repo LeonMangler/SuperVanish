@@ -27,22 +27,9 @@ import lombok.Data;
 
 public class FeatureMgr {
 
-    private static Requirement<FeatureInfo> protocolLibInstalled = new Requirement<FeatureInfo>() {
-        @Override
-        public boolean fulfilledBy(FeatureInfo featureInfo) {
-            return Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
-        }
-    }, oneDotEightOrHigher = new Requirement<FeatureInfo>() {
-        @Override
-        public boolean fulfilledBy(FeatureInfo featureInfo) {
-            return featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8);
-        }
-    }, oneDotSeventeenOrHigher = new Requirement<FeatureInfo>() {
-        @Override
-        public boolean fulfilledBy(FeatureInfo featureInfo) {
-            return featureInfo.getPlugin().getVersionUtil().isOneDotX(17);
-        }
-    };
+    private static final Requirement<FeatureInfo> protocolLibInstalled = featureInfo -> Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"),
+            oneDotEightOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8),
+            oneDotSeventeenOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotX(17);
     private final Map<String, FeatureInfo> registeredFeatures = new HashMap<>();
     private final Set<Feature> activeFeatures = new HashSet<>();
     private final SuperVanish plugin;
@@ -71,7 +58,7 @@ public class FeatureMgr {
             try {
                 feature = featureInfo.getFeatureClass().getConstructor(SuperVanish.class).newInstance(plugin);
             } catch (NoSuchMethodException | InvocationTargetException
-                    | InstantiationException | IllegalAccessException e) {
+                     | InstantiationException | IllegalAccessException e) {
                 plugin.logException(e);
                 continue;
             }
@@ -118,7 +105,7 @@ public class FeatureMgr {
         }
 
         FeatureInfo(Class<? extends Feature> featureClass, SuperVanish plugin) {
-            this(featureClass, plugin, Collections.<Requirement<FeatureInfo>>emptySet());
+            this(featureClass, plugin, Collections.emptySet());
         }
     }
 }
