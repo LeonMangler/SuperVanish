@@ -25,8 +25,8 @@ InvisibilityFeatures:
   DefaultPickUpItemsOption: false
   # Should SV modify tablist packets to prevent the server from leaking who is online?
   ModifyTablistPackets: true
-  # Should sculk sensors ignore vanished players?
-  DisableSculkSensorDetection: true
+  # Should vanished players be unable to trigger the vibration of a sculk sensor?
+  PreventSculkSensorActivation: true
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
