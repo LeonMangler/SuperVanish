@@ -148,9 +148,9 @@ public class SilentOpenChest extends Feature {
                 || !p.hasPermission("sv.silentchest")) return;
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (p.getGameMode() == GameMode.SPECTATOR) return;
-        //noinspection deprecation
         // Remember to keep "p.getItemInHand() != null" as we can't ensure that older Spigot versions will always return a non-null value
-        if (p.isSneaking() && p.isSneaking() && p.getItemInHand() != null && p.getItemInHand().getType() != Material.AIR)
+        //noinspection deprecation,ConstantConditions
+        if (p.isSneaking() && p.getItemInHand() != null && p.getItemInHand().getType() != Material.AIR)
             return;
         Block block = e.getClickedBlock();
         if (block == null) return;
