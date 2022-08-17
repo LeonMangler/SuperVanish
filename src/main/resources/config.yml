@@ -27,6 +27,8 @@ InvisibilityFeatures:
   ModifyTablistPackets: true
   # Should vanished players be unable to trigger the vibration of a sculk sensor?
   PreventSculkSensorActivation: true
+  # Should vanished players activate the tipping effect on Dripleaves.
+  DisableDripLeaf: true
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
