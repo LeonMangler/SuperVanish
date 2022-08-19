@@ -29,7 +29,7 @@ public class FeatureMgr {
 
     private static final Requirement<FeatureInfo> protocolLibInstalled = featureInfo -> Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"),
             oneDotEightOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8),
-            oneDotSeventeenOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotX(17);
+            oneDotSeventeenOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(17);
     private final Map<String, FeatureInfo> registeredFeatures = new HashMap<>();
     private final Set<Feature> activeFeatures = new HashSet<>();
     private final SuperVanish plugin;
