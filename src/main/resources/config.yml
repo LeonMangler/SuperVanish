@@ -25,6 +25,8 @@ InvisibilityFeatures:
   DefaultPickUpItemsOption: false
   # Should SV modify tablist packets to prevent the server from leaking who is online?
   ModifyTablistPackets: true
+  # Should SV modify tab complete packets to prevent minecraft commands from leaking who is online?
+  ModifyTabCompletePackets: true
   # Should vanished players be unable to trigger the vibration of a sculk sensor?
   PreventSculkSensorActivation: true
   # Should vanished players activate the tipping effect on Dripleaves?

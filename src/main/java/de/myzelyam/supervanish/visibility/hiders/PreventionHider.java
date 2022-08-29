@@ -11,6 +11,7 @@ package de.myzelyam.supervanish.visibility.hiders;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.BukkitPlayerHidingUtil;
 import de.myzelyam.supervanish.visibility.hiders.modules.PlayerInfoModule;
+import de.myzelyam.supervanish.visibility.hiders.modules.TabCompleteModule;
 import org.bukkit.entity.Player;
 
 public class PreventionHider extends PlayerHider implements Runnable {
@@ -23,6 +24,9 @@ public class PreventionHider extends PlayerHider implements Runnable {
         if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
             PlayerInfoModule.register(plugin, this);
+        if (plugin.isUseProtocolLib()
+                && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTabCompletePackets", true))
+            TabCompleteModule.register(plugin, this);
     }
 
     @Override
