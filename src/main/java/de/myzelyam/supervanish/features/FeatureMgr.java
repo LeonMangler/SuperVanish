@@ -45,6 +45,8 @@ public class FeatureMgr {
         registeredFeatures.put("Broadcast", new FeatureInfo(Broadcast.class, plugin));
         registeredFeatures.put("NoSculkSensorDetection", new FeatureInfo(NoSculkSensorDetection.class, plugin,
                 Collections.singletonList(oneDotSeventeenOrHigher)));
+        registeredFeatures.put("NoTurtleEggBreaking", new FeatureInfo(NoTurtleEggBreaking.class, plugin,
+                Collections.singletonList(oneDotSeventeenOrHigher)));
         registeredFeatures.put("NoDripLeafTilt", new FeatureInfo(NoDripLeafTilt.class, plugin,
             Collections.singletonList(oneDotSeventeenOrHigher)));
     }
