@@ -33,6 +33,8 @@ InvisibilityFeatures:
   PreventTurtleEggBreaking: true
   # Should vanished players activate the tipping effect on Dripleaves?
   DisableDripLeaf: true
+  # Should vanished players be unable to trigger raids?
+  PreventRaidTriggering: true
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
