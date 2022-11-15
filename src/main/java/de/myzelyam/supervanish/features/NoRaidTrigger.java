@@ -18,7 +18,6 @@ public class NoRaidTrigger extends Feature{
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(RaidTriggerEvent e) {
         Player p = e.getPlayer();
-        p.sendMessage("RaidTriggerEvent");
         if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId())) return;
         e.setCancelled(true);
     }
