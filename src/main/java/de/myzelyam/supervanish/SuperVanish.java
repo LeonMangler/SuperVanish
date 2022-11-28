@@ -236,10 +236,10 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
 
     public void sendMessage(CommandSender p, String messagesYmlPath, Object... additionalPlayerInfo) {
         String message;
-        if (!messagesYmlPath.contains(" "))
+        if (!messagesYmlPath.contains(" ") && getMessage(messagesYmlPath) != null)
             message = getMessage(messagesYmlPath);
         else message = messagesYmlPath;
-        if (message.equalsIgnoreCase("") || messagesYmlPath.equalsIgnoreCase(""))
+        if ("".equalsIgnoreCase(message) || "".equalsIgnoreCase(messagesYmlPath))
             return;
         message = replacePlaceholders(message, additionalPlayerInfo);
         p.sendMessage(message);
