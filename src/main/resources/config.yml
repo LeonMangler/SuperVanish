@@ -157,6 +157,9 @@ HookOptions:
   EnableMVdWPlaceholderAPIHook: true
   # Should SV stop NPCs from greeting or talking about hidden players?
   EnableCitizensHook: true
+  # Should SV hide invisible players on your dynamic map if you use pl3xmap?
+  # Ensure you are using pl3xmap V2!
+  EnablePl3xMapHook: true
 
 ############# Compatibility Options ##############
 CompatibilityOptions:
