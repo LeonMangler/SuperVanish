@@ -31,6 +31,7 @@ public class PluginHookMgr implements Listener {
         put("Citizens", CitizensHook.class);
         put("PlaceholderAPI", PlaceholderAPIHook.class);
         put("dynmap", DynmapHook.class);
+        put("Pl3xMap", Pl3xMapHook.class);
         put("TrailGUI", TrailGUIHook.class);
         put("MVdWPlaceholderAPI", MVdWPlaceholderAPIHook.class);
     }};
@@ -88,6 +89,7 @@ public class PluginHookMgr implements Listener {
     private boolean isHookDisabled(String pluginName) {
         if (pluginName.equalsIgnoreCase("dynmap"))
             return !plugin.getSettings().getBoolean("HookOptions.EnableDynmapHook");
+
         return !plugin.getSettings().getBoolean("HookOptions.Enable" + pluginName + "Hook", true);
     }
 

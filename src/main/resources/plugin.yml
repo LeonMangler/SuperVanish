@@ -18,6 +18,7 @@ softdepend:
 - NametagEdit
 - MVdWPlaceholderAPI
 - Vault
+- Pl3xMap
 commands:
   sv:
     usage: /sv

@@ -6,7 +6,7 @@
 
     <groupId>de.myzelyam</groupId>
     <artifactId>SuperVanish</artifactId>
-    <version>6.2.12</version>
+    <version>6.3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -77,6 +77,10 @@
             <id>minecraft-libraries</id>
             <name>Minecraft Libraries</name>
             <url>https://libraries.minecraft.net</url>
+        </repository>
+        <repository>
+            <id>Modrinth</id>
+            <url>https://api.modrinth.com/maven</url>
         </repository>
     </repositories>
     <dependencies>
@@ -177,6 +181,13 @@
             <groupId>com.mojang</groupId>
             <artifactId>brigadier</artifactId>
             <version>1.0.18</version>
+        </dependency>
+        <!--Pl3xmap-->
+        <dependency>
+            <groupId>maven.modrinth</groupId>
+            <artifactId>pl3xmap</artifactId>
+            <version>1.19.2-318</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
