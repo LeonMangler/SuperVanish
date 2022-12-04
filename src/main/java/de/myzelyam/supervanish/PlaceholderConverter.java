@@ -166,7 +166,7 @@ public class PlaceholderConverter {
 
             while (matcher.find()) {
                 String color = msg.substring(matcher.start(), matcher.end());
-                msg = msg.replace(color, net.md_5.bungee.api.ChatColor.of(color) + "");
+                msg = msg.replace(color, net.md_5.bungee.api.ChatColor.of(color.replace("&", "")) + "");
                 matcher = pattern.matcher(msg);
             }
         }
