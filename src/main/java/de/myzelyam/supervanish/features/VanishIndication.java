@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.PostPlayerHideEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.VersionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -90,6 +91,8 @@ public class VanishIndication extends Feature {
         });
     }
 
+    private static final int playerInfoDataListsOffset = VersionUtil.playerInfoDataListsOffset();
+
     @Override
     public void onEnable() {
         ProtocolLibrary.getProtocolManager().addPacketListener(
@@ -100,7 +103,7 @@ public class VanishIndication extends Feature {
                             // multiple events share same packet object
                             event.setPacket(event.getPacket().shallowClone());
                             List<PlayerInfoData> infoDataList = new ArrayList<>(
-                                    event.getPacket().getPlayerInfoDataLists().read(0));
+                                    event.getPacket().getPlayerInfoDataLists().read(playerInfoDataListsOffset));
                             Player receiver = event.getPlayer();
                             for (PlayerInfoData infoData : ImmutableList.copyOf(infoDataList)) {
                                 try {
@@ -130,7 +133,7 @@ public class VanishIndication extends Feature {
                                 } catch (UnsupportedOperationException ignored) {
                                 }
                             }
-                            event.getPacket().getPlayerInfoDataLists().write(0, infoDataList);
+                            event.getPacket().getPlayerInfoDataLists().write(playerInfoDataListsOffset, infoDataList);
                         } catch (Exception | NoClassDefFoundError e) {
                             if (!suppressErrors) {
                                 VanishIndication.this.plugin.logException(e);
@@ -157,7 +160,7 @@ public class VanishIndication extends Feature {
                 spectator ? EnumWrappers.NativeGameMode.SPECTATOR
                         : EnumWrappers.NativeGameMode.fromBukkit(change.getGameMode()),
                 WrappedChatComponent.fromText(change.getPlayerListName())));
-        packet.getPlayerInfoDataLists().write(0, data);
+        packet.getPlayerInfoDataLists().write(playerInfoDataListsOffset, data);
         try {
             ProtocolLibrary.getProtocolManager().sendServerPacket(p, packet);
         } catch (InvocationTargetException e) {

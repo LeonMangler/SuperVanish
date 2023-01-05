@@ -8,6 +8,7 @@
 
 package de.myzelyam.supervanish.features;
 
+import de.myzelyam.supervanish.utils.VersionUtil;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
@@ -35,6 +36,7 @@ public class SilentOpenChestPacketAdapter extends PacketAdapter {
         this.silentOpenChest = silentOpenChest;
     }
 
+    private static final int playerInfoDataListsOffset = VersionUtil.playerInfoDataListsOffset();
     @Override
     public void onPacketSending(PacketEvent event) {
         try {
@@ -45,7 +47,7 @@ public class SilentOpenChestPacketAdapter extends PacketAdapter {
                 event.setPacket(event.getPacket().shallowClone());
 
                 List<PlayerInfoData> infoDataList = new ArrayList<>(
-                        event.getPacket().getPlayerInfoDataLists().read(0));
+                        event.getPacket().getPlayerInfoDataLists().read(playerInfoDataListsOffset));
                 for (PlayerInfoData infoData : ImmutableList.copyOf(infoDataList)) {
                     if (!silentOpenChest.plugin.getVisibilityChanger().getHider()
                             .isHidden(infoData.getProfile().getUUID(), receiver)
@@ -70,7 +72,7 @@ public class SilentOpenChestPacketAdapter extends PacketAdapter {
                         }
                     }
                 }
-                event.getPacket().getPlayerInfoDataLists().write(0, infoDataList);
+                event.getPacket().getPlayerInfoDataLists().write(playerInfoDataListsOffset, infoDataList);
             } else if (event.getPacketType() == GAME_STATE_CHANGE) {
                 // Currently unused due to ProtocolLib class loading bug
                 if (silentOpenChest.plugin.getVanishStateMgr().isVanished(

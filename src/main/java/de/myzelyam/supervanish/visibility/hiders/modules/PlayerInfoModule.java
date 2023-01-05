@@ -16,6 +16,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.google.common.collect.ImmutableList;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.VersionUtil;
 import de.myzelyam.supervanish.visibility.hiders.PlayerHider;
 import org.bukkit.entity.Player;
 
@@ -39,12 +40,14 @@ public class PlayerInfoModule extends PacketAdapter {
         ProtocolLibrary.getProtocolManager().addPacketListener(new PlayerInfoModule(plugin, hider));
     }
 
+    private static final int playerInfoDataListsOffset = VersionUtil.playerInfoDataListsOffset();
+
     @Override
     public void onPacketSending(PacketEvent event) {
         // multiple events share same packet object
         event.setPacket(event.getPacket().shallowClone());
         try {
-            List<PlayerInfoData> infoDataList = new ArrayList<>(event.getPacket().getPlayerInfoDataLists().read(0));
+            List<PlayerInfoData> infoDataList = new ArrayList<>(event.getPacket().getPlayerInfoDataLists().read(playerInfoDataListsOffset));
 
             Player receiver = event.getPlayer();
             for (PlayerInfoData infoData : ImmutableList.copyOf(infoDataList)) {
@@ -57,7 +60,7 @@ public class PlayerInfoModule extends PacketAdapter {
             if (infoDataList.isEmpty()) {
                 event.setCancelled(true);
             }
-            event.getPacket().getPlayerInfoDataLists().write(0, infoDataList);
+            event.getPacket().getPlayerInfoDataLists().write(playerInfoDataListsOffset, infoDataList);
         } catch (Exception | NoClassDefFoundError e) {
             if (e.getMessage() == null
                     || !e.getMessage().endsWith("is not supported for temporary players.")) {

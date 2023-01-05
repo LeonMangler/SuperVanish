@@ -1,6 +1,8 @@
 package de.myzelyam.supervanish.utils;
 
 import de.myzelyam.supervanish.SuperVanish;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.utility.MinecraftVersion;
 
 public class VersionUtil {
 
@@ -35,5 +37,15 @@ public class VersionUtil {
         for (int i = majorRelease; i < 20; i++)
             if (version.contains("v1_" + i + "_R")) return true;
         return version.contains("v2_");
+    }
+
+    private static final MinecraftVersion mcSpigot1993 = MinecraftVersion.fromServerVersion("3632-Spigot-d90018e-d67777f (MC: 1.19.3)");    // MC Version 1.19.3+
+    public static int playerInfoDataListsOffset() {
+        // detect MC 1.19.3+
+        if( ProtocolLibrary.getProtocolManager().getMinecraftVersion().isAtLeast(mcSpigot1993) ) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
