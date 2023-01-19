@@ -223,8 +223,10 @@ public class SilentOpenChest extends Feature {
 
     @Override
     public void onEnable() {
-        SilentOpenChestPacketAdapter packetAdapter = new SilentOpenChestPacketAdapter(this);
-        ProtocolLibrary.getProtocolManager().addPacketListener(packetAdapter);
+        if (!plugin.getVersionUtil().isOneDotXOrHigher(19)) {
+            SilentOpenChestPacketAdapter packetAdapter = new SilentOpenChestPacketAdapter(this);
+            ProtocolLibrary.getProtocolManager().addPacketListener(packetAdapter);
+        }
     }
 
     private static class StateInfo {

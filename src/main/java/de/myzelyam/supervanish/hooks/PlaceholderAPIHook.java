@@ -20,8 +20,14 @@ import java.util.UUID;
 
 public class PlaceholderAPIHook extends PluginHook {
 
+    private final String yes, no, prefix, suffix;
+
     public PlaceholderAPIHook(SuperVanish superVanish) {
         super(superVanish);
+        yes = superVanish.getMessage("PlaceholderIsVanishedYes");
+        no = superVanish.getMessage("PlaceholderIsVanishedNo");
+        prefix = superVanish.getMessage("PlaceholderVanishPrefix");
+        suffix = superVanish.getMessage("PlaceholderVanishSuffix");
         new SVPlaceholderExpansion().register();
     }
 
@@ -69,7 +75,13 @@ public class PlaceholderAPIHook extends PluginHook {
                         || id.equalsIgnoreCase("vanished")
                         || id.equalsIgnoreCase("invisible"))
                     return p != null && superVanish.getVanishStateMgr().isVanished(p.getUniqueId())
-                            ? "Yes" : "No";
+                            ? yes : no;
+                if (id.equalsIgnoreCase("vanishprefix"))
+                    return p != null && superVanish.getVanishStateMgr().isVanished(p.getUniqueId())
+                            ? prefix : "";
+                if (id.equalsIgnoreCase("vanishsuffix"))
+                    return p != null && superVanish.getVanishStateMgr().isVanished(p.getUniqueId())
+                            ? suffix : "";
                 if (id.equalsIgnoreCase("onlinevanishedplayers")
                         || id.equalsIgnoreCase("onlinevanished")
                         || id.equalsIgnoreCase("invisibleplayers")

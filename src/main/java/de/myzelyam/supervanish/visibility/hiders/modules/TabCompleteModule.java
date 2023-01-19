@@ -52,7 +52,6 @@ public class TabCompleteModule extends PacketAdapter {
                     String completion = suggestion.getText();
                     if (completion.contains("/")) continue;
                     if (hider.isHidden(completion, event.getPlayer())) {
-                        if (hider.getShowInTab()) continue;
                         iterator.remove();
                         containsHiddenPlayer = true;
                     }
@@ -67,7 +66,6 @@ public class TabCompleteModule extends PacketAdapter {
                 for (String suggestion : suggestions) {
                     if (suggestion.contains("/")) continue;
                     if (hider.isHidden(suggestion, event.getPlayer())) {
-                        if (hider.getShowInTab()) continue;
                         suggestionList.remove(suggestion);
                         containsHiddenPlayer = true;
                     }

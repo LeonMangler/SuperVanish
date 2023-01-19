@@ -35,6 +35,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static com.comphenix.protocol.PacketType.Play.Server.PLAYER_INFO;
 
+/**
+ * This is currently unused on Minecraft 1.19 or higher
+ */
 public class VanishIndication extends Feature {
     private boolean suppressErrors = false;
 
@@ -44,7 +47,8 @@ public class VanishIndication extends Feature {
 
     @Override
     public boolean isActive() {
-        return plugin.getSettings().getBoolean("IndicationFeatures.MarkVanishedPlayersAsSpectators");
+        return !plugin.getVersionUtil().isOneDotXOrHigher(19)
+                && plugin.getSettings().getBoolean("IndicationFeatures.MarkVanishedPlayersAsSpectators");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
