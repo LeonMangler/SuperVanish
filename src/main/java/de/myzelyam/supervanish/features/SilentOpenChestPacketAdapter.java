@@ -23,6 +23,9 @@ import java.util.List;
 
 import static com.comphenix.protocol.PacketType.Play.Server.*;
 
+/**
+ * This is currently unused on Minecraft 1.19 or higher
+ */
 public class SilentOpenChestPacketAdapter extends PacketAdapter {
 
     private final SilentOpenChest silentOpenChest;

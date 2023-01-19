@@ -22,6 +22,7 @@ public class PreventionHider extends PlayerHider implements Runnable {
         super(plugin);
         taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 1, 1).getTaskId();
         if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
+                && !plugin.getVersionUtil().isOneDotXOrHigher(19)
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
             PlayerInfoModule.register(plugin, this);
         if (plugin.isUseProtocolLib()
@@ -43,11 +44,6 @@ public class PreventionHider extends PlayerHider implements Runnable {
             BukkitPlayerHidingUtil.showPlayer(player, viewer, plugin);
         }
         return stateChanged;
-    }
-
-    @Override
-    public boolean supportsShowInTab() {
-        return false;
     }
 
     @Override

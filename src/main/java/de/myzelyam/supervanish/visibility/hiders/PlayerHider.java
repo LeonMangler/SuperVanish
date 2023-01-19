@@ -36,12 +36,6 @@ public abstract class PlayerHider implements Listener {
 
     public abstract String getName();
 
-    public abstract boolean supportsShowInTab();
-
-    public boolean getShowInTab() {
-        return !plugin.getSettings().getBoolean("InvisibilityFeatures.HideInTablist") && supportsShowInTab();
-    }
-
     public boolean isHidden(Player player, Player viewer) {
         return !player.getUniqueId().equals(viewer.getUniqueId())
                 && playerHiddenFromPlayersMap.containsKey(player)

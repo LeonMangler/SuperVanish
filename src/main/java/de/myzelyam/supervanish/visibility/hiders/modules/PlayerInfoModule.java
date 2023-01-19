@@ -22,6 +22,9 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is currently unused on Minecraft 1.19 or higher
+ */
 public class PlayerInfoModule extends PacketAdapter {
 
     private final PlayerHider hider;
@@ -49,9 +52,7 @@ public class PlayerInfoModule extends PacketAdapter {
             Player receiver = event.getPlayer();
             for (PlayerInfoData infoData : ImmutableList.copyOf(infoDataList)) {
                 if (hider.isHidden(infoData.getProfile().getUUID(), receiver)) {
-                    if (!hider.getShowInTab()) {
-                        infoDataList.remove(infoData);
-                    }
+                    infoDataList.remove(infoData);
                 }
             }
             if (infoDataList.isEmpty()) {
