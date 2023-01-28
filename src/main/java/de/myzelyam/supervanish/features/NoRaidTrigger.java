@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.raid.RaidEvent;
 import org.bukkit.event.raid.RaidTriggerEvent;
 
-public class NoRaidTrigger extends Feature{
+public class NoRaidTrigger extends Feature {
 
     public NoRaidTrigger(SuperVanish plugin) {
         super(plugin);

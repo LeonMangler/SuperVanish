@@ -7,7 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class NoTurtleEggBreaking extends Feature{
+public class NoTurtleEggBreaking extends Feature {
 
     public NoTurtleEggBreaking(SuperVanish plugin) {
         super(plugin);
