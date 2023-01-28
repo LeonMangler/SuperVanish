@@ -187,6 +187,7 @@ public class SilentOpenChest extends Feature {
 
     private void restoreState(StateInfo stateInfo, Player p) {
         p.setGameMode(stateInfo.gameMode);
+        p.teleport(p.getLocation().add(0, 0.05, 0));
         new BukkitRunnable() {
             @Override
             public void run() {
