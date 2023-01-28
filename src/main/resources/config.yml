@@ -32,7 +32,7 @@ InvisibilityFeatures:
   PreventSculkSensorActivation: true
   # Should vanished players be unable to break turtle eggs?
   PreventTurtleEggBreaking: true
-  # Should vanished players activate the tipping effect on Dripleaves?
+  # Should vanished players not activate the tipping effect on dripleaves?
   DisableDripLeaf: true
   # Should vanished players be unable to trigger raids?
   PreventRaidTriggering: true
