@@ -14,7 +14,6 @@ softdepend:
 - TrailGUI
 - PlaceholderAPI
 - CustomParticleEffects
-- Citizens
 - NametagEdit
 - MVdWPlaceholderAPI
 - Vault
