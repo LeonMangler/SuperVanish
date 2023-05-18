@@ -27,6 +27,8 @@ public class TabCompleteListener implements Listener {
 
     private final SuperVanish plugin;
 
+    private boolean errorLogged = false;
+
     public TabCompleteListener(SuperVanish plugin) {
         this.plugin = plugin;
     }
@@ -50,9 +52,16 @@ public class TabCompleteListener implements Listener {
                     it.remove();
                 }
             }
-
+        } catch (UnsupportedOperationException uoe) {
+            if (!errorLogged) {
+                plugin.getLogger().warning("UnsupportedOperationException while modifying TabCompleteEvent");
+                errorLogged = true;
+            }
         } catch (Exception er) {
-            plugin.logException(er);
+            if (!errorLogged) {
+                plugin.logException(er);
+                errorLogged = true;
+            }
         }
     }
 
