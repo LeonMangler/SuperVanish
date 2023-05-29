@@ -51,6 +51,8 @@ public class FeatureMgr {
             Collections.singletonList(oneDotSeventeenOrHigher)));
         registeredFeatures.put("NoRaidTrigger", new FeatureInfo(NoRaidTrigger.class, plugin,
             Collections.singletonList(oneDotSeventeenOrHigher)));
+        registeredFeatures.put("NoAdvancementEarn", new FeatureInfo(NoAdvancementEarn.class, plugin,
+            Collections.singletonList(oneDotSeventeenOrHigher)));
     }
 
     public void enableFeatures() {

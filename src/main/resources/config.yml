@@ -36,6 +36,8 @@ InvisibilityFeatures:
   DisableDripLeaf: true
   # Should vanished players be unable to trigger raids?
   PreventRaidTriggering: true
+  # Should vanished players be unable to earn advancements? (works only on paper)
+  PreventAdvancementEarning: true
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
