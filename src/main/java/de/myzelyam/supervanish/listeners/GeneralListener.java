@@ -8,6 +8,7 @@
 
 package de.myzelyam.supervanish.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.VanishPlayer;
 import de.myzelyam.supervanish.features.Broadcast;
@@ -110,6 +111,22 @@ public class GeneralListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemPickUp(PlayerPickupItemEvent e) {
+        try {
+            VanishPlayer vanishPlayer = plugin.getVanishPlayer(e.getPlayer());
+            if (vanishPlayer == null || !vanishPlayer.isOnlineVanished()) return;
+            if (!vanishPlayer.hasItemPickUpsEnabled())
+                e.setCancelled(true);
+            if (plugin.getSettings().getBoolean("RestrictiveOptions.PreventModifyingOwnInventory")
+                    && !vanishPlayer.getPlayer().hasPermission("sv.modifyowninv")) {
+                e.setCancelled(true);
+            }
+        } catch (Exception er) {
+            plugin.logException(er);
+        }
+    }
+
+    @EventHandler
+    public void onExperienceOrbPickup(PlayerPickupExperienceEvent e) {
         try {
             VanishPlayer vanishPlayer = plugin.getVanishPlayer(e.getPlayer());
             if (vanishPlayer == null || !vanishPlayer.isOnlineVanished()) return;
