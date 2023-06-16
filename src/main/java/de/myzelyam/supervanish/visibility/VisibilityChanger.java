@@ -98,7 +98,7 @@ public class VisibilityChanger {
             } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
             }
             // stop player from being a mob target
-            if (config.getBoolean("InvisibilityFeatures.DisableMobTarget")) {
+            if (config.getBoolean("InvisibilityFeatures.DisabledGameEvents.MobTarget")) {
                 player.getWorld().getEntities().stream()
                         .filter(ent -> ent instanceof Creature)
                         .map(ent -> (Creature) ent)

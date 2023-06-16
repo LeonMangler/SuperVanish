@@ -8,18 +8,26 @@
 
 package de.myzelyam.supervanish.listeners;
 
+import com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent;
+import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
+import com.destroystokyo.paper.event.entity.SkeletonHorseTrapEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.VanishPlayer;
 import de.myzelyam.supervanish.features.Broadcast;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockReceiveGameEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.raid.RaidTriggerEvent;
+
+import java.util.List;
 
 
 public class GeneralListener implements Listener {
@@ -67,38 +75,10 @@ public class GeneralListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onFoodLevelChange(FoodLevelChangeEvent e) {
-        try {
-            if (e.getEntity() instanceof Player && config.getBoolean("InvisibilityFeatures.DisableHunger")) {
-                Player p = (Player) e.getEntity();
-                if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())
-                        && e.getFoodLevel() <= p.getFoodLevel())
-                    e.setCancelled(true);
-            }
-        } catch (Exception er) {
-            plugin.logException(er);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(EntityDamageEvent e) {
-        try {
-            if (!(e.getEntity() instanceof Player)) return;
-            Player p = (Player) e.getEntity();
-            if (!config.getBoolean("InvisibilityFeatures.DisableDamage")) return;
-            if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
-                e.setCancelled(true);
-            }
-        } catch (Exception er) {
-            plugin.logException(er);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
     public void onTarget(EntityTargetEvent e) {
         try {
             if (!(e.getTarget() instanceof Player)) return;
-            if (!config.getBoolean("InvisibilityFeatures.DisableMobTarget")) return;
+            if (!config.getBoolean("InvisibilityFeatures.DisabledGameEvents.MobTarget")) return;
             Player p = (Player) e.getTarget();
             if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
                 e.setCancelled(true);
@@ -109,28 +89,73 @@ public class GeneralListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onItemPickUp(PlayerPickupItemEvent e) {
+    public void onSculkSensorTrigger(BlockReceiveGameEvent e) {
         try {
-            VanishPlayer vanishPlayer = plugin.getVanishPlayer(e.getPlayer());
-            if (vanishPlayer == null || !vanishPlayer.isOnlineVanished()) return;
-            if (!vanishPlayer.hasItemPickUpsEnabled())
-                e.setCancelled(true);
-            if (plugin.getSettings().getBoolean("RestrictiveOptions.PreventModifyingOwnInventory")
-                    && !vanishPlayer.getPlayer().hasPermission("sv.modifyowninv")) {
-                e.setCancelled(true);
-            }
+            if (!config.getBoolean("InvisibilityFeatures.DisabledGameEvents.SculkSensor")) return;
+            if (!(e.getEntity() instanceof Player)) return;
+            Player p = (Player) e.getEntity();
+            if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId())) return;
+            e.setCancelled(true);
+        } catch (Exception er) {
+            plugin.logException(er);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onRaidTrigger(RaidTriggerEvent e) {
+        try {
+            if (!config.getBoolean("InvisibilityFeatures.DisabledGameEvents.Raid")) return;
+            Player p = e.getPlayer();
+            if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId())) return;
+            e.setCancelled(true);
         } catch (Exception er) {
             plugin.logException(er);
         }
     }
 
     @EventHandler
-    public void onPlayerCropTrample(PlayerInteractEvent e) {
+    public void onSkeletonHorseTrap(SkeletonHorseTrapEvent e) {
         try {
-            if (!plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId())) return;
-            if (e.getAction() != Action.PHYSICAL) return;
-            if (e.getClickedBlock() != null && e.getClickedBlock().getType().toString().matches("SOIL|FARMLAND"))
+            if (!config.getBoolean("InvisibilityFeatures.DisabledGameEvents.SkeletonHorseTrap")) return;
+            List<HumanEntity> humans = e.getEligibleHumans();
+            int humansCount = humans.size();
+            for (HumanEntity human : humans) {
+                if (human instanceof Player) {
+                    Player p = (Player) human;
+                    if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
+                        humansCount--;
+                    }
+                }
+            }
+            if (humansCount == 0)
                 e.setCancelled(true);
+        } catch (Exception er) {
+            plugin.logException(er);
+        }
+    }
+
+    @EventHandler
+    public void onEntitySpawn(PlayerNaturallySpawnCreaturesEvent e) {
+        try {
+            if (!config.getBoolean("InvisibilityFeatures.DisabledGameEvents.NaturalMobSpawn")) return;
+            if (plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()))
+                e.setCancelled(true);
+        } catch (Exception er) {
+            plugin.logException(er);
+        }
+    }
+    @EventHandler
+    public void onEntitySpawnerSpawn(PreSpawnerSpawnEvent e) {
+        try {
+            if (!config.getBoolean("InvisibilityFeatures.DisabledGameEvents.SpawnerMobSpawn")) return;
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (p.getWorld().equals(e.getSpawnerLocation().getWorld()) &&
+                        p.getLocation().distanceSquared(e.getSpawnerLocation()) <= 256 &&
+                        p.getGameMode() != GameMode.SPECTATOR &&
+                        !plugin.getVanishStateMgr().isVanished(p.getUniqueId()))
+                    return;
+            }
+            e.setCancelled(true);
         } catch (Exception er) {
             plugin.logException(er);
         }

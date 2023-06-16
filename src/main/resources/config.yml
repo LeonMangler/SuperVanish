@@ -8,34 +8,52 @@ InvisibilityFeatures:
   DisableDamage: true
   # Should SV disable hunger for invisible players?
   DisableHunger: true
-  # Should SV prevent mobs from targeting invisible players?
-  DisableMobTarget: true
   # Should invisible players open chests and shulker boxes without the animation and sound?
   # This makes them go into spectator mode temporarily. It's better to only give access to this feature
   # to staff members since a server crash can cause players to stay in spectator mode.
   # Permission: sv.silentchest
   OpenChestsSilently: true
-  # Should invisible players not be able to trigger pressure plates and tripwire?
-  # If this feature is enabled invisible players can't trigger pressure plates and tripwire.
-  DisablePressurePlates: true
   # Should invisible players not be able to push other players or be able to be pushed?
   # WARNING: Uses the scoreboard and may conflict with other plugins!
   DisablePush: false
-  # Should vanished players pick up items by default? This can be changed individually with /sv tipu
+  # Should invisible players pick up items by default? This can be changed individually with /sv tipu
   DefaultPickUpItemsOption: false
   # Should SV modify tablist packets to prevent the server from leaking who is online?
   # This currently only works on versions below 1.19
   ModifyTablistPackets: true
   # Should SV modify tab complete packets to prevent minecraft commands from leaking who is online?
   ModifyTabCompletePackets: true
-  # Should vanished players be unable to trigger the vibration of a sculk sensor?
-  PreventSculkSensorActivation: true
-  # Should vanished players be unable to break turtle eggs?
-  PreventTurtleEggBreaking: true
-  # Should vanished players not activate the tipping effect on dripleaves?
-  DisableDripLeaf: true
-  # Should vanished players be unable to trigger raids?
-  PreventRaidTriggering: true
+
+  # Which game events should be disabled for invisible players?
+  DisabledGameEvents:
+    # Should SV prevent mobs from targeting invisible players?
+    MobTarget: true
+    # Should invisible players be unable to make mobs spawn naturally?
+    NaturalMobSpawn: true
+    # Should invisible players be unable to make mobs spawn by spawners?
+    SpawnerMobSpawn: true
+    # Should invisible players be unable to trigger sculk sensors?
+    SculkSensor: true
+    # Should invisible players be unable to trigger raids?
+    Raid: true
+    # Should invisible players be unable to trigger skeleton horse traps?
+    SkeletonHorseTrap: true
+
+  # Which block interactions should be disabled for invisible players?
+  DisabledBlockInteractions:
+    - "STONE_PLATE"
+    - "GOLD_PLATE"
+    - "IRON_PLATE"
+    - "WOOD_PLATE"
+    - "TRIPWIRE"
+    - "PRESSURE_PLATE"
+    - "SOIL"
+    - "FARMLAND"
+    - "TURTLE_EGG"
+    - "BIG_DRIPLEAF"
+    - "SCULK_SENSOR"
+    - "CALIBRATED_SCULK_SENSOR"
+    - "SCULK_SHRIEKER"
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
@@ -101,6 +119,10 @@ MessageOptions:
 
   # Should SV hide the real join/leave messages of invisible players?
   HideRealJoinQuitMessages: true
+  # Should SV hide the advancement messages of invisible players (it only send it to the player)?
+  HideAdvancementMessages: true
+  # Should non-admins players be unable to send messages to invisible players using minecraft /msg?
+  DisableMsgCommand: true
   # Should SV hide leave messages for invisible players if 'VanishStateFeatures->ReappearOnQuit' is turned on?
   # Overrides 'HideRealJoinQuitMessages'
   ReappearOnQuitHideLeaveMsg: true

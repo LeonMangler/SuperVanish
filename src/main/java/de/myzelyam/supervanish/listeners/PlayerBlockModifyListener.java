@@ -38,11 +38,8 @@ public class PlayerBlockModifyListener implements Listener {
             if (!plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()))
                 return;
             if (e.getAction().equals(Action.PHYSICAL) && e.getClickedBlock() != null) {
-                if (!plugin.getSettings().getBoolean("InvisibilityFeatures.DisablePressurePlates"))
-                    return;
                 String material = e.getClickedBlock().getType().toString();
-                List<String> disallowedMaterials = Arrays.asList("STONE_PLATE", "GOLD_PLATE", "IRON_PLATE",
-                        "WOOD_PLATE"/* <- LEGACY*/, "TRIPWIRE", "PRESSURE_PLATE");
+                List<String> disallowedMaterials = plugin.getSettings().getStringList("InvisibilityFeatures.DisabledBlockInteractions");
                 for (String disallowedMaterial : disallowedMaterials)
                     if (material.equals(disallowedMaterial) || material.contains(disallowedMaterial)) {
                         e.setCancelled(true);
@@ -52,7 +49,6 @@ public class PlayerBlockModifyListener implements Listener {
             plugin.logException(er);
         }
     }
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlace(BlockPlaceEvent e) {
         try {
