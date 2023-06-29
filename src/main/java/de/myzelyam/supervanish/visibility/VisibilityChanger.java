@@ -91,12 +91,6 @@ public class VisibilityChanger {
                 plugin.sendMessage(player, "OnVanish", player);
             else
                 plugin.sendMessage(player, "OnVanishCausedByOtherPlayer", player, hiderName);
-            // change collision
-            try {
-                //noinspection deprecation
-                player.spigot().setCollidesWithEntities(false);
-            } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
-            }
             // stop player from being a mob target
             if (config.getBoolean("InvisibilityFeatures.DisableMobTarget")) {
                 player.getWorld().getEntities().stream()
@@ -147,12 +141,6 @@ public class VisibilityChanger {
                 plugin.sendMessage(player, "OnReappear", player);
             else
                 plugin.sendMessage(player, "OnReappearCausedByOtherPlayer", player, showerName);
-            // adjust collision
-            try {
-                //noinspection deprecation
-                player.spigot().setCollidesWithEntities(true);
-            } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
-            }
             // fly
             // remove fly if not spectator or creative and no perm
             if (config.getBoolean("InvisibilityFeatures.Fly.DisableOnReappear")

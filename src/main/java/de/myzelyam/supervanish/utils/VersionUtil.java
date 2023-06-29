@@ -32,7 +32,7 @@ public class VersionUtil {
     }
 
     public boolean isOneDotXOrHigher(int majorRelease) {
-        for (int i = majorRelease; i < 20; i++)
+        for (int i = majorRelease; i < 40; i++)
             if (version.contains("v1_" + i + "_R")) return true;
         return version.contains("v2_");
     }

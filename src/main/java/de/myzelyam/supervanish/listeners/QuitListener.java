@@ -47,12 +47,6 @@ public class QuitListener implements EventExecutor, Listener {
                             || plugin.getSettings().getBoolean("VanishStateFeatures.CheckPermissionOnQuit")
                             && !CommandAction.VANISH_SELF.checkPermission(p, plugin)) {
                         plugin.getVanishStateMgr().setVanishedState(p.getUniqueId(), p.getName(), false, null);
-                        // collision
-                        try {
-                            //noinspection deprecation
-                            p.spigot().setCollidesWithEntities(true);
-                        } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
-                        }
                         // check if it should handle the quit msg
                         if (!config.getBoolean("MessageOptions.ReappearOnQuitHideLeaveMsg"))
                             noMsg = true;
