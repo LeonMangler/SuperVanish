@@ -45,12 +45,6 @@ public class JoinListener implements EventExecutor, Listener {
                         e.setJoinMessage(null);
                         Broadcast.announceSilentJoin(p, plugin);
                     }
-                    // collision
-                    try {
-                        //noinspection deprecation
-                        p.spigot().setCollidesWithEntities(false);
-                    } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
-                    }
                     // reminding message
                     if (plugin.getSettings().getBoolean("MessageOptions.RemindVanishedOnJoin")) {
                         plugin.sendMessage(p, "RemindingMessage", p);

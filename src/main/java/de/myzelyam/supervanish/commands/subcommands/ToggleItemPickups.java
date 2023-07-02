@@ -38,13 +38,6 @@ public class ToggleItemPickups extends SubCommand {
         plugin.getPlayerData().set("PlayerData." + p.getPlayer().getUniqueId() + ".itemPickUps", !hasEnabled);
         p.setItemPickUps(!hasEnabled);
         plugin.getConfigMgr().getPlayerDataFile().save();
-        // fix /sv tipu
-        try {
-            //noinspection deprecation
-            p.getPlayer().spigot().setCollidesWithEntities(!hasEnabled);
-        } catch (NoClassDefFoundError | NoSuchMethodError ignored) {
-        }
-        //
         return !hasEnabled;
     }
 }
