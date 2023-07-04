@@ -77,12 +77,9 @@ public class JoinListener implements EventExecutor, Listener {
                             plugin.getPlayerData().getBoolean("PlayerData." + p.getUniqueId() + ".dismissed."
                                     + currentVersion.replace(".", "_"), false);
                     if (!isDismissed)
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                plugin.sendMessage(p, "RecreationRequiredMsg", p);
-                            }
-                        }.runTaskLater(plugin, 1);
+                        plugin.getScheduler().runTaskLater(() -> {
+                          plugin.sendMessage(p, "RecreationRequiredMsg", p);
+                        }, 1L);
                 }
                 // hide others
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers())

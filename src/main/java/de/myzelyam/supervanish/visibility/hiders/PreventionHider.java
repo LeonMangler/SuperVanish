@@ -16,11 +16,8 @@ import org.bukkit.entity.Player;
 
 public class PreventionHider extends PlayerHider implements Runnable {
 
-    private int taskId;
-
     public PreventionHider(SuperVanish plugin) {
         super(plugin);
-        taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 1, 1).getTaskId();
         if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
                 && !plugin.getVersionUtil().isOneDotXOrHigher(19)
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
@@ -55,7 +52,6 @@ public class PreventionHider extends PlayerHider implements Runnable {
     public void run() {
         for (Player hidden : playerHiddenFromPlayersMap.keySet()) {
             if (BukkitPlayerHidingUtil.isNewPlayerHidingAPISupported(hidden)) {
-                plugin.getServer().getScheduler().cancelTask(taskId);
                 return;
             }
             for (Player viewer : playerHiddenFromPlayersMap.get(hidden)) {
