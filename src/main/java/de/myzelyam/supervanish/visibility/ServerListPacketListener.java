@@ -86,6 +86,7 @@ public class ServerListPacketListener extends PacketAdapter {
                     }
                 }
                 ping.setPlayers(wrappedGameProfiles);
+                e.getPacket().getServerPings().write(0, ping);
             }
         } catch (Exception er) {
             if (!errorLogged) {
