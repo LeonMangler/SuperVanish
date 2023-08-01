@@ -32,7 +32,7 @@ public class CommandListener implements Listener {
             Player target = Bukkit.getPlayer(args[1]);
             if (target == null || !plugin.getVanishStateMgr().isVanished(target.getUniqueId())) return;
 
-            String message = plugin.getMessage("FakeNotOnline");
+            String message = plugin.getMessage("FakeNotFound");
 
             String command = e.getMessage().replace("/", "");
             String cmd = command.split(" ")[0];
