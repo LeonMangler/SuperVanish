@@ -27,7 +27,7 @@ public class NoSculkSensorDetection extends Feature {
         Player p = e.getPlayer();
         if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId())) return;
         if (!e.getAction().equals(Action.PHYSICAL) || e.getClickedBlock() == null) return;
-        if (!e.getClickedBlock().getType().toString().equals("SCULK_SENSOR") && !e.getClickedBlock().getType().toString().equals("SCULK_SHRIEKER")) return;
+        if (!e.getClickedBlock().getType().toString().matches("SCULK_SENSOR|CALIBRATED_SCULK_SENSOR|SCULK_SHRIEKER")) return;
         e.setCancelled(true);
     }
 
