@@ -86,12 +86,12 @@ public class ServerListPacketListener extends PacketAdapter {
                     }
                 }
                 ping.setPlayers(wrappedGameProfiles);
-                e.getPacket().getServerPings().write(0, ping);
             }
+            e.getPacket().getServerPings().write(0, ping);
         } catch (Exception er) {
             if (!errorLogged) {
-                if (er.getMessage() != null && er.getMessage().contains("Unable to construct new instance using public net.minecraft.network.protocol.status.ServerPing$ServerPingPlayerSample(int,int,java.util.List)")) {
-                    plugin.getLogger().warning("The spigot-sided serverlist features are not supported by ProtocolLib on your server. Please make sure you are using the latest ProtocolLib dev build. (Unable to construct new instance using public net.minecraft.network.protocol.status.ServerPing$ServerPingPlayerSample(int,int,java.util.List))\n");
+                if (er.getMessage() != null && er.getMessage().contains("Unable to construct new instance using public net.minecraft.network.protocol.status.ServerPing")) {
+                    plugin.getLogger().warning("The spigot-sided serverlist features are not supported by ProtocolLib on your server. Please make sure you are using the latest ProtocolLib dev build. (" + er.getMessage() + ")\n");
                 } else if (er.getMessage() != null && er.getMessage().contains("Cannot assign field \"online\" because \"this.playerSample\" is null")) {
                     plugin.getLogger().warning("The spigot-sided serverlist features are not supported yet by ProtocolLib. Please make sure you are using the latest ProtocolLib dev build.");
                 } else {
