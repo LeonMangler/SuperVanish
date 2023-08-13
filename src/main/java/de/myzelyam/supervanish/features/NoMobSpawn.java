@@ -9,12 +9,12 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 
 import java.util.List;
 
 public class NoMobSpawn extends Feature {
 
+    private boolean suppressErrors = false;
 
     public NoMobSpawn(SuperVanish plugin) {
         super(plugin);
@@ -36,7 +36,10 @@ public class NoMobSpawn extends Feature {
             if (humansCount == 0)
                 e.setCancelled(true);
         } catch (Exception er) {
-            plugin.logException(er);
+            if (!suppressErrors) {
+                plugin.logException(er);
+                suppressErrors = true;
+            }
         }
     }
 
@@ -46,9 +49,13 @@ public class NoMobSpawn extends Feature {
             if (plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()))
                 e.setCancelled(true);
         } catch (Exception er) {
-            plugin.logException(er);
+            if (!suppressErrors) {
+                plugin.logException(er);
+                suppressErrors = true;
+            }
         }
     }
+
     @EventHandler
     public void onEntitySpawnerSpawn(PreSpawnerSpawnEvent e) {
         try {
@@ -61,7 +68,10 @@ public class NoMobSpawn extends Feature {
             }
             e.setCancelled(true);
         } catch (Exception er) {
-            plugin.logException(er);
+            if (!suppressErrors) {
+                plugin.logException(er);
+                suppressErrors = true;
+            }
         }
     }
 

@@ -9,6 +9,8 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 // This feature is paper-only because the PlayerAdvancementDoneEvent#message() method doesn't exist in Spigot
 public class HideAdvancementMessages extends Feature {
 
+    private boolean suppressErrors = false;
+
     public HideAdvancementMessages(SuperVanish plugin) {
         super(plugin);
     }
@@ -24,7 +26,10 @@ public class HideAdvancementMessages extends Feature {
             e.message(null);
             p.sendMessage(message);
         } catch (Exception er) {
-            plugin.logException(er);
+            if (!suppressErrors) {
+                plugin.logException(er);
+                suppressErrors = true;
+            }
         }
     }
 
