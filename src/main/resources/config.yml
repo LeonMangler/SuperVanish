@@ -36,6 +36,8 @@ InvisibilityFeatures:
   DisableDripLeaf: true
   # Should vanished players be unable to trigger raids?
   PreventRaidTriggering: true
+  # Should vanished players be unable to make spawn mobs? (paper only)
+  PreventMobSpawning: true
 
   Fly:
     # Should invisible players be able to fly even if they aren't in creative/spectator mode?
@@ -101,6 +103,8 @@ MessageOptions:
 
   # Should SV hide the real join/leave messages of invisible players?
   HideRealJoinQuitMessages: true
+  # Should SV hide the advancement messages of invisible players (only send it to the player)? (paper only)
+  HideAdvancementMessages: true
   # Should SV hide leave messages for invisible players if 'VanishStateFeatures->ReappearOnQuit' is turned on?
   # Overrides 'HideRealJoinQuitMessages'
   ReappearOnQuitHideLeaveMsg: true
