@@ -36,7 +36,7 @@ InvisibilityFeatures:
   DisableDripLeaf: true
   # Should vanished players be unable to trigger raids?
   PreventRaidTriggering: true
-  # Should vanished players be unable to make spawn mobs? (paper only)
+  # Should vanished players be unable to make mobs spawn? (paper only)
   PreventMobSpawning: true
 
   Fly:
