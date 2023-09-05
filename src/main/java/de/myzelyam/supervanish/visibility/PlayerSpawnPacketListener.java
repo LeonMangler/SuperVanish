@@ -20,7 +20,10 @@ public class PlayerSpawnPacketListener extends PacketAdapter {
     }
 
     public static void register(SuperVanish plugin) {
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PlayerSpawnPacketListener(plugin));
+        if (plugin.getVersionUtil().isOneDotXOrHigher(17)) {
+            ProtocolLibrary.getProtocolManager().addPacketListener(new PlayerSpawnPacketListener(plugin));
+        }
+
     }
 
     @Override
@@ -32,7 +35,7 @@ public class PlayerSpawnPacketListener extends PacketAdapter {
                 Entity entity = event.getPacket().getEntityModifier(p.getWorld()).read(0);
                 if (entity instanceof Player) {
                     Player target = (Player) entity;
-                    if (plugin.getVanishStateMgr().isVanished(target.getUniqueId()) && !p.hasPermission("sv.see")) {
+                    if (plugin.getVanishStateMgr().isVanished(target.getUniqueId()) && plugin.getLayeredPermissionChecker().hasPermissionToSee(p, target)) {
                         event.setCancelled(true);
                     }
                 }
