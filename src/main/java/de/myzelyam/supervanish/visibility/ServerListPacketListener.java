@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class ServerListPacketListener extends PacketAdapter {
 
@@ -48,10 +49,18 @@ public class ServerListPacketListener extends PacketAdapter {
     }
 
     public static void register(SuperVanish plugin) {
-        if (plugin.getVersionUtil().isOneDotXOrHigher(19)) {
-            ProtocolLibrary.getProtocolManager().addPacketListener(new ServerListPacketListener(plugin));
-        } else {
-            ProtocolLibrary.getProtocolManager().addPacketListener(new ServerListPacketListener(plugin, true));
+        // Use Paper event listener if available
+        try {
+            Class.forName("com.destroystokyo.paper.event.server.PaperServerListPingEvent");
+            plugin.getLogger().log(Level.INFO, "Hooked into PaperSpigot for server list ping support");
+            plugin.getServer().getPluginManager().registerEvents(new PaperServerPingListener(plugin), plugin);
+        } catch (ClassNotFoundException ignored) {
+            // Otherwise use ProtocolLib
+            if (plugin.getVersionUtil().isOneDotXOrHigher(19)) {
+                ProtocolLibrary.getProtocolManager().addPacketListener(new ServerListPacketListener(plugin));
+            } else {
+                ProtocolLibrary.getProtocolManager().addPacketListener(new ServerListPacketListener(plugin, true));
+            }
         }
     }
 
@@ -87,10 +96,11 @@ public class ServerListPacketListener extends PacketAdapter {
                 }
                 ping.setPlayers(wrappedGameProfiles);
             }
+            e.getPacket().getServerPings().write(0, ping);
         } catch (Exception er) {
             if (!errorLogged) {
-                if (er.getMessage() != null && er.getMessage().contains("Unable to construct new instance using public net.minecraft.network.protocol.status.ServerPing$ServerPingPlayerSample(int,int,java.util.List)")) {
-                    plugin.getLogger().warning("The spigot-sided serverlist features are not supported by ProtocolLib on your server. Please make sure you are using the latest ProtocolLib dev build. (Unable to construct new instance using public net.minecraft.network.protocol.status.ServerPing$ServerPingPlayerSample(int,int,java.util.List))\n");
+                if (er.getMessage() != null && er.getMessage().contains("Unable to construct new instance using public net.minecraft.network.protocol.status.ServerPing")) {
+                    plugin.getLogger().warning("The spigot-sided serverlist features are not supported by ProtocolLib on your server. Please make sure you are using the latest ProtocolLib dev build. (" + er.getMessage() + ")\n");
                 } else if (er.getMessage() != null && er.getMessage().contains("Cannot assign field \"online\" because \"this.playerSample\" is null")) {
                     plugin.getLogger().warning("The spigot-sided serverlist features are not supported yet by ProtocolLib. Please make sure you are using the latest ProtocolLib dev build.");
                 } else {
