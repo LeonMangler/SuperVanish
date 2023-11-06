@@ -41,13 +41,8 @@
 
     <repositories>
         <repository>
-            <id>mvdw-software-repo</id>
-            <name>MVdW Public Repositories</name>
-            <url>https://repo.mvdw-software.com/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>papermc-repo</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
             <id>essentials-repo</id>
@@ -77,6 +72,11 @@
             <id>minecraft-libraries</id>
             <name>Minecraft Libraries</name>
             <url>https://libraries.minecraft.net</url>
+        </repository>
+        <repository>
+            <id>mvdw-software-repo</id>
+            <name>MVdW Public Repositories</name>
+            <url>https://repo.mvdw-software.com/content/groups/public/</url>
         </repository>
     </repositories>
     <dependencies>
