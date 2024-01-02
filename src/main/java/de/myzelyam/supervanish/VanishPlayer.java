@@ -41,6 +41,8 @@ public class VanishPlayer {
         return plugin.getVanishStateMgr().isVanished(player.getUniqueId());
     }
 
+    public long getLastSeen() { return plugin.getVanishStateMgr().getLastSeen(player.getUniqueId()); }
+
     public boolean hasItemPickUpsEnabled() {
         return itemPickUps;
     }
