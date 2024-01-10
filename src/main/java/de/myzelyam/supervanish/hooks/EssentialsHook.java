@@ -14,6 +14,8 @@ import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.commands.CommandAction;
+import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
+import me.hsgamer.hscore.bukkit.scheduler.Task;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,24 +23,23 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
 public class EssentialsHook extends PluginHook {
 
     private final Set<UUID> preVanishHiddenPlayers = new HashSet<>();
     private Essentials essentials;
-    private BukkitRunnable forcedInvisibilityRunnable = new BukkitRunnable() {
+    private BooleanSupplier forcedInvisibilityRunnable = new BooleanSupplier() {
 
         @Override
-        public void run() {
+        public boolean getAsBoolean() {
             try {
-                if (!Bukkit.getPluginManager().isPluginEnabled("Essentials")) return;
+                if (!Bukkit.getPluginManager().isPluginEnabled("Essentials")) return false;
                 for (UUID uuid : superVanish.getVanishStateMgr().getOnlineVanishedPlayers()) {
                     Player p = Bukkit.getPlayer(uuid);
                     User user = essentials.getUser(p);
@@ -46,14 +47,15 @@ public class EssentialsHook extends PluginHook {
                     if (!user.isHidden())
                         user.setHidden(true);
                 }
+                return true;
             } catch (Exception e) {
-                cancel();
                 superVanish.logException(e);
+                return false;
             }
         }
     };
 
-    private BukkitTask forcedInvisibilityTask;
+    private Task forcedInvisibilityTask;
 
     public EssentialsHook(SuperVanish superVanish) {
         super(superVanish);
@@ -62,8 +64,8 @@ public class EssentialsHook extends PluginHook {
     @Override
     public void onPluginEnable(Plugin plugin) {
         essentials = (Essentials) plugin;
-        forcedInvisibilityTask = forcedInvisibilityRunnable.runTaskTimer(superVanish, 0, 100);
-        forcedInvisibilityRunnable.run();
+        forcedInvisibilityTask = Scheduler.plugin(superVanish).sync().runTaskTimer(forcedInvisibilityRunnable, 0, 100);
+        forcedInvisibilityRunnable.getAsBoolean();
     }
 
     @Override

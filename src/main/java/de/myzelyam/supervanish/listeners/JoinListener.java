@@ -11,6 +11,7 @@ package de.myzelyam.supervanish.listeners;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.features.Broadcast;
 
+import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -18,7 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.EventExecutor;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class JoinListener implements EventExecutor, Listener {
 
@@ -77,12 +77,7 @@ public class JoinListener implements EventExecutor, Listener {
                             plugin.getPlayerData().getBoolean("PlayerData." + p.getUniqueId() + ".dismissed."
                                     + currentVersion.replace(".", "_"), false);
                     if (!isDismissed)
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                plugin.sendMessage(p, "RecreationRequiredMsg", p);
-                            }
-                        }.runTaskLater(plugin, 1);
+                        Scheduler.plugin(plugin).sync().runEntityTask(p, () -> plugin.sendMessage(p, "RecreationRequiredMsg", p));
                 }
                 // hide others
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers())

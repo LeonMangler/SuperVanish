@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 
 import de.myzelyam.supervanish.SuperVanish;
 
+import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -89,7 +90,7 @@ public abstract class PlayerHider implements Listener {
 
             @EventHandler(priority = EventPriority.MONITOR)
             public void onQuit(final PlayerQuitEvent e) {
-                plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
+                Scheduler.plugin(plugin).sync().runTaskLater(new Runnable() {
                     @Override
                     public void run() {
                         playerHiddenFromPlayersMap.remove(e.getPlayer());

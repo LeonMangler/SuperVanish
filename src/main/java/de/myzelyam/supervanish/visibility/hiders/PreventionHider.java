@@ -12,15 +12,15 @@ import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.BukkitPlayerHidingUtil;
 import de.myzelyam.supervanish.visibility.hiders.modules.PlayerInfoModule;
 import de.myzelyam.supervanish.visibility.hiders.modules.TabCompleteModule;
+import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
 import org.bukkit.entity.Player;
 
-public class PreventionHider extends PlayerHider implements Runnable {
+import java.util.function.BooleanSupplier;
 
-    private int taskId;
-
+public class PreventionHider extends PlayerHider implements BooleanSupplier {
     public PreventionHider(SuperVanish plugin) {
         super(plugin);
-        taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 1, 1).getTaskId();
+        Scheduler.plugin(plugin).sync().runTaskTimer(this, 1, 1);
         if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
                 && !plugin.getVersionUtil().isOneDotXOrHigher(19)
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
@@ -52,15 +52,15 @@ public class PreventionHider extends PlayerHider implements Runnable {
     }
 
     @Override
-    public void run() {
+    public boolean getAsBoolean() {
         for (Player hidden : playerHiddenFromPlayersMap.keySet()) {
             if (BukkitPlayerHidingUtil.isNewPlayerHidingAPISupported(hidden)) {
-                plugin.getServer().getScheduler().cancelTask(taskId);
-                return;
+                return false;
             }
             for (Player viewer : playerHiddenFromPlayersMap.get(hidden)) {
                 BukkitPlayerHidingUtil.hidePlayer(hidden, viewer, plugin);
             }
         }
+        return true;
     }
 }

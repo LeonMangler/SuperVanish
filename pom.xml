@@ -30,6 +30,19 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>me.hsgamer.hscore</pattern>
+                            <shadedPattern>de.myzelyam.supervanish.hscore</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -177,6 +190,14 @@
             <groupId>com.mojang</groupId>
             <artifactId>brigadier</artifactId>
             <version>1.0.18</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- HSCore Bukkit Scheduler -->
+        <dependency>
+            <groupId>me.hsgamer</groupId>
+            <artifactId>hscore-bukkit-scheduler</artifactId>
+            <version>4.3.26</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

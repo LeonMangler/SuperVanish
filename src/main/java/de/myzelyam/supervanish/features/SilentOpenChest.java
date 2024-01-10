@@ -11,6 +11,7 @@ package de.myzelyam.supervanish.features;
 import com.comphenix.protocol.ProtocolLibrary;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,7 +26,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -174,27 +174,21 @@ public class SilentOpenChest extends Feature {
             return;
         final Player p = (Player) e.getPlayer();
         if (!playerStateInfoMap.containsKey(p)) return;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                StateInfo stateInfo = playerStateInfoMap.get(p);
-                if (stateInfo == null) return;
-                restoreState(stateInfo, p);
-                playerStateInfoMap.remove(p);
-            }
-        }.runTaskLater(plugin, 1);
+        Scheduler.plugin(plugin).sync().runEntityTask(p, () -> {
+            StateInfo stateInfo = playerStateInfoMap.get(p);
+            if (stateInfo == null) return;
+            restoreState(stateInfo, p);
+            playerStateInfoMap.remove(p);
+        });
     }
 
     private void restoreState(StateInfo stateInfo, Player p) {
         p.setGameMode(stateInfo.gameMode);
         p.teleport(p.getLocation().add(0, 0.2, 0));
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                p.setAllowFlight(stateInfo.canFly);
-                p.setFlying(stateInfo.isFlying);
-            }
-        }.runTaskLater(plugin, 1);
+        Scheduler.plugin(plugin).sync().runEntityTask(p, () -> {
+            p.setAllowFlight(stateInfo.canFly);
+            p.setFlying(stateInfo.isFlying);
+        });
     }
 
     @Override
