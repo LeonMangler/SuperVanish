@@ -1,6 +1,10 @@
 # SuperVanish
 Website: https://www.spigotmc.org/resources/supervanish-be-invisible.1331/
 
+# Unofficial Discord
+
+https://discord.gg/aT9z7q7hX8
+
 # Building instructions
 
 mvn clean install
