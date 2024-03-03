@@ -12,7 +12,7 @@ import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.BukkitPlayerHidingUtil;
 import de.myzelyam.supervanish.visibility.hiders.modules.PlayerInfoModule;
 import de.myzelyam.supervanish.visibility.hiders.modules.TabCompleteModule;
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import org.bukkit.entity.Player;
 
 import java.util.function.BooleanSupplier;
@@ -20,7 +20,7 @@ import java.util.function.BooleanSupplier;
 public class PreventionHider extends PlayerHider implements BooleanSupplier {
     public PreventionHider(SuperVanish plugin) {
         super(plugin);
-        Scheduler.plugin(plugin).sync().runTaskTimer(this, 1, 1);
+        GlobalScheduler.get(plugin).runTimer(this, 1, 1);
         if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
                 && !plugin.getVersionUtil().isOneDotXOrHigher(19)
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))

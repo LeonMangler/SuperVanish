@@ -11,7 +11,7 @@ package de.myzelyam.supervanish.listeners;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.features.Broadcast;
 
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
+import io.github.projectunified.minelib.scheduler.entity.EntityScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -77,7 +77,7 @@ public class JoinListener implements EventExecutor, Listener {
                             plugin.getPlayerData().getBoolean("PlayerData." + p.getUniqueId() + ".dismissed."
                                     + currentVersion.replace(".", "_"), false);
                     if (!isDismissed)
-                        Scheduler.plugin(plugin).sync().runEntityTask(p, () -> plugin.sendMessage(p, "RecreationRequiredMsg", p));
+                        EntityScheduler.get(plugin, p).run(() -> plugin.sendMessage(p, "RecreationRequiredMsg", p));
                 }
                 // hide others
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers())

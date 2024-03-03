@@ -12,7 +12,7 @@ import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
+import io.github.projectunified.minelib.scheduler.entity.EntityScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -62,7 +62,7 @@ public class NoPush extends Feature {
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
         if (plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId())) {
-            Scheduler.plugin(plugin).sync().runEntityTaskLater(e.getPlayer(), () -> setCantPush(e.getPlayer()), 5);
+            EntityScheduler.get(plugin, e.getPlayer()).runLater(() -> setCantPush(e.getPlayer()), 5);
         }
     }
 

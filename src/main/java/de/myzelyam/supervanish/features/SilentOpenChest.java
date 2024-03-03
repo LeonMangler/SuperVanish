@@ -11,7 +11,7 @@ package de.myzelyam.supervanish.features;
 import com.comphenix.protocol.ProtocolLibrary;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
+import io.github.projectunified.minelib.scheduler.entity.EntityScheduler;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -174,7 +174,7 @@ public class SilentOpenChest extends Feature {
             return;
         final Player p = (Player) e.getPlayer();
         if (!playerStateInfoMap.containsKey(p)) return;
-        Scheduler.plugin(plugin).sync().runEntityTask(p, () -> {
+        EntityScheduler.get(plugin, p).run(() -> {
             StateInfo stateInfo = playerStateInfoMap.get(p);
             if (stateInfo == null) return;
             restoreState(stateInfo, p);
@@ -185,7 +185,7 @@ public class SilentOpenChest extends Feature {
     private void restoreState(StateInfo stateInfo, Player p) {
         p.setGameMode(stateInfo.gameMode);
         p.teleportAsync(p.getLocation().add(0, 0.2, 0));
-        Scheduler.plugin(plugin).sync().runEntityTask(p, () -> {
+        EntityScheduler.get(plugin, p).run(() -> {
             p.setAllowFlight(stateInfo.canFly);
             p.setFlying(stateInfo.isFlying);
         });

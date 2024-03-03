@@ -10,8 +10,9 @@ package de.myzelyam.supervanish.net;
 
 import de.myzelyam.supervanish.SuperVanish;
 
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
-import me.hsgamer.hscore.bukkit.scheduler.Task;
+import io.github.projectunified.minelib.scheduler.async.AsyncScheduler;
+import io.github.projectunified.minelib.scheduler.common.task.Task;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,7 +52,7 @@ public class UpdateNotifier {
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onJoin(final PlayerJoinEvent e) {
-                Scheduler.plugin(plugin).sync().runTaskLater(() -> {
+                GlobalScheduler.get(plugin).runLater(() -> {
                     if (!isUpToDate())
                         notifyPlayer(e.getPlayer());
                 }, 2);
@@ -95,7 +96,7 @@ public class UpdateNotifier {
 
     private Task start() {
         if (checkTask != null) throw new IllegalStateException("Task is already running");
-        return Scheduler.plugin(plugin).async().runTaskTimer(() -> {
+        return AsyncScheduler.get(plugin).runTimer(() -> {
                 String latestVersion = fetchLatestVersion();
                 UpdateNotifier.this.latestVersion = latestVersion.equals("Error")
                         ? UpdateNotifier.this.latestVersion == null
@@ -103,7 +104,7 @@ public class UpdateNotifier {
                         : UpdateNotifier.this.latestVersion
                         : latestVersion;
                 if (!isUpToDate())
-                    Scheduler.plugin(plugin).sync().runTask(() -> {
+                    GlobalScheduler.get(plugin).run(() -> {
                             notifyConsole();
                             if (plugin.getSettings().getBoolean(
                                     "MiscellaneousOptions.UpdateChecker.NotifyAdmins")) notifyAdmins();

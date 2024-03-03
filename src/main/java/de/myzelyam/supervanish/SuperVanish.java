@@ -23,8 +23,8 @@ import de.myzelyam.supervanish.visibility.FileVanishStateMgr;
 import de.myzelyam.supervanish.visibility.ServerListPacketListener;
 import de.myzelyam.supervanish.visibility.VisibilityChanger;
 import de.myzelyam.supervanish.visibility.hiders.PreventionHider;
+import io.github.projectunified.minelib.scheduler.canceller.TaskCanceller;
 import lombok.Getter;
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -151,7 +151,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     }
 
     public void reload() {
-        Scheduler.plugin(this).cancelAllTasks();
+        TaskCanceller.get(this).cancelAll();
         HandlerList.unregisterAll(this);
         if (useProtocolLib)
             ProtocolLibrary.getProtocolManager().removePacketListeners(this);

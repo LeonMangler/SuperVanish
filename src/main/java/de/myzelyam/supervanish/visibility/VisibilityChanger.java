@@ -15,9 +15,9 @@ import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.Validation;
 import de.myzelyam.supervanish.visibility.hiders.PlayerHider;
+import io.github.projectunified.minelib.scheduler.common.util.Platform;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import lombok.Getter;
-import me.hsgamer.hscore.bukkit.folia.FoliaChecker;
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -114,8 +114,8 @@ public class VisibilityChanger {
                 mob.setTarget(null);
             }
         };
-        if (FoliaChecker.isFolia()) {
-            Scheduler.plugin(plugin).sync().runTask(runnable);
+        if (Platform.FOLIA.isPlatform()) {
+            GlobalScheduler.get(plugin).run(runnable);
         } else {
             runnable.run();
         }

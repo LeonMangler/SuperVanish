@@ -201,11 +201,29 @@
             <version>1.0.18</version>
             <scope>provided</scope>
         </dependency>
-        <!-- HSCore Bukkit Scheduler -->
+        <!-- MineLib Scheduler -->
         <dependency>
-            <groupId>me.hsgamer</groupId>
-            <artifactId>hscore-bukkit-scheduler</artifactId>
-            <version>4.3.26</version>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>minelib-scheduler-entity</artifactId>
+            <version>1.0.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>minelib-scheduler-global</artifactId>
+            <version>1.0.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>minelib-scheduler-async</artifactId>
+            <version>1.0.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>minelib-scheduler-canceller</artifactId>
+            <version>1.0.3</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

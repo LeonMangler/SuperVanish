@@ -14,7 +14,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import de.myzelyam.supervanish.SuperVanish;
-import me.hsgamer.hscore.bukkit.scheduler.Scheduler;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
@@ -35,7 +35,7 @@ public class ActionBarMgr {
     }
 
     private void startTask() {
-        Scheduler.plugin(plugin).sync().runTaskTimer(() -> {
+        GlobalScheduler.get(plugin).runTimer(() -> {
                 for (Player p : actionBars) {
                     try {
                         sendActionBar(p, plugin.replacePlaceholders(plugin.getMessage("ActionBarMessage"), p));
