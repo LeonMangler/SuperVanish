@@ -44,8 +44,8 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>me.hsgamer.hscore</pattern>
-                                    <shadedPattern>de.myzelyam.supervanish.hscore</shadedPattern>
+                                    <pattern>io.github.projectunified.minelib</pattern>
+                                    <shadedPattern>de.myzelyam.supervanish.minelib</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
