@@ -116,7 +116,7 @@ public class GeneralListener implements Listener {
             if (!vanishPlayer.hasItemPickUpsEnabled())
                 e.setCancelled(true);
             if (plugin.getSettings().getBoolean("RestrictiveOptions.PreventModifyingOwnInventory")
-                    && !vanishPlayer.getPlayer().hasPermission("sv.modifyowninv")) {
+                    && !e.getPlayer().hasPermission("sv.modifyowninv")) {
                 e.setCancelled(true);
             }
         } catch (Exception er) {
