@@ -13,6 +13,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -40,7 +41,7 @@ public class NightVision extends Feature implements Runnable {
 
     @Override
     public void onEnable() {
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 20 * 60 * 2, 20 * 60 * 2);
+        GlobalScheduler.get(plugin).runTimer(this, 20 * 60 * 2, 20 * 60 * 2);
     }
 
     @Override
