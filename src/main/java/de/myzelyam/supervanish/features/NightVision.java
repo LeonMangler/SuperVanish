@@ -40,7 +40,7 @@ public class NightVision extends Feature implements Runnable {
 
     @Override
     public void onEnable() {
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 20 * 60 * 2, 20 * 60 * 2);
+        plugin.getScheduler().runTaskTimer(this, 20 * 60 * 2, 20 * 60 * 2);
     }
 
     @Override

@@ -10,6 +10,8 @@ package de.myzelyam.supervanish.hooks;
 
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
+
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
@@ -53,7 +55,7 @@ public class EssentialsHook extends PluginHook {
         }
     };
 
-    private BukkitTask forcedInvisibilityTask;
+    private MyScheduledTask forcedInvisibilityTask;
 
     public EssentialsHook(SuperVanish superVanish) {
         super(superVanish);
@@ -62,7 +64,7 @@ public class EssentialsHook extends PluginHook {
     @Override
     public void onPluginEnable(Plugin plugin) {
         essentials = (Essentials) plugin;
-        forcedInvisibilityTask = forcedInvisibilityRunnable.runTaskTimer(superVanish, 0, 100);
+        forcedInvisibilityTask = SuperVanish.getScheduler().runTaskTimer(forcedInvisibilityRunnable, 1L, 100L);
         forcedInvisibilityRunnable.run();
     }
 
@@ -110,14 +112,11 @@ public class EssentialsHook extends PluginHook {
             if (user == null || !user.isAfk()) return;
             user.setHidden(true);
             preVanishHiddenPlayers.add(e.getPlayer().getUniqueId());
-            superVanish.getServer().getScheduler().runTaskLater(superVanish, new Runnable() {
-                @Override
-                public void run() {
-                    if (preVanishHiddenPlayers.remove(e.getPlayer().getUniqueId())) {
-                        user.setHidden(false);
-                    }
-                }
-            }, 1);
+            superVanish.getScheduler().runTaskLater(() -> {
+              if (preVanishHiddenPlayers.remove(e.getPlayer().getUniqueId())) {
+                user.setHidden(false);
+              }
+            }, 1L);
         }
     }
 }

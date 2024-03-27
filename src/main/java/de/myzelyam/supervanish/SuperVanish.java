@@ -9,6 +9,9 @@
 package de.myzelyam.supervanish;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
+
 import de.myzelyam.api.vanish.VanishAPI;
 import de.myzelyam.supervanish.commands.VanishCommand;
 import de.myzelyam.supervanish.config.ConfigMgr;
@@ -78,10 +81,12 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     @Getter
     private LayeredPermissionChecker layeredPermissionChecker;
     private Set<VanishPlayer> vanishPlayers = new HashSet<>();
+    private static TaskScheduler scheduler;
 
     @Override
     public void onEnable() {
         try {
+            scheduler = UniversalScheduler.getScheduler(this);
             useProtocolLib = getServer().getPluginManager().isPluginEnabled("ProtocolLib");
             if (!useProtocolLib) log(Level.INFO,
                     "Please install ProtocolLib to be able to use all SuperVanish features: " +
@@ -114,6 +119,10 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
         } catch (NoSuchMethodError ignored) {
             // API already loaded by other plugin
         }
+    }
+
+    public static TaskScheduler getScheduler() {
+      return scheduler;
     }
 
     @Override

@@ -80,7 +80,14 @@
         </repository>
     </repositories>
     <dependencies>
-        <!--Paper API-->
+        <!--Universal Scheduler-->
+        <dependency>
+            <groupId>com.github.Anon8281</groupId>
+            <artifactId>UniversalScheduler</artifactId>
+            <version>0.1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--Spigot API-->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
