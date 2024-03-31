@@ -7,6 +7,7 @@
     <groupId>de.myzelyam</groupId>
     <artifactId>SuperVanish</artifactId>
     <version>6.2.18</version>
+    <name>SuperVanish-${project.version}</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -169,7 +170,7 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.10.10</version>
+            <version>2.11.5</version>
             <scope>provided</scope>
         </dependency>
         <!--BrigadierAPI-->
