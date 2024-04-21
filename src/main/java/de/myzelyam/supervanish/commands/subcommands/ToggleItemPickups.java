@@ -32,11 +32,11 @@ public class ToggleItemPickups extends SubCommand {
         }
     }
 
-    private boolean toggleState(VanishPlayer p) {
+    private boolean toggleState(VanishPlayer vp) {
         boolean hasEnabled = plugin.getPlayerData().getBoolean("PlayerData."
-                + p.getPlayer().getUniqueId() + ".itemPickUps");
-        plugin.getPlayerData().set("PlayerData." + p.getPlayer().getUniqueId() + ".itemPickUps", !hasEnabled);
-        p.setItemPickUps(!hasEnabled);
+                + vp.getPlayerUUID() + ".itemPickUps");
+        plugin.getPlayerData().set("PlayerData." + vp.getPlayerUUID() + ".itemPickUps", !hasEnabled);
+        vp.setItemPickUps(!hasEnabled);
         plugin.getConfigMgr().getPlayerDataFile().save();
         return !hasEnabled;
     }

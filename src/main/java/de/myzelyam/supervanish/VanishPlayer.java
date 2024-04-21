@@ -13,15 +13,18 @@ import org.bukkit.entity.Player;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+import java.util.UUID;
+
 
 /**
- * Wrapped org.bukkit.entity.Player
+ * Holds additional information about players in the context of vanishing
  */
 public class VanishPlayer {
 
     private final SuperVanish plugin;
     @Getter
-    private Player player;
+    private final UUID playerUUID;
     @Setter
     private boolean itemPickUps;
     @Getter
@@ -29,7 +32,7 @@ public class VanishPlayer {
 
     VanishPlayer(Player player, SuperVanish plugin, boolean itemPickUps) {
         this.plugin = plugin;
-        this.player = player;
+        this.playerUUID = player.getUniqueId();
         this.itemPickUps = itemPickUps;
         if (plugin.getSettings().getBoolean("IndicationFeatures.LayeredPermissions.LayeredSeeAndUsePermissions", false)) {
             seePermissionLevel = plugin.getLayeredPermissionLevel(player, "see");
@@ -38,7 +41,7 @@ public class VanishPlayer {
     }
 
     public boolean isOnlineVanished() {
-        return plugin.getVanishStateMgr().isVanished(player.getUniqueId());
+        return plugin.getVanishStateMgr().isVanished(playerUUID);
     }
 
     public boolean hasItemPickUpsEnabled() {
@@ -50,11 +53,11 @@ public class VanishPlayer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VanishPlayer that = (VanishPlayer) o;
-        return player != null ? player.getUniqueId().equals(that.player.getUniqueId()) : that.player == null;
+        return Objects.equals(playerUUID, that.playerUUID);
     }
 
     @Override
     public int hashCode() {
-        return player != null ? player.getUniqueId().hashCode() : 0;
+        return Objects.hash(playerUUID);
     }
 }

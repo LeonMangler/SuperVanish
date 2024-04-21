@@ -222,7 +222,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
 
     public VanishPlayer getVanishPlayer(Player player) {
         for (VanishPlayer vanishPlayer : vanishPlayers) {
-            if (vanishPlayer.getPlayer().equals(player)) {
+            if (vanishPlayer.getPlayerUUID().equals(player.getUniqueId())) {
                 return vanishPlayer;
             }
         }
