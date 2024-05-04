@@ -1,15 +1,20 @@
 package de.myzelyam.supervanish.utils;
 
 import de.myzelyam.supervanish.SuperVanish;
+import org.bukkit.Bukkit;
 
 public class VersionUtil {
 
     private final SuperVanish plugin;
-    private final String version;
+    private final int[] version;
 
     public VersionUtil(SuperVanish plugin) {
         this.plugin = plugin;
-        version = plugin.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+        this.version = new int[3];
+        String[] bukkitVersion = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
+        for (int i=0; i < Math.min(bukkitVersion.length, 3); i++) {
+            this.version[i] = Integer.parseInt(bukkitVersion[i]);
+        }
     }
 
     public int compareVersions(String version1, String version2) {
@@ -27,13 +32,16 @@ public class VersionUtil {
         return 0;
     }
 
-    public boolean isOneDotX(int majorRelease) {
-        return version.contains("v1_" + majorRelease + "_R");
+    public boolean isOneDotX(int minorRelease) {
+        return minorRelease == this.version[1];
     }
 
-    public boolean isOneDotXOrHigher(int majorRelease) {
-        for (int i = majorRelease; i < 40; i++)
-            if (version.contains("v1_" + i + "_R")) return true;
-        return version.contains("v2_");
+    public boolean isOneDotXOrHigher(int minorRelease) {
+        return this.isOneDotXOrHigher(minorRelease, 0);
+    }
+    public boolean isOneDotXOrHigher(int minorRelease, int build) {
+        if (this.version[0] > 1) return true;
+        if (this.version[1] > minorRelease) return true;
+        return this.version[1] == minorRelease && this.version[2] >= build;
     }
 }
