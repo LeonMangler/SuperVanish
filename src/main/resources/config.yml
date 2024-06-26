@@ -2,7 +2,7 @@
 
 ############# Invisibility Features ##############
 InvisibilityFeatures:
-  # Should invisible players get night vision? (client-side; Requires ProtocolLib)
+  # Should invisible players get night vision?
   NightVisionEffect: true
   # Should SV disable damage for invisible players?
   DisableDamage: true

@@ -2,14 +2,17 @@ package de.myzelyam.supervanish.utils;
 
 import de.myzelyam.supervanish.SuperVanish;
 
+import java.util.regex.Pattern;
+
 public class VersionUtil {
 
     private final SuperVanish plugin;
-    private final String version;
+    private final String minecraftVersion;
 
     public VersionUtil(SuperVanish plugin) {
         this.plugin = plugin;
-        version = plugin.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+        // saves versions in the format x.x.x (e.g. 1.20.1)
+        minecraftVersion = plugin.getServer().getBukkitVersion().split(Pattern.quote("-"))[0];
     }
 
     public int compareVersions(String version1, String version2) {
@@ -28,12 +31,12 @@ public class VersionUtil {
     }
 
     public boolean isOneDotX(int majorRelease) {
-        return version.contains("v1_" + majorRelease + "_R");
+        return minecraftVersion.equals("1." + majorRelease) || minecraftVersion.startsWith("1." + majorRelease + ".");
     }
 
     public boolean isOneDotXOrHigher(int majorRelease) {
         for (int i = majorRelease; i < 40; i++)
-            if (version.contains("v1_" + i + "_R")) return true;
-        return version.contains("v2_");
+            if (minecraftVersion.equals("1." + i) || minecraftVersion.startsWith("1." + i + ".")) return true;
+        return minecraftVersion.startsWith("2.");
     }
 }
