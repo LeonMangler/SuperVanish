@@ -15,6 +15,8 @@ import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.Validation;
 import de.myzelyam.supervanish.visibility.hiders.PlayerHider;
+import io.github.projectunified.minelib.scheduler.common.util.Platform;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -96,15 +98,26 @@ public class VisibilityChanger {
                 player.getWorld().getEntities().stream()
                         .filter(ent -> ent instanceof Creature)
                         .map(ent -> (Creature) ent)
-                        .filter(mob -> mob.getTarget() != null)
-                        .filter(mob -> player.getUniqueId().equals(mob.getTarget().getUniqueId()))
-                        .forEach(mob -> mob.setTarget(null));
+                        .forEach(ent -> stopTarget(ent, player));
             }
             // call post event
             PostPlayerHideEvent e2 = new PostPlayerHideEvent(player, silent);
             plugin.getServer().getPluginManager().callEvent(e2);
         } catch (Exception e) {
             plugin.logException(e);
+        }
+    }
+
+    private void stopTarget(Creature mob, Player player) {
+        Runnable runnable = () -> {
+            if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(player.getUniqueId())) {
+                mob.setTarget(null);
+            }
+        };
+        if (Platform.FOLIA.isPlatform()) {
+            GlobalScheduler.get(plugin).run(runnable);
+        } else {
+            runnable.run();
         }
     }
 
