@@ -30,7 +30,7 @@ public class FeatureMgr {
     private static final Requirement<FeatureInfo> protocolLibInstalled = featureInfo -> Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"),
             oneDotEightOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8),
             oneDotSeventeenOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(17),
-            paperServer = featureInfo -> Bukkit.getServer().getName().equals("Paper") || Bukkit.getServer().getName().equals("Purpur");
+            supportedServer = featureInfo -> Bukkit.getServer().getName().equals("Paper") || Bukkit.getServer().getName().equals("Purpur");
     private final Map<String, FeatureInfo> registeredFeatures = new HashMap<>();
     private final Set<Feature> activeFeatures = new HashSet<>();
     private final SuperVanish plugin;
@@ -53,9 +53,9 @@ public class FeatureMgr {
         registeredFeatures.put("NoRaidTrigger", new FeatureInfo(NoRaidTrigger.class, plugin,
             Collections.singletonList(oneDotSeventeenOrHigher)));
         registeredFeatures.put("NoMobSpawn", new FeatureInfo(NoMobSpawn.class, plugin,
-            Collections.singletonList(paperServer)));
+            Collections.singletonList(supportedServer)));
         registeredFeatures.put("HideAdvancementMessages", new FeatureInfo(HideAdvancementMessages.class, plugin,
-            Collections.singletonList(paperServer)));
+            Collections.singletonList(supportedServer)));
     }
 
     public void enableFeatures() {
