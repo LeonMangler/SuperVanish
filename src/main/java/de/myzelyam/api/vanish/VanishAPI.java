@@ -52,6 +52,14 @@ public class VanishAPI {
     }
 
     /**
+     * @return Unix timestamp of when the player was last seen not vanished
+     */
+    public static long getLastSeen(UUID uuid) {
+        Validation.checkNotNull("UUID cannot be null!", uuid);
+        return PLUGIN.getVanishStateMgr().getLastSeen(uuid);
+    }
+
+    /**
      * Checks if a player is invisible, online or not
      * <p/>
      * Deprecated: Will cause minor lag if mysql is enabled, use asynchronously or sparingly

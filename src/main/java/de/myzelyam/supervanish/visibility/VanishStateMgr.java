@@ -24,6 +24,8 @@ public abstract class VanishStateMgr {
 
     public abstract boolean isVanished(final UUID uuid);
 
+    public abstract long getLastSeen(final UUID uuid);
+
     public abstract void setVanishedState(final UUID uuid, String name, boolean hide, String causeName);
 
     public final void setVanishedState(final UUID uuid, String name, boolean hide) {
