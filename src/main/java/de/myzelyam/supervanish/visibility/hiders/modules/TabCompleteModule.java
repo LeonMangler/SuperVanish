@@ -13,6 +13,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.FieldAccessException;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import de.myzelyam.supervanish.SuperVanish;
@@ -44,20 +45,27 @@ public class TabCompleteModule extends PacketAdapter {
     public void onPacketSending(PacketEvent event) {
         try {
             if (plugin.getVersionUtil().isOneDotXOrHigher(13)) {
-                Suggestions suggestions = event.getPacket().getSpecificModifier(Suggestions.class).read(0);
-                Iterator<Suggestion> iterator = suggestions.getList().iterator();
-                boolean containsHiddenPlayer = false;
-                while (iterator.hasNext()) {
-                    Suggestion suggestion = iterator.next();
-                    String completion = suggestion.getText();
-                    if (completion.contains("/")) continue;
-                    if (hider.isHidden(completion, event.getPlayer())) {
-                        iterator.remove();
-                        containsHiddenPlayer = true;
+                try {
+                    Suggestions suggestions = event.getPacket().getSpecificModifier(Suggestions.class).read(0);
+                    Iterator<Suggestion> iterator = suggestions.getList().iterator();
+                    boolean containsHiddenPlayer = false;
+                    while (iterator.hasNext()) {
+                        Suggestion suggestion = iterator.next();
+                        String completion = suggestion.getText();
+                        if (completion.contains("/")) continue;
+                        if (hider.isHidden(completion, event.getPlayer())) {
+                            iterator.remove();
+                            containsHiddenPlayer = true;
+                        }
                     }
-                }
-                if (containsHiddenPlayer) {
-                    event.getPacket().getSpecificModifier(Suggestions.class).write(0, suggestions);
+                    if (containsHiddenPlayer) {
+                        event.getPacket().getSpecificModifier(Suggestions.class).write(0, suggestions);
+                    }
+                } catch (FieldAccessException e) {
+                    if (errorLogged) return;
+                    plugin.getLogger().warning("Could not intercept tab-completions using ProtocolLib: "
+                            + e.getMessage());
+                    errorLogged = true;
                 }
             } else {
                 String[] suggestions = event.getPacket().getStringArrays().read(0);
