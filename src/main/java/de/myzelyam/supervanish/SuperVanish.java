@@ -18,10 +18,7 @@ import de.myzelyam.supervanish.hooks.PluginHookMgr;
 import de.myzelyam.supervanish.net.UpdateNotifier;
 import de.myzelyam.supervanish.utils.ExceptionLogger;
 import de.myzelyam.supervanish.utils.VersionUtil;
-import de.myzelyam.supervanish.visibility.ActionBarMgr;
-import de.myzelyam.supervanish.visibility.FileVanishStateMgr;
-import de.myzelyam.supervanish.visibility.ServerListPacketListener;
-import de.myzelyam.supervanish.visibility.VisibilityChanger;
+import de.myzelyam.supervanish.visibility.*;
 import de.myzelyam.supervanish.visibility.hiders.PreventionHider;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -101,6 +98,8 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
                 actionBarMgr = new ActionBarMgr(this);
             if (useProtocolLib && ServerListPacketListener.isEnabled(this))
                 ServerListPacketListener.register(this);
+            if (useProtocolLib)
+                PlayerSpawnPacketListener.register(this);
             registerEvents();
             new PluginHookMgr(this);
             featureMgr = new FeatureMgr(this);
