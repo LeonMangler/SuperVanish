@@ -10,6 +10,7 @@ package de.myzelyam.supervanish.features;
 
 import de.myzelyam.supervanish.SuperVanish;
 
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import org.bukkit.event.Listener;
 
 /**
@@ -32,6 +33,6 @@ public abstract class Feature implements Listener {
     public abstract boolean isActive();
 
     protected void delay(Runnable runnable) {
-        plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 1);
+        GlobalScheduler.get(plugin).run(runnable);
     }
 }
