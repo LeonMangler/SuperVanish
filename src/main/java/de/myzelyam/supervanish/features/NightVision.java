@@ -119,30 +119,53 @@ public class NightVision extends Feature implements Runnable {
     }
 
     private void sendAddPotionEffect(Player p) {
-        Runnable r = () -> p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
-                INFINITE_POTION_EFFECT_LENGTH, 0, true, false));
+        if (p == null || !p.isOnline()) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
+                    INFINITE_POTION_EFFECT_LENGTH, 0, true, false));
+                plugin.getLogger().info("Applied night vision to " + p.getName());
+            }
+        };
+        
         if (Platform.FOLIA.isPlatform()) {
-            p.getScheduler().run(plugin, task -> r.run(), () -> {});
+            p.getScheduler().run(plugin, task -> r.run(), null);
         } else {
             r.run();
         }
     }
 
     private void sendRemovePotionEffect(Player p) {
-        Runnable r = () -> p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        if (p == null || !p.isOnline()) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            }
+        };
+        
         if (Platform.FOLIA.isPlatform()) {
-            p.getScheduler().run(plugin, task -> r.run(), () -> {});
+            p.getScheduler().run(plugin, task -> r.run(), null);
         } else {
             r.run();
         }
     }
 
     private void restorePreviousEffect(Player p) {
+        if (p == null || !p.isOnline()) return;
+        
         PotionEffect prev = playerPreviousPotionEffectMap.remove(p.getUniqueId());
         if (prev == null) return;
-        Runnable r = () -> p.addPotionEffect(prev);
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.addPotionEffect(prev);
+            }
+        };
+        
         if (Platform.FOLIA.isPlatform()) {
-            p.getScheduler().run(plugin, task -> r.run(), () -> {});
+            p.getScheduler().run(plugin, task -> r.run(), null);
         } else {
             r.run();
         }
