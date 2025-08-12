@@ -212,29 +212,25 @@
             <groupId>io.github.projectunified</groupId>
             <artifactId>minelib-scheduler-entity</artifactId>
             <version>1.1.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.projectunified</groupId>
             <artifactId>minelib-scheduler-global</artifactId>
             <version>1.1.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.projectunified</groupId>
             <artifactId>minelib-scheduler-async</artifactId>
             <version>1.1.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.projectunified</groupId>
             <artifactId>minelib-scheduler-canceller</artifactId>
             <version>1.1.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
