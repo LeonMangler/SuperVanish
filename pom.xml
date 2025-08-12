@@ -64,7 +64,7 @@
     <repositories>
         <repository>
             <id>papermc-repo</id>
-            <url>https://repo.papermc.io/repository/maven-public/</url>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
             <id>essentials-repo</id>
@@ -72,11 +72,7 @@
         </repository>
         <repository>
             <id>dmulloy2-repo</id>
-            <url>https://repo.dmulloy2.net/repository/public/</url>
-        </repository>
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <url>https://repo.dmulloy2.net/nexus/repository/public/</url>
         </repository>
         <repository>
             <id>jitpack.io</id>
@@ -137,9 +133,8 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.7.0</version>
+            <version>4.8.0</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <!--Vault API-->
         <dependency>
@@ -198,7 +193,6 @@
             <artifactId>placeholderapi</artifactId>
             <version>2.10.10</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <!--BrigadierAPI-->
         <dependency>
