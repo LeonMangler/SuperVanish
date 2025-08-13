@@ -11,6 +11,7 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import io.github.projectunified.minelib.scheduler.common.util.Platform;
 import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -64,7 +65,7 @@ public class NightVision extends Feature implements Runnable {
         Player p = e.getPlayer();
         sendRemovePotionEffect(p);
         if (playerPreviousPotionEffectMap.containsKey(p.getUniqueId())) {
-            p.addPotionEffect(playerPreviousPotionEffectMap.remove(p.getUniqueId()));
+            restorePreviousEffect(p);
         }
     }
 
@@ -73,7 +74,7 @@ public class NightVision extends Feature implements Runnable {
         Player p = e.getPlayer();
         if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
             if (playerPreviousPotionEffectMap.containsKey(p.getUniqueId())) {
-                p.addPotionEffect(playerPreviousPotionEffectMap.remove(p.getUniqueId()));
+                restorePreviousEffect(p);
             }
         } else {
             sendAddPotionEffect(p);
@@ -118,11 +119,55 @@ public class NightVision extends Feature implements Runnable {
     }
 
     private void sendAddPotionEffect(Player p) {
-        p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
-                INFINITE_POTION_EFFECT_LENGTH, 0, true, false));
+        if (p == null || !p.isOnline()) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
+                    INFINITE_POTION_EFFECT_LENGTH, 0, true, false));
+                plugin.getLogger().info("Applied night vision to " + p.getName());
+            }
+        };
+        
+        if (Platform.FOLIA.isPlatform()) {
+            p.getScheduler().run(plugin, task -> r.run(), null);
+        } else {
+            r.run();
+        }
     }
 
     private void sendRemovePotionEffect(Player p) {
-        p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        if (p == null || !p.isOnline()) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            }
+        };
+        
+        if (Platform.FOLIA.isPlatform()) {
+            p.getScheduler().run(plugin, task -> r.run(), null);
+        } else {
+            r.run();
+        }
+    }
+
+    private void restorePreviousEffect(Player p) {
+        if (p == null || !p.isOnline()) return;
+        
+        PotionEffect prev = playerPreviousPotionEffectMap.remove(p.getUniqueId());
+        if (prev == null) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.addPotionEffect(prev);
+            }
+        };
+        
+        if (Platform.FOLIA.isPlatform()) {
+            p.getScheduler().run(plugin, task -> r.run(), null);
+        } else {
+            r.run();
+        }
     }
 }
