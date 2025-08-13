@@ -10,13 +10,14 @@ package de.myzelyam.supervanish.net;
 
 import de.myzelyam.supervanish.SuperVanish;
 
+import io.github.projectunified.minelib.scheduler.async.AsyncScheduler;
+import io.github.projectunified.minelib.scheduler.common.task.Task;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -36,7 +37,7 @@ public class UpdateNotifier {
     private static final long CHECK_INTERVAL = 20 * 60 * 20;
 
     private final SuperVanish plugin;
-    private final BukkitTask checkTask;
+    private final Task checkTask;
     @Getter
     private final String currentVersion;
     private final Set<UUID> notifiedPlayers = new HashSet<>();
@@ -51,13 +52,10 @@ public class UpdateNotifier {
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onJoin(final PlayerJoinEvent e) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!isUpToDate())
-                            notifyPlayer(e.getPlayer());
-                    }
-                }.runTaskLater(plugin, 2);
+                GlobalScheduler.get(plugin).runLater(() -> {
+                    if (!isUpToDate())
+                        notifyPlayer(e.getPlayer());
+                }, 2);
             }
         }, plugin);
     }
@@ -96,11 +94,9 @@ public class UpdateNotifier {
         }
     }
 
-    private BukkitTask start() {
+    private Task start() {
         if (checkTask != null) throw new IllegalStateException("Task is already running");
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
+        return AsyncScheduler.get(plugin).runTimer(() -> {
                 String latestVersion = fetchLatestVersion();
                 UpdateNotifier.this.latestVersion = latestVersion.equals("Error")
                         ? UpdateNotifier.this.latestVersion == null
@@ -108,16 +104,12 @@ public class UpdateNotifier {
                         : UpdateNotifier.this.latestVersion
                         : latestVersion;
                 if (!isUpToDate())
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
+                    GlobalScheduler.get(plugin).run(() -> {
                             notifyConsole();
                             if (plugin.getSettings().getBoolean(
                                     "MiscellaneousOptions.UpdateChecker.NotifyAdmins")) notifyAdmins();
-                        }
-                    }.runTask(plugin);
-            }
-        }.runTaskTimerAsynchronously(plugin, 0, CHECK_INTERVAL);
+                    });
+        }, 0, CHECK_INTERVAL);
     }
 
     private String fetchLatestVersion() {

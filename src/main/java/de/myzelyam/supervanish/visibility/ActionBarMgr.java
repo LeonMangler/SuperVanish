@@ -14,13 +14,12 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import de.myzelyam.supervanish.SuperVanish;
+import io.github.projectunified.minelib.scheduler.global.GlobalScheduler;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,15 +34,11 @@ public class ActionBarMgr {
     }
 
     private void startTask() {
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
+        GlobalScheduler.get(plugin).runTimer(() -> {
                 for (Player p : actionBars) {
                     try {
                         sendActionBar(p, plugin.replacePlaceholders(plugin.getMessage("ActionBarMessage"), p));
                     } catch (Exception | NoSuchMethodError | NoClassDefFoundError e) {
-                        cancel();
                         plugin.logException(e);
                         plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
                                 "dev-build of ProtocolLib and that your server is up-to-date! This error likely " +
@@ -52,10 +47,11 @@ public class ActionBarMgr {
                                 "DisplayActionBar in the config file. Please report this " +
                                 "error if you can reproduce it on an up-to-date server with only latest " +
                                 "ProtocolLib and latest SV installed.");
+                        return false;
                     }
                 }
-            }
-        }.runTaskTimer(plugin, 0, 2 * 20);
+                return true;
+        }, 0, 2 * 20);
     }
 
     private void sendActionBar(Player p, String bar) {
@@ -76,11 +72,7 @@ public class ActionBarMgr {
                 }
             else
                 chatMsg.getBytes().write(0, (byte) 2);
-            try {
-                ProtocolLibrary.getProtocolManager().sendServerPacket(p, chatMsg);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException("Cannot send packet " + chatMsg, e);
-            }
+            ProtocolLibrary.getProtocolManager().sendServerPacket(p, chatMsg);
         }
     }
 
