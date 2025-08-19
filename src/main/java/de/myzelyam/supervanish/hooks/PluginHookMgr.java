@@ -33,6 +33,7 @@ public class PluginHookMgr implements Listener {
         put("dynmap", DynmapHook.class);
         put("TrailGUI", TrailGUIHook.class);
         put("MVdWPlaceholderAPI", MVdWPlaceholderAPIHook.class);
+        put("OpenInv", OpenInvHook.class);
     }};
     private final SuperVanish plugin;
     private Set<PluginHook> activeHooks = new HashSet<>();
@@ -108,5 +109,14 @@ public class PluginHookMgr implements Listener {
     private PluginHook getActiveHook(Plugin plugin) {
         for (PluginHook hook : activeHooks) if (hook.getPlugin() == plugin) return hook;
         return null;
+    }
+
+    public boolean isHookActive(Class<? extends PluginHook> hookClass) {
+        for (PluginHook hook : activeHooks) {
+            if (hook.getClass().equals(hookClass)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

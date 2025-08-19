@@ -167,6 +167,8 @@ HookOptions:
   EnableMVdWPlaceholderAPIHook: true
   # Should SV stop NPCs from greeting or talking about hidden players?
   EnableCitizensHook: true
+  # Should SV use OpenInv for opening chests silently?
+  EnableOpenInvHook: true
 
 ############# Compatibility Options ##############
 CompatibilityOptions:

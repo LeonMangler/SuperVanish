@@ -48,11 +48,11 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
             "6.0.4", "6.0.5", "6.1.0", "6.1.1", "6.1.2", "6.1.3", "6.1.4", "6.1.5", "6.1.6", "6.1.7",
             "6.1.8", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.2.7", "6.2.8",
             "6.2.9", "6.2.10", "6.2.11", "6.2.12", "6.2.13", "6.2.14", "6.2.15", "6.2.16", "6.2.17",
-            "6.2.18", "6.2.19"},
+            "6.2.18", "6.2.19", "6.2.20"},
             NON_REQUIRED_MESSAGES_UPDATES = {"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.0.5", "6.1.0",
                     "6.1.1", "6.1.2", "6.1.3", "6.1.4", "6.1.5", "6.1.6", "6.1.7", "6.1.8", "6.2.0", "6.2.1",
                     "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.2.7", "6.2.8", "6.2.9", "6.2.10", "6.2.11",
-                    "6.2.12", "6.2.13", "6.2.14", "6.2.15", "6.2.16", "6.2.17", "6.2.18", "6.2.19"};
+                    "6.2.12", "6.2.13", "6.2.14", "6.2.15", "6.2.16", "6.2.17", "6.2.18", "6.2.19", "6.2.20"};
 
     @Getter
     private boolean useProtocolLib;
@@ -78,6 +78,8 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     private LoginListener loginListener;
     @Getter
     private LayeredPermissionChecker layeredPermissionChecker;
+    @Getter
+    private PluginHookMgr pluginHookMgr;
     private Set<VanishPlayer> vanishPlayers = new HashSet<>();
 
     @Override
@@ -102,7 +104,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
             if (useProtocolLib && ServerListPacketListener.isEnabled(this))
                 ServerListPacketListener.register(this);
             registerEvents();
-            new PluginHookMgr(this);
+            pluginHookMgr = new PluginHookMgr(this);
             featureMgr = new FeatureMgr(this);
             featureMgr.enableFeatures();
             if (!Bukkit.getOnlinePlayers().isEmpty())

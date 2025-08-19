@@ -11,6 +11,7 @@ package de.myzelyam.supervanish.features;
 import com.comphenix.protocol.ProtocolLibrary;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.hooks.OpenInvHook;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -150,7 +151,9 @@ public class SilentOpenChest extends Feature {
         if (p.getGameMode() == GameMode.SPECTATOR) return;
         // Remember to keep "p.getItemInHand() != null" as we can't ensure that older Spigot versions will always return a non-null value
         //noinspection deprecation,ConstantConditions
-        if (p.isSneaking() && p.getItemInHand() != null && p.getItemInHand().getType() != Material.AIR)
+        if (p.isSneaking() && p.getItemInHand() != null
+                && (p.getItemInHand().getType().isBlock() || p.getItemInHand().getType() == ITEM_FRAME)
+                && p.getItemInHand().getType() != Material.AIR)
             return;
         Block block = e.getClickedBlock();
         if (block == null) return;
@@ -199,7 +202,8 @@ public class SilentOpenChest extends Feature {
 
     @Override
     public boolean isActive() {
-        return plugin.getSettings().getBoolean("InvisibilityFeatures.OpenChestsSilently");
+        return plugin.getSettings().getBoolean("InvisibilityFeatures.OpenChestsSilently")
+                && !(plugin.getPluginHookMgr() != null && plugin.getPluginHookMgr().isHookActive(OpenInvHook.class));
     }
 
     private boolean isShulkerBox(Inventory inv) {

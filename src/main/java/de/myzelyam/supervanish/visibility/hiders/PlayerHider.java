@@ -67,7 +67,7 @@ public abstract class PlayerHider implements Listener {
      */
     public boolean setHidden(Player player, Player viewer, boolean hidden) {
         if (!playerHiddenFromPlayersMap.containsKey(player))
-            playerHiddenFromPlayersMap.put(player, new HashSet<Player>());
+            playerHiddenFromPlayersMap.put(player, new HashSet<>());
         if (viewer == player) return false;
         Set<Player> hiddenFromPlayers = playerHiddenFromPlayersMap.get(player);
         if (hidden && !hiddenFromPlayers.contains(viewer)) {

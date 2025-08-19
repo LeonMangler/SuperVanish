@@ -10,7 +10,7 @@ public class BukkitPlayerHidingUtil {
     }
 
     public static void hidePlayer(Player player, Player viewer, SuperVanish plugin) {
-        if (isNewPlayerHidingAPISupported(viewer))
+        if (isNewPlayerHidingAPISupported(plugin))
             viewer.hidePlayer(plugin, player);
         else
             //noinspection deprecation
@@ -18,22 +18,14 @@ public class BukkitPlayerHidingUtil {
     }
 
     public static void showPlayer(Player player, Player viewer, SuperVanish plugin) {
-        if (isNewPlayerHidingAPISupported(viewer))
+        if (isNewPlayerHidingAPISupported(plugin))
             viewer.showPlayer(plugin, player);
         else
             //noinspection deprecation
             viewer.showPlayer(player);
     }
 
-    public static boolean isNewPlayerHidingAPISupported(Player testPlayer) {
-        return false; // New API doesn't seem to work with SuperVanish
-    /*
-        Class<? extends Player> playerClass = testPlayer.getClass();
-        try {
-            playerClass.getMethod("hidePlayer", Plugin.class, Player.class);
-        } catch (NoSuchMethodException e) {
-            return false;
-        }
-        return true;*/
+    public static boolean isNewPlayerHidingAPISupported(SuperVanish plugin) {
+        return plugin.getVersionUtil().isOneDotXOrHigher(19);
     }
 }
