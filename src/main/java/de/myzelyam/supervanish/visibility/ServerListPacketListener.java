@@ -49,6 +49,10 @@ public class ServerListPacketListener extends PacketAdapter {
     }
 
     public static void register(SuperVanish plugin) {
+        if (!plugin.supportsProtocolLibPacketFeatures()) {
+            plugin.logOptionalFeatureDisabled("Server list packet adjustments", "ProtocolLib packet listeners are disabled on Folia");
+            return;
+        }
         // Use Paper event listener if available
         try {
             Class.forName("com.destroystokyo.paper.event.server.PaperServerListPingEvent");

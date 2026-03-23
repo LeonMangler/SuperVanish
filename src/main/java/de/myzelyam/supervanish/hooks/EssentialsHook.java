@@ -14,6 +14,7 @@ import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.commands.CommandAction;
+import de.myzelyam.supervanish.scheduler.TaskHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,39 +22,18 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EssentialsHook extends PluginHook {
 
-    private final Set<UUID> preVanishHiddenPlayers = new HashSet<>();
+    private final Set<UUID> preVanishHiddenPlayers = ConcurrentHashMap.newKeySet();
     private Essentials essentials;
-    private BukkitRunnable forcedInvisibilityRunnable = new BukkitRunnable() {
-
-        @Override
-        public void run() {
-            try {
-                if (!Bukkit.getPluginManager().isPluginEnabled("Essentials")) return;
-                for (UUID uuid : superVanish.getVanishStateMgr().getOnlineVanishedPlayers()) {
-                    Player p = Bukkit.getPlayer(uuid);
-                    User user = essentials.getUser(p);
-                    if (user == null) continue;
-                    if (!user.isHidden())
-                        user.setHidden(true);
-                }
-            } catch (Exception e) {
-                cancel();
-                superVanish.logException(e);
-            }
-        }
-    };
-
-    private BukkitTask forcedInvisibilityTask;
+    private TaskHandle forcedInvisibilityTask;
 
     public EssentialsHook(SuperVanish superVanish) {
         super(superVanish);
@@ -62,14 +42,17 @@ public class EssentialsHook extends PluginHook {
     @Override
     public void onPluginEnable(Plugin plugin) {
         essentials = (Essentials) plugin;
-        forcedInvisibilityTask = forcedInvisibilityRunnable.runTaskTimer(superVanish, 0, 100);
-        forcedInvisibilityRunnable.run();
+        forcedInvisibilityTask = superVanish.getSchedulerFacade().runGlobalRepeating(this::syncForcedInvisibility, 0, 100);
+        syncForcedInvisibility();
     }
 
     @Override
     public void onPluginDisable(Plugin plugin) {
         essentials = null;
-        forcedInvisibilityTask.cancel();
+        if (forcedInvisibilityTask != null) {
+            forcedInvisibilityTask.cancel();
+            forcedInvisibilityTask = null;
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -110,14 +93,32 @@ public class EssentialsHook extends PluginHook {
             if (user == null || !user.isAfk()) return;
             user.setHidden(true);
             preVanishHiddenPlayers.add(e.getPlayer().getUniqueId());
-            superVanish.getServer().getScheduler().runTaskLater(superVanish, new Runnable() {
-                @Override
-                public void run() {
-                    if (preVanishHiddenPlayers.remove(e.getPlayer().getUniqueId())) {
-                        user.setHidden(false);
-                    }
+            superVanish.getSchedulerFacade().runLaterForEntity(e.getPlayer(), () -> {
+                if (preVanishHiddenPlayers.remove(e.getPlayer().getUniqueId())) {
+                    user.setHidden(false);
                 }
             }, 1);
+        }
+    }
+
+    private void syncForcedInvisibility() {
+        try {
+            if (!Bukkit.getPluginManager().isPluginEnabled("Essentials") || essentials == null) return;
+            for (UUID uuid : superVanish.getVanishStateMgr().getOnlineVanishedPlayers()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue;
+                superVanish.getSchedulerFacade().runForEntity(player, () -> {
+                    User user = essentials.getUser(player);
+                    if (user != null && !user.isHidden()) {
+                        user.setHidden(true);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            if (forcedInvisibilityTask != null) {
+                forcedInvisibilityTask.cancel();
+            }
+            superVanish.logException(e);
         }
     }
 }

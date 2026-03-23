@@ -18,7 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.EventExecutor;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class JoinListener implements EventExecutor, Listener {
 
@@ -35,16 +34,11 @@ public class JoinListener implements EventExecutor, Listener {
                 PlayerJoinEvent e = (PlayerJoinEvent) event;
                 final Player p = e.getPlayer();
                 // hide others
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                    if (plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())
-                            && !plugin.hasPermissionToSee(p, onlinePlayer))
-                        plugin.getVisibilityChanger().getHider().setHidden(onlinePlayer, p, true);
+                plugin.getVisibilityChanger().updateViewerVisibility(p);
                 // vanished:
                 if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
                     // hide self
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                        if (!plugin.hasPermissionToSee(onlinePlayer, p))
-                            plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
+                    plugin.getVisibilityChanger().restoreHiddenState(p);
                     // Join message
                     if (plugin.getSettings().getBoolean("MessageOptions.HideRealJoinQuitMessages")) {
                         e.setJoinMessage(null);
@@ -82,12 +76,8 @@ public class JoinListener implements EventExecutor, Listener {
                             plugin.getPlayerData().getBoolean("PlayerData." + p.getUniqueId() + ".dismissed."
                                     + currentVersion.replace(".", "_"), false);
                     if (!isDismissed)
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                plugin.sendMessage(p, "RecreationRequiredMsg", p);
-                            }
-                        }.runTaskLater(plugin, 1);
+                        plugin.getSchedulerFacade().runLaterForEntity(p,
+                                () -> plugin.sendMessage(p, "RecreationRequiredMsg", p), 1);
                 }
             }
         } catch (Exception er) {

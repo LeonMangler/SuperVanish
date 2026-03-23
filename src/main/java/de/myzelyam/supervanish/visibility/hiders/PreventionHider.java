@@ -9,6 +9,7 @@
 package de.myzelyam.supervanish.visibility.hiders;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.scheduler.TaskHandle;
 import de.myzelyam.supervanish.utils.BukkitPlayerHidingUtil;
 import de.myzelyam.supervanish.visibility.hiders.modules.PlayerInfoModule;
 import de.myzelyam.supervanish.visibility.hiders.modules.TabCompleteModule;
@@ -16,20 +17,31 @@ import org.bukkit.entity.Player;
 
 public class PreventionHider extends PlayerHider implements Runnable {
 
-    private int taskId;
+    private TaskHandle repeatingHideTask;
 
     public PreventionHider(SuperVanish plugin) {
         super(plugin);
         if (!BukkitPlayerHidingUtil.isNewPlayerHidingAPISupported(plugin)) {
-            taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 2, 2).getTaskId();
+            repeatingHideTask = plugin.getSchedulerFacade().runGlobalRepeating(this, 2, 2);
+        }
+        if (!plugin.supportsProtocolLibPacketFeatures()) {
+            if (plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true)) {
+                plugin.logOptionalFeatureDisabled("Tablist packet visibility", "ProtocolLib packet listeners are disabled on Folia");
+            }
+            if (plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTabCompletePackets", true)
+                    && !plugin.getVersionUtil().isOneDotXOrHigher(21)) {
+                plugin.logOptionalFeatureDisabled("Tab complete packet visibility", "ProtocolLib packet listeners are disabled on Folia");
+            }
         }
         if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
                 && !plugin.getVersionUtil().isOneDotXOrHigher(19)
-                && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
+                && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true)
+                && plugin.supportsProtocolLibPacketFeatures())
             PlayerInfoModule.register(plugin, this);
         if (plugin.isUseProtocolLib()
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTabCompletePackets", true)
-                && !plugin.getVersionUtil().isOneDotXOrHigher(21)) {
+                && !plugin.getVersionUtil().isOneDotXOrHigher(21)
+                && plugin.supportsProtocolLibPacketFeatures()) {
             // Not supported anymore on 1.21 and above (ProtocolLib broken)
             TabCompleteModule.register(plugin, this);
         }
@@ -54,7 +66,10 @@ public class PreventionHider extends PlayerHider implements Runnable {
     public void run() {
         for (Player hidden : playerHiddenFromPlayersMap.keySet()) {
             if (BukkitPlayerHidingUtil.isNewPlayerHidingAPISupported(plugin)) {
-                plugin.getServer().getScheduler().cancelTask(taskId);
+                if (repeatingHideTask != null) {
+                    repeatingHideTask.cancel();
+                    repeatingHideTask = null;
+                }
                 return;
             }
             for (Player viewer : playerHiddenFromPlayersMap.get(hidden)) {

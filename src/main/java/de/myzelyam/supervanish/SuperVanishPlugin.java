@@ -8,6 +8,8 @@
 
 package de.myzelyam.supervanish;
 
+import de.myzelyam.supervanish.scheduler.PlatformMode;
+import de.myzelyam.supervanish.scheduler.SchedulerFacade;
 import de.myzelyam.supervanish.visibility.VanishStateMgr;
 
 import java.util.logging.Level;
@@ -24,4 +26,8 @@ public interface SuperVanishPlugin {
     void logException(Throwable e);
 
     VanishStateMgr getVanishStateMgr();
+
+    SchedulerFacade getSchedulerFacade();
+
+    PlatformMode getPlatformMode();
 }

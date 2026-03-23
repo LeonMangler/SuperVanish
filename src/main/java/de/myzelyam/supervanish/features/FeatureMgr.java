@@ -30,7 +30,8 @@ public class FeatureMgr {
     private static final Requirement<FeatureInfo> protocolLibInstalled = featureInfo -> Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"),
             oneDotEightOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8),
             oneDotSeventeenOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(17),
-            supportedServer = featureInfo -> Bukkit.getServer().getName().equals("Paper") || Bukkit.getServer().getName().equals("Purpur");
+            supportedServer = featureInfo -> Bukkit.getServer().getName().equals("Paper") || Bukkit.getServer().getName().equals("Purpur"),
+            foliaSafePacketFeatures = featureInfo -> featureInfo.getPlugin().supportsProtocolLibPacketFeatures();
     private final Map<String, FeatureInfo> registeredFeatures = new HashMap<>();
     private final Set<Feature> activeFeatures = new HashSet<>();
     private final SuperVanish plugin;
@@ -42,7 +43,7 @@ public class FeatureMgr {
         registeredFeatures.put("NightVision", new FeatureInfo(NightVision.class, plugin,
                 Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
         registeredFeatures.put("VanishIndication", new FeatureInfo(VanishIndication.class, plugin,
-                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
+                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher, foliaSafePacketFeatures)));
         registeredFeatures.put("Broadcast", new FeatureInfo(Broadcast.class, plugin));
         registeredFeatures.put("NoSculkSensorDetection", new FeatureInfo(NoSculkSensorDetection.class, plugin,
                 Collections.singletonList(oneDotSeventeenOrHigher)));
@@ -63,7 +64,12 @@ public class FeatureMgr {
         for (String id : registeredFeatures.keySet()) {
             FeatureInfo featureInfo = registeredFeatures.get(id);
             for (Requirement<FeatureInfo> requirement : featureInfo.getRequirements()) {
-                if (!requirement.fulfilledBy(featureInfo)) continue featureLoop;
+                if (!requirement.fulfilledBy(featureInfo)) {
+                    if (requirement == foliaSafePacketFeatures) {
+                        plugin.logOptionalFeatureDisabled(id, "ProtocolLib packet listeners are disabled on Folia");
+                    }
+                    continue featureLoop;
+                }
             }
             Feature feature;
             try {

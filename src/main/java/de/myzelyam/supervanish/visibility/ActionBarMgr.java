@@ -14,48 +14,24 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.scheduler.TaskHandle;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ActionBarMgr {
 
     private final SuperVanish plugin;
-    private final List<Player> actionBars = new ArrayList<>();
+    private final Map<UUID, TaskHandle> actionBars = new ConcurrentHashMap<>();
 
     public ActionBarMgr(SuperVanish plugin) {
         this.plugin = plugin;
-        startTask();
-    }
-
-    private void startTask() {
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                for (Player p : actionBars) {
-                    try {
-                        sendActionBar(p, plugin.replacePlaceholders(plugin.getMessage("ActionBarMessage"), p));
-                    } catch (Exception | NoSuchMethodError | NoClassDefFoundError e) {
-                        cancel();
-                        plugin.logException(e);
-                        plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
-                                "dev-build of ProtocolLib and that your server is up-to-date! This error likely " +
-                                "happened inside of ProtocolLib code which is out of SuperVanish's control. It's part " +
-                                "of an optional feature module and can be removed safely by disabling " +
-                                "DisplayActionBar in the config file. Please report this " +
-                                "error if you can reproduce it on an up-to-date server with only latest " +
-                                "ProtocolLib and latest SV installed.");
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 0, 2 * 20);
     }
 
     private void sendActionBar(Player p, String bar) {
@@ -85,10 +61,35 @@ public class ActionBarMgr {
     }
 
     public void addActionBar(Player p) {
-        actionBars.add(p);
+        actionBars.computeIfAbsent(p.getUniqueId(), uuid -> plugin.getSchedulerFacade().runRepeatingForEntity(
+                p,
+                () -> sendActionBarSafely(p),
+                () -> actionBars.remove(uuid),
+                0,
+                2 * 20
+        ));
     }
 
     public void removeActionBar(Player p) {
-        actionBars.remove(p);
+        TaskHandle taskHandle = actionBars.remove(p.getUniqueId());
+        if (taskHandle != null) {
+            taskHandle.cancel();
+        }
+    }
+
+    private void sendActionBarSafely(Player p) {
+        try {
+            sendActionBar(p, plugin.replacePlaceholders(plugin.getMessage("ActionBarMessage"), p));
+        } catch (Exception | NoSuchMethodError | NoClassDefFoundError e) {
+            removeActionBar(p);
+            plugin.logException(e);
+            plugin.getLogger().warning("IMPORTANT: Please make sure that you are using the latest " +
+                    "dev-build of ProtocolLib and that your server is up-to-date! This error likely " +
+                    "happened inside of ProtocolLib code which is out of SuperVanish's control. It's part " +
+                    "of an optional feature module and can be removed safely by disabling " +
+                    "DisplayActionBar in the config file. Please report this " +
+                    "error if you can reproduce it on an up-to-date server with only latest " +
+                    "ProtocolLib and latest SV installed.");
+        }
     }
 }

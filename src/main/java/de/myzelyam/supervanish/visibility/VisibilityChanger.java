@@ -73,9 +73,7 @@ public class VisibilityChanger {
             // metadata
             player.setMetadata("vanished", new FixedMetadataValue(plugin, true));
             // hide
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                if (!plugin.hasPermissionToSee(onlinePlayer, player))
-                    plugin.getVisibilityChanger().getHider().setHidden(player, onlinePlayer, true);
+            restoreHiddenState(player);
             // fly check
             if (config.getBoolean("InvisibilityFeatures.Fly.Enable")) {
                 player.setAllowFlight(true);
@@ -124,9 +122,7 @@ public class VisibilityChanger {
             // metadata
             player.removeMetadata("vanished", plugin);
             // show
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                if (!plugin.hasPermissionToSee(onlinePlayer, player))
-                    plugin.getVisibilityChanger().getHider().setHidden(player, onlinePlayer, false);
+            applyVisibilityForAllViewers(player, false);
             // action bars
             if (plugin.getActionBarMgr() != null && config.getBoolean("MessageOptions.DisplayActionBar")) {
                 plugin.getActionBarMgr().removeActionBar(player);
@@ -155,6 +151,37 @@ public class VisibilityChanger {
             plugin.getServer().getPluginManager().callEvent(e2);
         } catch (Exception e) {
             plugin.logException(e);
+        }
+    }
+
+    public void restoreHiddenState(Player player) {
+        applyVisibilityForAllViewers(player, true);
+    }
+
+    public void updateViewerVisibility(Player viewer) {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (viewer.equals(onlinePlayer)) {
+                continue;
+            }
+            boolean shouldHide = plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())
+                    && !plugin.hasPermissionToSee(viewer, onlinePlayer);
+            plugin.getSchedulerFacade().runForEntity(viewer,
+                    () -> plugin.getVisibilityChanger().getHider().setHidden(onlinePlayer, viewer, shouldHide));
+        }
+    }
+
+    private void applyVisibilityForAllViewers(Player player, boolean hidden) {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.equals(player)) {
+                continue;
+            }
+            plugin.getSchedulerFacade().runForEntity(onlinePlayer, () -> {
+                if (!plugin.hasPermissionToSee(onlinePlayer, player)) {
+                    plugin.getVisibilityChanger().getHider().setHidden(player, onlinePlayer, hidden);
+                } else if (!hidden) {
+                    plugin.getVisibilityChanger().getHider().setHidden(player, onlinePlayer, false);
+                }
+            });
         }
     }
 }

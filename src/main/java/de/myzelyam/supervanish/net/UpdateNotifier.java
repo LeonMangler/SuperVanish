@@ -9,21 +9,20 @@
 package de.myzelyam.supervanish.net;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.scheduler.TaskHandle;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -36,10 +35,10 @@ public class UpdateNotifier {
     private static final long CHECK_INTERVAL = 20 * 60 * 20;
 
     private final SuperVanish plugin;
-    private final BukkitTask checkTask;
+    private final TaskHandle checkTask;
     @Getter
     private final String currentVersion;
-    private final Set<UUID> notifiedPlayers = new HashSet<>();
+    private final Set<UUID> notifiedPlayers = ConcurrentHashMap.newKeySet();
     @Getter
     private volatile String latestVersion;
     private boolean notifiedConsole = false;
@@ -51,13 +50,11 @@ public class UpdateNotifier {
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onJoin(final PlayerJoinEvent e) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!isUpToDate())
-                            notifyPlayer(e.getPlayer());
+                plugin.getSchedulerFacade().runLaterForEntity(e.getPlayer(), () -> {
+                    if (!isUpToDate()) {
+                        notifyPlayer(e.getPlayer());
                     }
-                }.runTaskLater(plugin, 2);
+                }, 2);
             }
         }, plugin);
     }
@@ -84,7 +81,7 @@ public class UpdateNotifier {
 
     private void notifyAdmins() {
         for (Player p : plugin.getServer().getOnlinePlayers()) {
-            notifyPlayer(p);
+            plugin.getSchedulerFacade().runForEntity(p, () -> notifyPlayer(p));
         }
     }
 
@@ -96,28 +93,23 @@ public class UpdateNotifier {
         }
     }
 
-    private BukkitTask start() {
+    private TaskHandle start() {
         if (checkTask != null) throw new IllegalStateException("Task is already running");
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                String latestVersion = fetchLatestVersion();
-                UpdateNotifier.this.latestVersion = latestVersion.equals("Error")
-                        ? UpdateNotifier.this.latestVersion == null
-                        ? currentVersion
-                        : UpdateNotifier.this.latestVersion
-                        : latestVersion;
-                if (!isUpToDate())
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            notifyConsole();
-                            if (plugin.getSettings().getBoolean(
-                                    "MiscellaneousOptions.UpdateChecker.NotifyAdmins")) notifyAdmins();
-                        }
-                    }.runTask(plugin);
+        return plugin.getSchedulerFacade().runAsyncRepeating(() -> {
+            String latestVersion = fetchLatestVersion();
+            UpdateNotifier.this.latestVersion = latestVersion.equals("Error")
+                    ? UpdateNotifier.this.latestVersion == null
+                    ? currentVersion
+                    : UpdateNotifier.this.latestVersion
+                    : latestVersion;
+            if (!isUpToDate()) {
+                plugin.getSchedulerFacade().runNowGlobal(() -> {
+                    notifyConsole();
+                    if (plugin.getSettings().getBoolean(
+                            "MiscellaneousOptions.UpdateChecker.NotifyAdmins")) notifyAdmins();
+                });
             }
-        }.runTaskTimerAsynchronously(plugin, 0, CHECK_INTERVAL);
+        }, 0, CHECK_INTERVAL);
     }
 
     private String fetchLatestVersion() {

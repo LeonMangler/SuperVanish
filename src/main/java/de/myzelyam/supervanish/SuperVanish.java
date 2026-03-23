@@ -16,6 +16,8 @@ import de.myzelyam.supervanish.listeners.*;
 import de.myzelyam.supervanish.features.FeatureMgr;
 import de.myzelyam.supervanish.hooks.PluginHookMgr;
 import de.myzelyam.supervanish.net.UpdateNotifier;
+import de.myzelyam.supervanish.scheduler.PlatformMode;
+import de.myzelyam.supervanish.scheduler.SchedulerFacade;
 import de.myzelyam.supervanish.utils.ExceptionLogger;
 import de.myzelyam.supervanish.utils.VersionUtil;
 import de.myzelyam.supervanish.visibility.ActionBarMgr;
@@ -37,9 +39,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
@@ -80,12 +83,19 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     private LayeredPermissionChecker layeredPermissionChecker;
     @Getter
     private PluginHookMgr pluginHookMgr;
-    private Set<VanishPlayer> vanishPlayers = new HashSet<>();
+    @Getter
+    private SchedulerFacade schedulerFacade;
+    private final Set<VanishPlayer> vanishPlayers = ConcurrentHashMap.newKeySet();
 
     @Override
     public void onEnable() {
         try {
             useProtocolLib = getServer().getPluginManager().isPluginEnabled("ProtocolLib");
+            schedulerFacade = new SchedulerFacade(this);
+            log(Level.INFO, "Detected platform mode: " + schedulerFacade.getPlatformMode());
+            if (schedulerFacade.isFolia()) {
+                log(Level.INFO, "Folia core support enabled");
+            }
             if (!useProtocolLib) log(Level.INFO,
                     "Please install ProtocolLib to be able to use all SuperVanish features: " +
                             "https://www.spigotmc.org/resources/protocollib.1997/");
@@ -122,6 +132,9 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     @Override
     public void onDisable() {
         try {
+            if (schedulerFacade != null) {
+                schedulerFacade.cancelAll();
+            }
             if (featureMgr != null) featureMgr.disableFeatures();
             vanishPlayers.clear();
             VanishAPI.setPlugin(null);
@@ -141,9 +154,7 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
             boolean vanished = vanishStateMgr.isVanished(player.getUniqueId());
             createVanishPlayer(player, itemPickUps);
             if (vanished) {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                    if (!hasPermissionToSee(onlinePlayer, player))
-                        visibilityChanger.getHider().setHidden(player, onlinePlayer, true);
+                visibilityChanger.restoreHiddenState(player);
             }
             if (getSettings().getBoolean("MessageOptions.DisplayActionBar")
                     && vanished && actionBarMgr != null) {
@@ -153,7 +164,9 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     }
 
     public void reload() {
-        getServer().getScheduler().cancelTasks(this);
+        if (schedulerFacade != null) {
+            schedulerFacade.cancelAll();
+        }
         HandlerList.unregisterAll(this);
         if (useProtocolLib)
             ProtocolLibrary.getProtocolManager().removePacketListeners(this);
@@ -230,12 +243,30 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     }
 
     public void createVanishPlayer(Player player, boolean itemPickUps) {
+        removeVanishPlayer(player.getUniqueId());
         VanishPlayer vanishPlayer = new VanishPlayer(player, this, itemPickUps);
         vanishPlayers.add(vanishPlayer);
     }
 
     public void removeVanishPlayer(VanishPlayer vanishPlayer) {
         vanishPlayers.remove(vanishPlayer);
+    }
+
+    public void removeVanishPlayer(UUID playerUuid) {
+        vanishPlayers.removeIf(vanishPlayer -> vanishPlayer.getPlayerUUID().equals(playerUuid));
+    }
+
+    @Override
+    public PlatformMode getPlatformMode() {
+        return schedulerFacade.getPlatformMode();
+    }
+
+    public boolean supportsProtocolLibPacketFeatures() {
+        return !schedulerFacade.isFolia();
+    }
+
+    public void logOptionalFeatureDisabled(String featureName, String reason) {
+        log(Level.INFO, "Disabled optional feature '" + featureName + "': " + reason);
     }
 
     public void sendMessage(CommandSender p, String messagesYmlPath, Object... additionalPlayerInfo) {

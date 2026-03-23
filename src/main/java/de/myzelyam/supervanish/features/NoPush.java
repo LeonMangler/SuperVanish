@@ -17,7 +17,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
 public class NoPush extends Feature {
@@ -62,12 +61,7 @@ public class NoPush extends Feature {
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
         if (plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()))
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    setCantPush(e.getPlayer());
-                }
-            }.runTaskLater(plugin, 5);
+            plugin.getSchedulerFacade().runLaterForEntity(e.getPlayer(), () -> setCantPush(e.getPlayer()), 5);
     }
 
     @EventHandler

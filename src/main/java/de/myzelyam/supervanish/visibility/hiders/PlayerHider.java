@@ -18,7 +18,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -67,7 +66,7 @@ public abstract class PlayerHider implements Listener {
      */
     public boolean setHidden(Player player, Player viewer, boolean hidden) {
         if (!playerHiddenFromPlayersMap.containsKey(player))
-            playerHiddenFromPlayersMap.put(player, new HashSet<>());
+            playerHiddenFromPlayersMap.put(player, ConcurrentHashMap.newKeySet());
         if (viewer == player) return false;
         Set<Player> hiddenFromPlayers = playerHiddenFromPlayersMap.get(player);
         if (hidden && !hiddenFromPlayers.contains(viewer)) {
@@ -89,12 +88,12 @@ public abstract class PlayerHider implements Listener {
 
             @EventHandler(priority = EventPriority.MONITOR)
             public void onQuit(final PlayerQuitEvent e) {
-                plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        playerHiddenFromPlayersMap.remove(e.getPlayer());
-                        for (Player p : ImmutableSet.copyOf(playerHiddenFromPlayersMap.keySet())) {
-                            playerHiddenFromPlayersMap.get(p).remove(e.getPlayer());
+                plugin.getSchedulerFacade().runLaterGlobal(() -> {
+                    playerHiddenFromPlayersMap.remove(e.getPlayer());
+                    for (Player p : ImmutableSet.copyOf(playerHiddenFromPlayersMap.keySet())) {
+                        Set<Player> hiddenFromPlayers = playerHiddenFromPlayersMap.get(p);
+                        if (hiddenFromPlayers != null) {
+                            hiddenFromPlayers.remove(e.getPlayer());
                         }
                     }
                 }, 1);

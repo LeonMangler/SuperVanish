@@ -11,7 +11,7 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
-import org.bukkit.Bukkit;
+import de.myzelyam.supervanish.scheduler.TaskHandle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,12 +25,14 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class NightVision extends Feature implements Runnable {
+public class NightVision extends Feature {
 
     public static final int INFINITE_POTION_EFFECT_LENGTH = 32767;
 
-    private final Map<UUID, PotionEffect> playerPreviousPotionEffectMap = new HashMap<>();
+    private final Map<UUID, PotionEffect> playerPreviousPotionEffectMap = new ConcurrentHashMap<>();
+    private final Map<UUID, TaskHandle> refreshTasks = new ConcurrentHashMap<>();
 
     public NightVision(SuperVanish plugin) {
         super(plugin);
@@ -38,7 +40,12 @@ public class NightVision extends Feature implements Runnable {
 
     @Override
     public void onEnable() {
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 20 * 60 * 2, 20 * 60 * 2);
+        for (UUID uuid : plugin.getVanishStateMgr().getOnlineVanishedPlayers()) {
+            Player player = plugin.getServer().getPlayer(uuid);
+            if (player != null) {
+                startRefreshTask(player);
+            }
+        }
     }
 
     @Override
@@ -56,11 +63,13 @@ public class NightVision extends Feature implements Runnable {
             }
         }
         sendAddPotionEffect(p);
+        startRefreshTask(p);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onReappear(PlayerShowEvent e) {
         Player p = e.getPlayer();
+        stopRefreshTask(p.getUniqueId());
         sendRemovePotionEffect(p);
         if (playerPreviousPotionEffectMap.containsKey(p.getUniqueId())) {
             p.addPotionEffect(playerPreviousPotionEffectMap.remove(p.getUniqueId()));
@@ -76,6 +85,7 @@ public class NightVision extends Feature implements Runnable {
             }
         } else {
             sendAddPotionEffect(p);
+            startRefreshTask(p);
         }
     }
 
@@ -84,6 +94,7 @@ public class NightVision extends Feature implements Runnable {
         Player p = e.getPlayer();
         if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId()))
             return;
+        stopRefreshTask(p.getUniqueId());
         sendRemovePotionEffect(p);
     }
 
@@ -106,14 +117,11 @@ public class NightVision extends Feature implements Runnable {
     }
 
     @Override
-    public void run() {
-        // renew every now and then to prevent blinking bug
-        for (UUID uuid : plugin.getVanishStateMgr().getOnlineVanishedPlayers()) {
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null) continue;
-            sendRemovePotionEffect(p);
-            sendAddPotionEffect(p);
+    public void onDisable() {
+        for (TaskHandle taskHandle : refreshTasks.values()) {
+            taskHandle.cancel();
         }
+        refreshTasks.clear();
     }
 
     private void sendAddPotionEffect(Player p) {
@@ -123,5 +131,25 @@ public class NightVision extends Feature implements Runnable {
 
     private void sendRemovePotionEffect(Player p) {
         p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+    }
+
+    private void startRefreshTask(Player player) {
+        refreshTasks.computeIfAbsent(player.getUniqueId(), uuid -> plugin.getSchedulerFacade().runRepeatingForEntity(
+                player,
+                () -> {
+                    sendRemovePotionEffect(player);
+                    sendAddPotionEffect(player);
+                },
+                () -> refreshTasks.remove(uuid),
+                20 * 60 * 2,
+                20 * 60 * 2
+        ));
+    }
+
+    private void stopRefreshTask(UUID uuid) {
+        TaskHandle taskHandle = refreshTasks.remove(uuid);
+        if (taskHandle != null) {
+            taskHandle.cancel();
+        }
     }
 }
