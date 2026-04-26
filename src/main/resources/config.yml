@@ -101,6 +101,9 @@ MessageOptions:
     # Should there only be fake join/quit messages and no admin announcements?
     SendMessageOnlyToUsers: false
 
+  # Should SV prevent the use of the /msg command on vanished players?
+  DisableMsgCommand: true
+
   # Should SV hide the real join/leave messages of invisible players?
   HideRealJoinQuitMessages: true
   # Should SV hide the advancement messages of invisible players (only send it to the player)? (paper only)
