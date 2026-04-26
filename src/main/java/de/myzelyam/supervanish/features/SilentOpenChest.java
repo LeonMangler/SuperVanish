@@ -21,13 +21,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -125,10 +123,8 @@ public class SilentOpenChest extends Feature {
         Player p = e.getPlayer();
         if (playerStateInfoMap.containsKey(p)) {
             Location loc = e.getTo() != null ? e.getTo() : e.getFrom();
-            if (playerStateInfoMap.get(p).openLoc.distance(loc) > .5) {
-                p.closeInventory();
-                restoreState(playerStateInfoMap.get(p), p);
-                playerStateInfoMap.remove(p);
+            if (playerStateInfoMap.get(p).openLoc.distance(loc) > 3) {
+                p.teleport(playerStateInfoMap.get(p).openLoc);
             }
         }
     }
@@ -166,17 +162,9 @@ public class SilentOpenChest extends Feature {
                 || plugin.getVersionUtil().isOneDotXOrHigher(11) && additionalChestMaterials.contains(block.getType())))
             return;
         StateInfo stateInfo = StateInfo.extract(p);
-        p.setVelocity(new Vector(0, 0, 0));
         playerStateInfoMap.put(p, stateInfo);
         p.setGameMode(GameMode.SPECTATOR);
-    }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onChestClose(InventoryCloseEvent e) {
-        if (!(e.getPlayer() instanceof Player))
-            return;
-        final Player p = (Player) e.getPlayer();
-        if (!playerStateInfoMap.containsKey(p)) return;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -185,12 +173,11 @@ public class SilentOpenChest extends Feature {
                 restoreState(stateInfo, p);
                 playerStateInfoMap.remove(p);
             }
-        }.runTaskLater(plugin, 1);
+        }.runTaskLater(plugin, 2);
     }
 
     private void restoreState(StateInfo stateInfo, Player p) {
         p.setGameMode(stateInfo.gameMode);
-        p.teleport(p.getLocation().add(0, 0.2, 0));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -228,10 +215,9 @@ public class SilentOpenChest extends Feature {
 
     @Override
     public void onEnable() {
-        if (!plugin.getVersionUtil().isOneDotXOrHigher(19)) {
-            SilentOpenChestPacketAdapter packetAdapter = new SilentOpenChestPacketAdapter(this);
-            ProtocolLibrary.getProtocolManager().addPacketListener(packetAdapter);
-        }
+        plugin.getVersionUtil().isOneDotXOrHigher(19);
+        SilentOpenChestPacketAdapter packetAdapter = new SilentOpenChestPacketAdapter(this);
+        ProtocolLibrary.getProtocolManager().addPacketListener(packetAdapter);
     }
 
     private static class StateInfo {
