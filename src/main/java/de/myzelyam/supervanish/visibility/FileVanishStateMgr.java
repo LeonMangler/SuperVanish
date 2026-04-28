@@ -36,6 +36,11 @@ public class FileVanishStateMgr extends VanishStateMgr {
     }
 
     @Override
+    public long getLastSeen(UUID uuid) {
+        return plugin.getPlayerData().getLong("PlayerData." + uuid + ".information.last_seen", System.currentTimeMillis() / 1000L);
+    }
+
+    @Override
     public void setVanishedState(final UUID uuid, String name, boolean hide, String causeName) {
         PlayerVanishStateChangeEvent event = new PlayerVanishStateChangeEvent(uuid, name, hide, causeName);
         Bukkit.getPluginManager().callEvent(event);
@@ -46,8 +51,11 @@ public class FileVanishStateMgr extends VanishStateMgr {
         else
             vanishedPlayerUUIDStrings.remove(uuid.toString());
         plugin.getPlayerData().set("InvisiblePlayers", vanishedPlayerUUIDStrings);
-        if (hide)
+        plugin.getPlayerData().set("PlayerData." + uuid + ".information.last_seen", null);
+        if (hide) {
             plugin.getPlayerData().set("PlayerData." + uuid + ".information.name", name);
+            plugin.getPlayerData().set("PlayerData." + uuid + ".information.last_seen", System.currentTimeMillis() / 1000L);
+        }
         plugin.getConfigMgr().getPlayerDataFile().save();
     }
 
