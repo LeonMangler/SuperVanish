@@ -87,12 +87,8 @@
             <name>Minecraft Libraries</name>
             <url>https://libraries.minecraft.net</url>
         </repository>
-        <repository>
-            <id>mvdw-software-repo</id>
-            <name>MVdW Public Repositories</name>
-            <url>https://repo.mvdw-software.com/content/groups/public/</url>
-        </repository>
     </repositories>
+
     <dependencies>
         <!--Paper API-->
         <dependency>
@@ -101,6 +97,7 @@
             <version>1.20.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
         <!--EssentialsX API-->
         <dependency>
             <groupId>net.essentialsx</groupId>
@@ -114,6 +111,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!--ProtocolLib-->
         <dependency>
             <groupId>net.dmulloy2</groupId>
@@ -121,6 +119,7 @@
             <version>5.4.0</version>
             <scope>provided</scope>
         </dependency>
+
         <!--Vault API-->
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
@@ -138,6 +137,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!--Citizens API-->
         <dependency>
             <groupId>net.citizensnpcs</groupId>
@@ -145,6 +145,7 @@
             <version>2.0.28-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
         <!--TrailGUI-->
         <dependency>
             <groupId>com.github.SinnDevelopment</groupId>
@@ -152,6 +153,7 @@
             <version>37659dda03</version>
             <scope>provided</scope>
         </dependency>
+
         <!--Dynmap-->
         <dependency>
             <groupId>us.dynmap</groupId>
@@ -159,19 +161,15 @@
             <version>3.1</version>
             <scope>provided</scope>
         </dependency>
+
         <!--MVdWPlaceholderAPI-->
         <dependency>
-            <groupId>be.maximvdw</groupId>
+            <groupId>com.intellectualsites.mvdwplaceholderapi</groupId>
             <artifactId>MVdWPlaceholderAPI</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.1</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.spigotmc</groupId>
-                    <artifactId>spigot</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
+
         <!--PlaceholderAPI-->
         <dependency>
             <groupId>me.clip</groupId>
@@ -179,6 +177,7 @@
             <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
+
         <!--BrigadierAPI-->
         <dependency>
             <groupId>com.mojang</groupId>
@@ -186,7 +185,8 @@
             <version>1.0.18</version>
             <scope>provided</scope>
         </dependency>
-        <!-- MineLib Scheduler -->
+
+        <!--MineLib Scheduler-->
         <dependency>
             <groupId>io.github.projectunified</groupId>
             <artifactId>minelib-scheduler-entity</artifactId>
@@ -211,6 +211,7 @@
             <version>1.2.5</version>
             <scope>compile</scope>
         </dependency>
+
         <!--OpenInv-->
         <dependency>
             <groupId>com.github.Jikoo</groupId>
