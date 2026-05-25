@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.EventExecutor;
 
 public class JoinListener implements EventExecutor, Listener {
@@ -33,23 +32,22 @@ public class JoinListener implements EventExecutor, Listener {
             if (event instanceof PlayerJoinEvent) {
                 PlayerJoinEvent e = (PlayerJoinEvent) event;
                 final Player p = e.getPlayer();
-                // hide others
-                final java.util.List<Player> snapshot1 = new java.util.ArrayList<>(Bukkit.getOnlinePlayers());
-                for (Player onlinePlayer : snapshot1) {
+                final boolean vanished = plugin.getVanishStateMgr().isVanished(p.getUniqueId());
+                final java.util.List<Player> snapshot = new java.util.ArrayList<>(Bukkit.getOnlinePlayers());
+                for (Player onlinePlayer : snapshot) {
+                    if (onlinePlayer.getUniqueId().equals(p.getUniqueId())) continue;
+
                     if (plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())
                             && !plugin.hasPermissionToSee(p, onlinePlayer)) {
                         plugin.getVisibilityChanger().getHider().setHidden(onlinePlayer, p, true);
                     }
-                }
-                // vanished:
-                if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
-                    // hide self
-                    final java.util.List<Player> snapshot2 = new java.util.ArrayList<>(Bukkit.getOnlinePlayers());
-                    for (Player onlinePlayer : snapshot2) {
-                        if (!plugin.hasPermissionToSee(onlinePlayer, p)) {
-                            plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
-                        }
+                    if (vanished && !plugin.hasPermissionToSee(onlinePlayer, p)) {
+                        plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
                     }
+                }
+
+                // vanished:
+                if (vanished) {
                     // Join message
                     if (plugin.getSettings().getBoolean("MessageOptions.HideRealJoinQuitMessages")) {
                         e.setJoinMessage(null);

@@ -30,13 +30,6 @@ import java.util.UUID;
 public class NightVision extends Feature implements Runnable {
 
     public static final int INFINITE_POTION_EFFECT_LENGTH = 32767;
-    private static final PotionEffect NIGHT_VISION_EFFECT = new PotionEffect(
-            PotionEffectType.NIGHT_VISION,
-            INFINITE_POTION_EFFECT_LENGTH,
-            0,
-            true,
-            false
-    );
 
     private final Map<UUID, PotionEffect> playerPreviousPotionEffectMap = new SWMRHashTable<>();
     private ScheduledTask renewTask;
@@ -136,7 +129,12 @@ public class NightVision extends Feature implements Runnable {
     }
 
     private void sendAddPotionEffect(Player p) {
-        p.addPotionEffect(NIGHT_VISION_EFFECT);
+        p.addPotionEffect(new PotionEffect(
+                PotionEffectType.NIGHT_VISION,
+                INFINITE_POTION_EFFECT_LENGTH,
+                0,
+                true,
+                false));
     }
 
     private void sendRemovePotionEffect(Player p) {

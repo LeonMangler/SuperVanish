@@ -18,9 +18,9 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 
 import ca.spottedleaf.concurrentutil.map.SWMRHashTable;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class PluginHookMgr implements Listener {
@@ -39,7 +39,7 @@ public class PluginHookMgr implements Listener {
         REGISTERED_HOOKS = java.util.Collections.unmodifiableMap(m);
     }
     private final SuperVanish plugin;
-    private Set<PluginHook> activeHooks = new HashSet<>();
+    private final Map<Plugin, PluginHook> activeHooks = new ConcurrentHashMap<>();
 
     public PluginHookMgr(SuperVanish plugin) {
         this.plugin = plugin;
@@ -55,15 +55,18 @@ public class PluginHookMgr implements Listener {
         Plugin plugin = e.getPlugin();
         if (REGISTERED_HOOKS.get(plugin.getName()) == null) return;
         if (isHookDisabled(plugin.getName())) return;
-        if (getActiveHook(plugin) != null) return;
         PluginHook hook = null;
         try {
+            synchronized (activeHooks) {
+                if (activeHooks.containsKey(plugin)) return;
+
             hook = REGISTERED_HOOKS.get(plugin.getName()).getConstructor(SuperVanish.class).
                     newInstance(PluginHookMgr.this.plugin);
             hook.setPlugin(plugin);
             hook.onPluginEnable(plugin);
             Bukkit.getPluginManager().registerEvents(hook, PluginHookMgr.this.plugin);
-            activeHooks.add(hook);
+                activeHooks.put(plugin, hook);
+            }
             PluginHookMgr.this.plugin.log(
                     Level.INFO, "Hooked into " + plugin.getName());
         } catch (NoClassDefFoundError er) {
@@ -100,7 +103,10 @@ public class PluginHookMgr implements Listener {
     @EventHandler
     public void onPluginDisable(PluginDisableEvent e) {
         Plugin plugin = e.getPlugin();
-        PluginHook hook = getActiveHook(plugin);
+        PluginHook hook;
+        synchronized (activeHooks) {
+            hook = activeHooks.remove(plugin);
+        }
         if (hook == null) return;
         try {
             hook.onPluginDisable(plugin);
@@ -109,16 +115,15 @@ public class PluginHookMgr implements Listener {
         }
         org.bukkit.event.HandlerList.unregisterAll(hook);
         hook.setPlugin(null);
-        activeHooks.remove(hook);
     }
 
     private PluginHook getActiveHook(Plugin plugin) {
-        for (PluginHook hook : activeHooks) if (hook.getPlugin() == plugin) return hook;
-        return null;
+        return activeHooks.get(plugin);
     }
 
     public boolean isHookActive(Class<? extends PluginHook> hookClass) {
-        for (PluginHook hook : activeHooks) {
+        Collection<PluginHook> hooks = activeHooks.values();
+        for (PluginHook hook : hooks) {
             if (hook.getClass().equals(hookClass)) {
                 return true;
             }

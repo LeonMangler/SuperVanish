@@ -47,19 +47,13 @@ public class LoginListener implements Listener {
                 plugin.getVanishStateMgr().setVanishedState(p.getUniqueId(), p.getName(), true, null);
                 vanished = true;
             }
-            if (vanished) {
-                // hide self
-                final java.util.List<Player> snapshot1 = new java.util.ArrayList<>(Bukkit.getOnlinePlayers());
-                for (Player onlinePlayer : snapshot1) {
-                    if (!plugin.hasPermissionToSee(onlinePlayer, p)) {
-                        plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
-                    }
-                }
-            }
+            final java.util.List<Player> snapshot = new java.util.ArrayList<>(Bukkit.getOnlinePlayers());
+            for (Player onlinePlayer : snapshot) {
+                if (onlinePlayer.getUniqueId().equals(p.getUniqueId())) continue;
 
-            // hide others
-            final java.util.List<Player> snapshot2 = new java.util.ArrayList<>(Bukkit.getOnlinePlayers());
-            for (Player onlinePlayer : snapshot2) {
+                if (vanished && !plugin.hasPermissionToSee(onlinePlayer, p)) {
+                    plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
+                }
                 if (plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())
                         && !plugin.hasPermissionToSee(p, onlinePlayer)) {
                     plugin.getVisibilityChanger().getHider().setHidden(onlinePlayer, p, true);

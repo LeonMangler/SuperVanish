@@ -9,8 +9,9 @@
 package de.myzelyam.supervanish.visibility;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.UUID;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.entity.Player;
 
@@ -22,7 +23,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class ActionBarMgr {
 
     private final SuperVanish plugin;
-    private final Collection<UUID> actionBars = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private final Set<UUID> actionBars = ConcurrentHashMap.newKeySet();
     private ScheduledTask task;
 
     public ActionBarMgr(SuperVanish plugin) {
@@ -56,21 +57,18 @@ public class ActionBarMgr {
     }
 
     public void addActionBar(Player p) {
-      UUID id = p.getUniqueId();
-      if (!actionBars.contains(id)) {
-        actionBars.add(id);
-      }
+        actionBars.add(p.getUniqueId());
     }
 
     public void removeActionBar(Player p) {
-      actionBars.remove(p.getUniqueId());
+        actionBars.remove(p.getUniqueId());
     }
 
     public void shutdown() {
-      actionBars.clear();
-      if (task != null) {
-        task.cancel();
-        task = null;
-      }
+        actionBars.clear();
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
     }
 }
