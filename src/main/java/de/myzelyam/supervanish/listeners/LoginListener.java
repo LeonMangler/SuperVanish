@@ -18,6 +18,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class LoginListener implements Listener {
 
@@ -48,14 +51,26 @@ public class LoginListener implements Listener {
                 vanished = true;
             }
             final java.util.List<Player> snapshot = new java.util.ArrayList<>(Bukkit.getOnlinePlayers());
+
+            final Map<java.util.UUID, Boolean> joinerCanSeeMap = new HashMap<>(snapshot.size());
+            final Map<java.util.UUID, Boolean> onlineCanSeeJoinerMap = new HashMap<>(snapshot.size());
+
+            for (Player onlinePlayer : snapshot) {
+                if (onlinePlayer.getUniqueId().equals(p.getUniqueId())) continue;
+                joinerCanSeeMap.put(onlinePlayer.getUniqueId(), plugin.hasPermissionToSee(p, onlinePlayer));
+                if (vanished) {
+                    onlineCanSeeJoinerMap.put(onlinePlayer.getUniqueId(), plugin.hasPermissionToSee(onlinePlayer, p));
+                }
+            }
+
             for (Player onlinePlayer : snapshot) {
                 if (onlinePlayer.getUniqueId().equals(p.getUniqueId())) continue;
 
-                if (vanished && !plugin.hasPermissionToSee(onlinePlayer, p)) {
+                if (vanished && !onlineCanSeeJoinerMap.get(onlinePlayer.getUniqueId())) {
                     plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
                 }
                 if (plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())
-                        && !plugin.hasPermissionToSee(p, onlinePlayer)) {
+                        && !joinerCanSeeMap.get(onlinePlayer.getUniqueId())) {
                     plugin.getVisibilityChanger().getHider().setHidden(onlinePlayer, p, true);
                 }
             }
