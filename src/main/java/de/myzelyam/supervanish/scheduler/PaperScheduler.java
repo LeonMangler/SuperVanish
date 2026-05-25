@@ -20,38 +20,74 @@ public class PaperScheduler implements TaskScheduler {
 
     @Override
     public ScheduledTask runTask(Runnable task) {
-        BukkitTask bukkitTask = Bukkit.getScheduler().runTask(plugin, task);
-        return wrapTask(bukkitTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        BukkitTask bukkitTask = Bukkit.getScheduler().runTask(plugin, () -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        });
+        tasks.put(taskId, bukkitTask);
+        return wrapTask(taskId, bukkitTask);
     }
 
     @Override
     public ScheduledTask runTaskLater(Runnable task, long delay) {
-        BukkitTask bukkitTask = Bukkit.getScheduler().runTaskLater(plugin, task, delay);
-        return wrapTask(bukkitTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        BukkitTask bukkitTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        }, delay);
+        tasks.put(taskId, bukkitTask);
+        return wrapTask(taskId, bukkitTask);
     }
 
     @Override
     public ScheduledTask runTaskTimer(Runnable task, long delay, long period) {
         BukkitTask bukkitTask = Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period);
-        return wrapTask(bukkitTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        tasks.put(taskId, bukkitTask);
+        return wrapTask(taskId, bukkitTask);
     }
 
     @Override
     public ScheduledTask runTaskAsynchronously(Runnable task) {
-        BukkitTask bukkitTask = Bukkit.getScheduler().runTaskAsynchronously(plugin, task);
-        return wrapTask(bukkitTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        BukkitTask bukkitTask = Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        });
+        tasks.put(taskId, bukkitTask);
+        return wrapTask(taskId, bukkitTask);
     }
 
     @Override
     public ScheduledTask runTaskLaterAsynchronously(Runnable task, long delay) {
-        BukkitTask bukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
-        return wrapTask(bukkitTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        BukkitTask bukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        }, delay);
+        tasks.put(taskId, bukkitTask);
+        return wrapTask(taskId, bukkitTask);
     }
 
     @Override
     public ScheduledTask runTaskTimerAsynchronously(Runnable task, long delay, long period) {
         BukkitTask bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task, delay, period);
-        return wrapTask(bukkitTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        tasks.put(taskId, bukkitTask);
+        return wrapTask(taskId, bukkitTask);
     }
 
     @Override
@@ -81,9 +117,7 @@ public class PaperScheduler implements TaskScheduler {
         return plugin;
     }
 
-    private ScheduledTask wrapTask(BukkitTask bukkitTask) {
-        int taskId = taskIdCounter.incrementAndGet();
-        tasks.put(taskId, bukkitTask);
+    private ScheduledTask wrapTask(int taskId, BukkitTask bukkitTask) {
         return new ScheduledTask() {
             private volatile boolean cancelled = false;
 

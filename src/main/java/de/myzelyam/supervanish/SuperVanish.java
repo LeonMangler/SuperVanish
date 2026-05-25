@@ -146,6 +146,12 @@ public class SuperVanish extends JavaPlugin implements SuperVanishPlugin {
     @Override
     public void onDisable() {
         try {
+            if (scheduler != null) {
+                scheduler.cancelAllTasks();
+            }
+            if (actionBarMgr != null) {
+                actionBarMgr.shutdown();
+            }
             if (packetListener != null) {
                 packetListener.uninjectAll();
             }

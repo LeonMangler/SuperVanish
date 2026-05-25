@@ -11,6 +11,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FoliaScheduler implements TaskScheduler {
     private final Plugin plugin;
@@ -18,7 +19,7 @@ public class FoliaScheduler implements TaskScheduler {
     private final RegionScheduler regionScheduler;
     private final AsyncScheduler asyncScheduler;
     private final ConcurrentHashMap<Integer, ScheduledTask> tasks = new ConcurrentHashMap<>();
-    private int taskIdCounter = 0;
+    private final AtomicInteger taskIdCounter = new AtomicInteger(0);
 
     public FoliaScheduler(Plugin plugin) {
         this.plugin = plugin;
@@ -29,33 +30,67 @@ public class FoliaScheduler implements TaskScheduler {
 
     @Override
     public de.myzelyam.supervanish.scheduler.ScheduledTask runTask(Runnable task) {
-        ScheduledTask scheduledTask = globalScheduler.run(plugin, (t) -> task.run());
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        ScheduledTask scheduledTask = globalScheduler.run(plugin, (t) -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        });
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
     public de.myzelyam.supervanish.scheduler.ScheduledTask runTaskLater(Runnable task, long delay) {
-        ScheduledTask scheduledTask = globalScheduler.runDelayed(plugin, (t) -> task.run(), delay);
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        ScheduledTask scheduledTask = globalScheduler.runDelayed(plugin, (t) -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        }, delay);
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
     public de.myzelyam.supervanish.scheduler.ScheduledTask runTaskTimer(Runnable task, long delay, long period) {
         ScheduledTask scheduledTask = globalScheduler.runAtFixedRate(plugin, (t) -> task.run(), delay, period);
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
     public de.myzelyam.supervanish.scheduler.ScheduledTask runTaskAsynchronously(Runnable task) {
-        ScheduledTask scheduledTask = asyncScheduler.runNow(plugin, (t) -> task.run());
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        ScheduledTask scheduledTask = asyncScheduler.runNow(plugin, (t) -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        });
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
     public de.myzelyam.supervanish.scheduler.ScheduledTask runTaskLaterAsynchronously(Runnable task, long delay) {
         long delayMs = delay * 50;
-        ScheduledTask scheduledTask = asyncScheduler.runDelayed(plugin, (t) -> task.run(), delayMs, TimeUnit.MILLISECONDS);
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        ScheduledTask scheduledTask = asyncScheduler.runDelayed(plugin, (t) -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        }, delayMs, TimeUnit.MILLISECONDS);
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
@@ -63,19 +98,37 @@ public class FoliaScheduler implements TaskScheduler {
         long delayMs = delay * 50;
         long periodMs = period * 50;
         ScheduledTask scheduledTask = asyncScheduler.runAtFixedRate(plugin, (t) -> task.run(), delayMs, periodMs, TimeUnit.MILLISECONDS);
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
     public de.myzelyam.supervanish.scheduler.ScheduledTask runTaskAtLocation(Location location, Runnable task) {
-        ScheduledTask scheduledTask = regionScheduler.run(plugin, location, (t) -> task.run());
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        ScheduledTask scheduledTask = regionScheduler.run(plugin, location, (t) -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        });
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
     public de.myzelyam.supervanish.scheduler.ScheduledTask runTaskAtEntity(Entity entity, Runnable task) {
-        ScheduledTask scheduledTask = entity.getScheduler().run(plugin, (t) -> task.run(), null);
-        return wrapTask(scheduledTask);
+        int taskId = taskIdCounter.incrementAndGet();
+        ScheduledTask scheduledTask = entity.getScheduler().run(plugin, (t) -> {
+            try {
+                task.run();
+            } finally {
+                tasks.remove(taskId);
+            }
+        }, null);
+        tasks.put(taskId, scheduledTask);
+        return wrapTask(taskId, scheduledTask);
     }
 
     @Override
@@ -96,9 +149,7 @@ public class FoliaScheduler implements TaskScheduler {
         return plugin;
     }
 
-    private de.myzelyam.supervanish.scheduler.ScheduledTask wrapTask(ScheduledTask foliaTask) {
-        int taskId = ++taskIdCounter;
-        tasks.put(taskId, foliaTask);
+    private de.myzelyam.supervanish.scheduler.ScheduledTask wrapTask(int taskId, ScheduledTask foliaTask) {
         return new de.myzelyam.supervanish.scheduler.ScheduledTask() {
             @Override
             public void cancel() {

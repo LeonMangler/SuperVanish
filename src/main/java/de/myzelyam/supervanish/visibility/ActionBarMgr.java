@@ -9,18 +9,21 @@
 package de.myzelyam.supervanish.visibility;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.scheduler.ScheduledTask;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class ActionBarMgr {
 
     private final SuperVanish plugin;
-    private final List<Player> actionBars = new ArrayList<>();
+    private final Collection<UUID> actionBars = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private ScheduledTask task;
 
     public ActionBarMgr(SuperVanish plugin) {
         this.plugin = plugin;
@@ -28,9 +31,14 @@ public class ActionBarMgr {
     }
 
     private void startTask() {
-        SuperVanish.getScheduler().runTaskTimer(() -> {
-          for (Player p : actionBars) {
+        task = SuperVanish.getScheduler().runTaskTimer(() -> {
+          for (UUID uuid : new ArrayList<>(actionBars)) {
             try {
+              Player p = plugin.getServer().getPlayer(uuid);
+              if (p == null || !p.isOnline()) {
+                actionBars.remove(uuid);
+                continue;
+              }
               sendActionBar(p, plugin.replacePlaceholders(plugin.getMessage("ActionBarMessage"), p));
             } catch (Exception | NoSuchMethodError | NoClassDefFoundError e) {
               plugin.logException(e);
@@ -48,10 +56,21 @@ public class ActionBarMgr {
     }
 
     public void addActionBar(Player p) {
-        actionBars.add(p);
+      UUID id = p.getUniqueId();
+      if (!actionBars.contains(id)) {
+        actionBars.add(id);
+      }
     }
 
     public void removeActionBar(Player p) {
-        actionBars.remove(p);
+      actionBars.remove(p.getUniqueId());
+    }
+
+    public void shutdown() {
+      actionBars.clear();
+      if (task != null) {
+        task.cancel();
+        task = null;
+      }
     }
 }

@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -53,6 +54,11 @@ public class UpdateNotifier {
                   if (!isUpToDate())
                     notifyPlayer(e.getPlayer());
                 }, 2L);
+            }
+
+            @EventHandler
+            public void onQuit(final PlayerQuitEvent e) {
+                notifiedPlayers.remove(e.getPlayer().getUniqueId());
             }
         }, plugin);
     }

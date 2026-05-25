@@ -55,13 +55,14 @@ public class PluginHookMgr implements Listener {
         Plugin plugin = e.getPlugin();
         if (REGISTERED_HOOKS.get(plugin.getName()) == null) return;
         if (isHookDisabled(plugin.getName())) return;
+        if (getActiveHook(plugin) != null) return;
         PluginHook hook = null;
         try {
             hook = REGISTERED_HOOKS.get(plugin.getName()).getConstructor(SuperVanish.class).
                     newInstance(PluginHookMgr.this.plugin);
             hook.setPlugin(plugin);
             hook.onPluginEnable(plugin);
-            Bukkit.getPluginManager().registerEvents(hook, plugin);
+            Bukkit.getPluginManager().registerEvents(hook, PluginHookMgr.this.plugin);
             activeHooks.add(hook);
             PluginHookMgr.this.plugin.log(
                     Level.INFO, "Hooked into " + plugin.getName());
@@ -106,6 +107,7 @@ public class PluginHookMgr implements Listener {
         } catch (Exception e1) {
             this.plugin.logException(new InvalidPluginHookException(e1));
         }
+        org.bukkit.event.HandlerList.unregisterAll(hook);
         hook.setPlugin(null);
         activeHooks.remove(hook);
     }

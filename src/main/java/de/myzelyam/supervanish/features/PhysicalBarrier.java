@@ -3,15 +3,13 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.scheduler.ScheduledTask;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.entity.CraftArmorStand;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PhysicalBarrier extends Feature {
     private final Map<UUID, ArmorStand> barriers = new ConcurrentHashMap<>();
+    private final Map<UUID, ScheduledTask> barrierTasks = new ConcurrentHashMap<>();
 
     public PhysicalBarrier(SuperVanish plugin) {
         super(plugin);
@@ -35,24 +34,27 @@ public class PhysicalBarrier extends Feature {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onVanish(PlayerHideEvent event) {
-        createBarrier(event.getPlayer());
+        createBarrier(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onReappear(PlayerShowEvent event) {
-        removeBarrier(event.getPlayer());
+        removeBarrier(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if (plugin.getVanishStateMgr().isVanished(event.getPlayer().getUniqueId())) {
-            SuperVanish.getScheduler().runTaskLater(() -> createBarrier(event.getPlayer()), 10L);
+        UUID playerId = event.getPlayer().getUniqueId();
+        if (plugin.getVanishStateMgr().isVanished(playerId)) {
+            SuperVanish.getScheduler().runTaskLater(() -> createBarrier(playerId), 10L);
         }
     }
 
-    private void createBarrier(Player player) {
+    private void createBarrier(UUID playerId) {
         try {
-            removeBarrier(player);
+            Player player = Bukkit.getPlayer(playerId);
+            if (player == null || !player.isOnline()) return;
+            removeBarrier(playerId);
 
             Location loc = player.getLocation();
             Level level = ((CraftWorld) loc.getWorld()).getHandle();
@@ -66,28 +68,35 @@ public class PhysicalBarrier extends Feature {
             barrier.setMarker(true);
             barrier.setSmall(true);
 
-            barriers.put(player.getUniqueId(), barrier);
+            barriers.put(playerId, barrier);
 
-            SuperVanish.getScheduler().runTaskTimer(() -> {
-                if (!player.isOnline() || !plugin.getVanishStateMgr().isVanished(player.getUniqueId())) {
-                    removeBarrier(player);
+            ScheduledTask task = SuperVanish.getScheduler().runTaskTimer(() -> {
+                Player livePlayer = Bukkit.getPlayer(playerId);
+                if (livePlayer == null || !livePlayer.isOnline() || !plugin.getVanishStateMgr().isVanished(playerId)) {
+                    removeBarrier(playerId);
                     return;
                 }
-                
-                Location newLoc = player.getLocation();
-                ArmorStand stand = barriers.get(player.getUniqueId());
+
+                Location newLoc = livePlayer.getLocation();
+                ArmorStand stand = barriers.get(playerId);
                 if (stand != null && !stand.isRemoved()) {
                     stand.setPos(newLoc.getX(), newLoc.getY(), newLoc.getZ());
                 }
             }, 1L, 1L);
+            barrierTasks.put(playerId, task);
 
         } catch (Exception e) {
             plugin.logException(e);
         }
     }
 
-    private void removeBarrier(Player player) {
-        ArmorStand barrier = barriers.remove(player.getUniqueId());
+    private void removeBarrier(UUID playerId) {
+        ScheduledTask task = barrierTasks.remove(playerId);
+        if (task != null) {
+            task.cancel();
+        }
+
+        ArmorStand barrier = barriers.remove(playerId);
         if (barrier != null) {
             try {
                 barrier.discard();
@@ -99,9 +108,10 @@ public class PhysicalBarrier extends Feature {
 
     @Override
     public void onDisable() {
-        for (UUID uuid : barriers.keySet()) {
-            removeBarrier(Bukkit.getPlayer(uuid));
+        for (UUID uuid : new java.util.ArrayList<>(barriers.keySet())) {
+            removeBarrier(uuid);
         }
+        barrierTasks.clear();
         barriers.clear();
     }
 
@@ -110,7 +120,7 @@ public class PhysicalBarrier extends Feature {
         for (UUID vanishedUUID : plugin.getVanishStateMgr().getOnlineVanishedPlayers()) {
             Player vanished = Bukkit.getPlayer(vanishedUUID);
             if (vanished != null && vanished.isOnline()) {
-                createBarrier(vanished);
+                createBarrier(vanishedUUID);
             }
         }
     }

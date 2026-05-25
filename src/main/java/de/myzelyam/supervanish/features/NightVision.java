@@ -11,6 +11,7 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,8 +30,16 @@ import java.util.UUID;
 public class NightVision extends Feature implements Runnable {
 
     public static final int INFINITE_POTION_EFFECT_LENGTH = 32767;
+    private static final PotionEffect NIGHT_VISION_EFFECT = new PotionEffect(
+            PotionEffectType.NIGHT_VISION,
+            INFINITE_POTION_EFFECT_LENGTH,
+            0,
+            true,
+            false
+    );
 
     private final Map<UUID, PotionEffect> playerPreviousPotionEffectMap = new SWMRHashTable<>();
+    private ScheduledTask renewTask;
 
     public NightVision(SuperVanish plugin) {
         super(plugin);
@@ -38,7 +47,16 @@ public class NightVision extends Feature implements Runnable {
 
     @Override
     public void onEnable() {
-        SuperVanish.getScheduler().runTaskTimer(this, 20 * 60 * 2, 20 * 60 * 2);
+        renewTask = SuperVanish.getScheduler().runTaskTimer(this, 20 * 60 * 2, 20 * 60 * 2);
+    }
+
+    @Override
+    public void onDisable() {
+        if (renewTask != null) {
+            renewTask.cancel();
+            renewTask = null;
+        }
+        playerPreviousPotionEffectMap.clear();
     }
 
     @Override
@@ -82,6 +100,7 @@ public class NightVision extends Feature implements Runnable {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
+        playerPreviousPotionEffectMap.remove(p.getUniqueId());
         if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId()))
             return;
         sendRemovePotionEffect(p);
@@ -117,8 +136,7 @@ public class NightVision extends Feature implements Runnable {
     }
 
     private void sendAddPotionEffect(Player p) {
-        p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
-                INFINITE_POTION_EFFECT_LENGTH, 0, true, false));
+        p.addPotionEffect(NIGHT_VISION_EFFECT);
     }
 
     private void sendRemovePotionEffect(Player p) {

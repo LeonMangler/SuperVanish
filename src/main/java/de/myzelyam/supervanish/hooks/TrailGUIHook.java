@@ -39,9 +39,7 @@ public class TrailGUIHook extends PluginHook {
 
             @EventHandler
             public void onPlayerMove(PlayerMoveEvent event) {
-                if (superVanish.getVanishStateMgr()
-                        .getOnlineVanishedPlayers().contains(
-                                event.getPlayer().getUniqueId()))
+                if (superVanish.getVanishStateMgr().isVanished(event.getPlayer().getUniqueId()))
                     return;
                 trailGUIListeners.onPlayerMove(event);
             }

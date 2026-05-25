@@ -33,11 +33,11 @@ public class SilentOpenChest extends Feature {
 
     private final Map<UUID, StateInfo> playerStateInfoMap = new SWMRHashTable<>();
 
-    private final Collection<Material> additionalChestMaterials;
+    private final Set<Material> additionalChestMaterials;
 
     public SilentOpenChest(SuperVanish plugin) {
         super(plugin);
-        additionalChestMaterials = new ArrayList<>();
+        additionalChestMaterials = EnumSet.noneOf(Material.class);
         if (plugin.getVersionUtil().isOneDotXOrHigher(11)) {
             try {
                 additionalChestMaterials.addAll(Arrays.asList(BLACK_SHULKER_BOX, BLUE_SHULKER_BOX, BROWN_SHULKER_BOX,
@@ -93,7 +93,6 @@ public class SilentOpenChest extends Feature {
         StateInfo stateInfo = playerStateInfoMap.remove(p.getUniqueId());
         if (stateInfo == null) return;
         restoreState(stateInfo, p);
-        playerStateInfoMap.remove(p.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -112,20 +111,19 @@ public class SilentOpenChest extends Feature {
         if (stateInfo == null) return;
         p.closeInventory();
         restoreState(stateInfo, p);
-        playerStateInfoMap.remove(p.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         UUID id = p.getUniqueId();
-        if (playerStateInfoMap.containsKey(id)) {
-            Location loc = e.getTo() != null ? e.getTo() : e.getFrom();
-            if (playerStateInfoMap.get(id).openLoc.distance(loc) > .5) {
-                p.closeInventory();
-                restoreState(playerStateInfoMap.get(id), p);
-                playerStateInfoMap.remove(id);
-            }
+        StateInfo stateInfo = playerStateInfoMap.get(id);
+        if (stateInfo == null) return;
+        Location loc = e.getTo() != null ? e.getTo() : e.getFrom();
+        if (stateInfo.openLoc.distanceSquared(loc) > 0.25D) {
+            p.closeInventory();
+            restoreState(stateInfo, p);
+            playerStateInfoMap.remove(id);
         }
     }
 

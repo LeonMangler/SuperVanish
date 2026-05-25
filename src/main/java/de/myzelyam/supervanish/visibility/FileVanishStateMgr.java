@@ -20,19 +20,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileVanishStateMgr extends VanishStateMgr {
 
     private final SuperVanish plugin;
+    private final Set<UUID> vanishedPlayersCache = ConcurrentHashMap.newKeySet();
 
     public FileVanishStateMgr(SuperVanish plugin) {
         super(plugin);
         this.plugin = plugin;
+        loadVanishedPlayersFromFile();
     }
 
     @Override
     public boolean isVanished(final UUID uuid) {
-        return getVanishedPlayersOnFile().contains(uuid);
+        return vanishedPlayersCache.contains(uuid);
     }
 
     @Override
@@ -40,11 +43,19 @@ public class FileVanishStateMgr extends VanishStateMgr {
         PlayerVanishStateChangeEvent event = new PlayerVanishStateChangeEvent(uuid, name, hide, causeName);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) return;
-        List<String> vanishedPlayerUUIDStrings = plugin.getPlayerData().getStringList("InvisiblePlayers");
-        if (hide)
-            vanishedPlayerUUIDStrings.add(uuid.toString());
-        else
-            vanishedPlayerUUIDStrings.remove(uuid.toString());
+        boolean changed;
+        if (hide) {
+            changed = vanishedPlayersCache.add(uuid);
+        } else {
+            changed = vanishedPlayersCache.remove(uuid);
+        }
+        if (!changed) {
+            return;
+        }
+        List<String> vanishedPlayerUUIDStrings = new ArrayList<>();
+        for (UUID vanishedUuid : vanishedPlayersCache) {
+            vanishedPlayerUUIDStrings.add(vanishedUuid.toString());
+        }
         plugin.getPlayerData().set("InvisiblePlayers", vanishedPlayerUUIDStrings);
         if (hide)
             plugin.getPlayerData().set("PlayerData." + uuid + ".information.name", name);
@@ -53,13 +64,13 @@ public class FileVanishStateMgr extends VanishStateMgr {
 
     @Override
     public Set<UUID> getVanishedPlayers() {
-        return getVanishedPlayersOnFile();
+        return new HashSet<>(vanishedPlayersCache);
     }
 
     @Override
     public Collection<UUID> getOnlineVanishedPlayers() {
         Set<UUID> onlineVanishedPlayers = new HashSet<>();
-        for (UUID vanishedUUID : getVanishedPlayers()) {
+        for (UUID vanishedUUID : vanishedPlayersCache) {
             if (Bukkit.getPlayer(vanishedUUID) != null)
                 onlineVanishedPlayers.add(vanishedUUID);
         }
@@ -67,7 +78,7 @@ public class FileVanishStateMgr extends VanishStateMgr {
     }
 
     public UUID getVanishedUUIDFromNameOnFile(String name) {
-        for (UUID uuid : getVanishedPlayersOnFile()) {
+        for (UUID uuid : vanishedPlayersCache) {
             if (plugin.getPlayerData().getString("PlayerData." + uuid + ".information.name")
                     .equalsIgnoreCase(name)) {
                 return uuid;
@@ -76,12 +87,12 @@ public class FileVanishStateMgr extends VanishStateMgr {
         return null;
     }
 
-    private Set<UUID> getVanishedPlayersOnFile() {
+    private void loadVanishedPlayersFromFile() {
+        vanishedPlayersCache.clear();
         List<String> vanishedPlayerUUIDStrings = plugin.getPlayerData().getStringList("InvisiblePlayers");
-        Set<UUID> vanishedPlayerUUIDs = new HashSet<>();
         for (String uuidString : new ArrayList<>(vanishedPlayerUUIDStrings)) {
             try {
-                vanishedPlayerUUIDs.add(UUID.fromString(uuidString));
+                vanishedPlayersCache.add(UUID.fromString(uuidString));
             } catch (IllegalArgumentException e) {
                 vanishedPlayerUUIDStrings.remove(uuidString);
                 plugin.log(Level.WARNING,
@@ -91,15 +102,5 @@ public class FileVanishStateMgr extends VanishStateMgr {
                 plugin.getConfigMgr().getPlayerDataFile().save();
             }
         }
-        return vanishedPlayerUUIDs;
-    }
-
-    private void setVanishedPlayersOnFile(Set<UUID> vanishedPlayers) {
-        List<String> vanishedPlayerUUIDStrings = new ArrayList<>();
-        for (UUID uuid : vanishedPlayers)
-            vanishedPlayerUUIDStrings.add(uuid.toString());
-        plugin.getPlayerData().set("InvisiblePlayers",
-                vanishedPlayerUUIDStrings);
-        plugin.getConfigMgr().getPlayerDataFile().save();
     }
 }
