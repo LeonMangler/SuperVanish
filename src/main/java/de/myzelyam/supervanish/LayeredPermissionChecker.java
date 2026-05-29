@@ -12,6 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class LayeredPermissionChecker {
 
     private final SuperVanish plugin;
@@ -49,6 +51,24 @@ public class LayeredPermissionChecker {
             int viewerLevel = vanishViewer.getSeePermissionLevel();
             if (viewerLevel == 0) return false;
             int viewedLevel = Math.max(1, vanishViewed.getUsePermissionLevel());
+            return viewerLevel >= viewedLevel;
+        } else {
+            boolean enableSeePermission = settings
+                    .getBoolean("IndicationFeatures.LayeredPermissions.EnableSeePermission", true);
+            return enableSeePermission && viewer.hasPermission("sv.see");
+        }
+    }
+
+    public boolean hasPermissionToSee(Player viewer, UUID viewedUuid, int viewedUsePermissionLevel) {
+        if (viewer == null)
+            throw new IllegalArgumentException("viewer cannot be null");
+        if (viewer.getUniqueId().equals(viewedUuid)) return true;
+        if (settings.getBoolean(
+                "IndicationFeatures.LayeredPermissions.LayeredSeeAndUsePermissions", false)) {
+            VanishPlayer vanishViewer = plugin.getVanishPlayer(viewer);
+            int viewerLevel = vanishViewer.getSeePermissionLevel();
+            if (viewerLevel == 0) return false;
+            int viewedLevel = Math.max(1, viewedUsePermissionLevel);
             return viewerLevel >= viewedLevel;
         } else {
             boolean enableSeePermission = settings

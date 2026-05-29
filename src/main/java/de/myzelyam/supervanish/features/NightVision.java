@@ -11,7 +11,7 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
-import org.bukkit.Bukkit;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,15 +22,15 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NightVision extends Feature implements Runnable {
 
     public static final int INFINITE_POTION_EFFECT_LENGTH = 32767;
 
-    private final Map<UUID, PotionEffect> playerPreviousPotionEffectMap = new HashMap<>();
+    private final Map<UUID, PotionEffect> playerPreviousPotionEffectMap = new ConcurrentHashMap<>();
 
     public NightVision(SuperVanish plugin) {
         super(plugin);
@@ -38,7 +38,7 @@ public class NightVision extends Feature implements Runnable {
 
     @Override
     public void onEnable() {
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 20 * 60 * 2, 20 * 60 * 2);
+        FoliaUtil.runGlobalTimer(plugin, this, 20 * 60 * 2, 20 * 60 * 2);
     }
 
     @Override
@@ -49,11 +49,9 @@ public class NightVision extends Feature implements Runnable {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVanish(PlayerHideEvent e) {
         Player p = e.getPlayer();
-        // getPotionEffect(..) is 1.10+ API
-        if (plugin.getVersionUtil().isOneDotXOrHigher(10)) {
-            if (p.getPotionEffect(PotionEffectType.NIGHT_VISION) != null) {
-                playerPreviousPotionEffectMap.put(p.getUniqueId(), p.getPotionEffect(PotionEffectType.NIGHT_VISION));
-            }
+        PotionEffect currentEffect = p.getPotionEffect(PotionEffectType.NIGHT_VISION);
+        if (currentEffect != null) {
+            playerPreviousPotionEffectMap.put(p.getUniqueId(), currentEffect);
         }
         sendAddPotionEffect(p);
     }
@@ -63,7 +61,7 @@ public class NightVision extends Feature implements Runnable {
         Player p = e.getPlayer();
         sendRemovePotionEffect(p);
         if (playerPreviousPotionEffectMap.containsKey(p.getUniqueId())) {
-            p.addPotionEffect(playerPreviousPotionEffectMap.remove(p.getUniqueId()));
+            restorePreviousEffect(p);
         }
     }
 
@@ -72,7 +70,7 @@ public class NightVision extends Feature implements Runnable {
         Player p = e.getPlayer();
         if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
             if (playerPreviousPotionEffectMap.containsKey(p.getUniqueId())) {
-                p.addPotionEffect(playerPreviousPotionEffectMap.remove(p.getUniqueId()));
+                restorePreviousEffect(p);
             }
         } else {
             sendAddPotionEffect(p);
@@ -108,20 +106,50 @@ public class NightVision extends Feature implements Runnable {
     @Override
     public void run() {
         // renew every now and then to prevent blinking bug
-        for (UUID uuid : plugin.getVanishStateMgr().getOnlineVanishedPlayers()) {
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null) continue;
+        for (Player p : FoliaUtil.onlinePlayersSnapshot()) {
+            if (!plugin.getVanishStateMgr().isVanished(p.getUniqueId())) continue;
             sendRemovePotionEffect(p);
             sendAddPotionEffect(p);
         }
     }
 
     private void sendAddPotionEffect(Player p) {
-        p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
-                INFINITE_POTION_EFFECT_LENGTH, 0, true, false));
+        if (p == null) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
+                    INFINITE_POTION_EFFECT_LENGTH, 0, true, false));
+            }
+        };
+        
+        FoliaUtil.runAtEntity(plugin, p, r);
     }
 
     private void sendRemovePotionEffect(Player p) {
-        p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        if (p == null) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            }
+        };
+        
+        FoliaUtil.runAtEntity(plugin, p, r);
+    }
+
+    private void restorePreviousEffect(Player p) {
+        if (p == null) return;
+        
+        PotionEffect prev = playerPreviousPotionEffectMap.remove(p.getUniqueId());
+        if (prev == null) return;
+        
+        Runnable r = () -> {
+            if (p.isOnline()) {
+                p.addPotionEffect(prev);
+            }
+        };
+        
+        FoliaUtil.runAtEntity(plugin, p, r);
     }
 }

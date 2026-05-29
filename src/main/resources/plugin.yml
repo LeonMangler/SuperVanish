@@ -3,18 +3,15 @@ main: de.myzelyam.supervanish.SuperVanish
 author: MyzelYam
 description: Advanced /vanish plugin which makes other players think that you're not on the server
 version: ${project.version}
-api-version: 1.13
+api-version: '1.20'
+folia-supported: true
 website: https://www.spigotmc.org/resources/supervanish-be-invisible.1331/
 softdepend:
 - ProtocolLib
-- LibsDisguises
-- DisguiseCraft
 - dynmap
 - Essentials
 - TrailGUI
 - PlaceholderAPI
-- CustomParticleEffects
-- NametagEdit
 - MVdWPlaceholderAPI
 - Vault
 - OpenInv

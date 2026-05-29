@@ -11,10 +11,12 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.PostPlayerHideEvent;
 import de.myzelyam.supervanish.SuperVanish;
-import org.bukkit.Bukkit;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+
+import java.util.UUID;
 
 public class Broadcast extends Feature {
 
@@ -24,39 +26,41 @@ public class Broadcast extends Feature {
 
     public static void announceSilentJoin(Player vanished, SuperVanish plugin) {
         if (plugin.getSettings().getBoolean("MessageOptions.AnnounceRealJoinQuitToAdmins", true)) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
                 if (vanished == onlinePlayer)
-                    continue;
+                    return;
                 if (plugin.canSee(onlinePlayer, vanished)) {
                     plugin.sendMessage(onlinePlayer, "SilentJoinMessageForAdmins", vanished, onlinePlayer);
                 }
-            }
+            });
         }
     }
 
     public static void announceSilentDeath(Player p, SuperVanish plugin, String deathMessage) {
         if (plugin.getSettings().getBoolean("MessageOptions.AnnounceDeathToAdmins", true)) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
                 if (p == onlinePlayer)
-                    continue;
+                    return;
                 if (plugin.canSee(onlinePlayer, p)) {
                     String message = plugin.getMessage("SilentDeathMessage")
                             .replace("%deathmsg%", deathMessage);
                     plugin.sendMessage(onlinePlayer, message, p, onlinePlayer);
                 }
-            }
+            });
         }
     }
 
     public static void announceSilentQuit(Player p, SuperVanish plugin) {
         if (plugin.getSettings().getBoolean("MessageOptions.AnnounceRealJoinQuitToAdmins", true)) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                if (p == onlinePlayer)
-                    continue;
-                if (plugin.canSee(onlinePlayer, p)) {
+            UUID playerUuid = p.getUniqueId();
+            int playerUsePermissionLevel = plugin.getCachedUsePermissionLevel(playerUuid);
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
+                if (playerUuid.equals(onlinePlayer.getUniqueId()))
+                    return;
+                if (plugin.hasPermissionToSee(onlinePlayer, playerUuid, playerUsePermissionLevel)) {
                     plugin.sendMessage(onlinePlayer, "SilentQuitMessageForAdmins", p, onlinePlayer);
                 }
-            }
+            });
         }
     }
 
@@ -72,7 +76,7 @@ public class Broadcast extends Feature {
         final Player p = e.getPlayer();
         if (plugin.getSettings().getBoolean("MessageOptions.FakeJoinQuitMessages.BroadcastFakeQuitOnVanish")
                 && !e.isSilent()) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
                 if (!plugin.canSee(onlinePlayer, p)) {
                     if (!plugin.getSettings().getBoolean(
                             "MessageOptions.FakeJoinQuitMessages.SendMessageOnlyToAdmins"))
@@ -87,7 +91,7 @@ public class Broadcast extends Feature {
                         plugin.sendMessage(onlinePlayer, "VanishMessage", p, onlinePlayer);
                     else if (onlinePlayer != p)
                         plugin.sendMessage(onlinePlayer, "VanishMessageWithPermission", p, onlinePlayer);
-            }
+            });
         }
     }
 
@@ -96,7 +100,7 @@ public class Broadcast extends Feature {
         Player p = e.getPlayer();
         if (plugin.getSettings().getBoolean(
                 "MessageOptions.FakeJoinQuitMessages.BroadcastFakeJoinOnReappear") && !e.isSilent()) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
                 if (!plugin.canSee(onlinePlayer, p)) {
                     if (!plugin.getSettings().getBoolean(
                             "MessageOptions.FakeJoinQuitMessages.SendMessageOnlyToAdmins"))
@@ -111,7 +115,7 @@ public class Broadcast extends Feature {
                         plugin.sendMessage(onlinePlayer, "ReappearMessage", p, onlinePlayer);
                     else if (onlinePlayer != p)
                         plugin.sendMessage(onlinePlayer, "ReappearMessageWithPermission", p, onlinePlayer);
-            }
+            });
         }
     }
 }

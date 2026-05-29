@@ -21,8 +21,8 @@ public class VanishPlayer {
 
     private final SuperVanish plugin;
     private final UUID playerUUID;
-    private boolean itemPickUps;
-    private int seePermissionLevel, usePermissionLevel;
+    private volatile boolean itemPickUps;
+    private final int seePermissionLevel, usePermissionLevel;
 
     VanishPlayer(Player player, SuperVanish plugin, boolean itemPickUps) {
         this.plugin = plugin;
@@ -31,6 +31,9 @@ public class VanishPlayer {
         if (plugin.getSettings().getBoolean("IndicationFeatures.LayeredPermissions.LayeredSeeAndUsePermissions", false)) {
             seePermissionLevel = plugin.getLayeredPermissionLevel(player, "see");
             usePermissionLevel = plugin.getLayeredPermissionLevel(player, "use");
+        } else {
+            seePermissionLevel = 0;
+            usePermissionLevel = 0;
         }
     }
 

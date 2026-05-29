@@ -36,11 +36,6 @@ public abstract class Validation {
     }
 
     private static void log(Level level, String message) {
-        try {
-            Class.forName("org.bukkit.plugin.java.JavaPlugin");
-            Bukkit.getLogger().log(level, message);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Bukkit.getLogger().log(level, message);
     }
 }

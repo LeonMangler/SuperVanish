@@ -15,7 +15,6 @@ import net.citizensnpcs.api.ai.speech.Talkable;
 import net.citizensnpcs.api.ai.speech.event.NPCSpeechEvent;
 import net.citizensnpcs.api.ai.speech.event.SpeechEvent;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,7 +46,8 @@ public class CitizensHook extends PluginHook {
     private boolean checkContext(SpeechContext context) {
         // don't let it talk about hidden players
         for (UUID uuid : superVanish.getVanishStateMgr().getOnlineVanishedPlayers()) {
-            if (context.getMessage().contains(Bukkit.getPlayer(uuid).getName())) {
+            String name = superVanish.getPlayerData().getString("PlayerData." + uuid + ".information.name");
+            if (name != null && context.getMessage().contains(name)) {
                 return false;
             }
         }

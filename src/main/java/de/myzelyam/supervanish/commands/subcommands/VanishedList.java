@@ -40,7 +40,7 @@ public class VanishedList extends SubCommand {
             for (int i = 0; i < allInvisiblePlayerUUIDs.size(); i++) {
                 UUID playerUUID = allInvisiblePlayerUUIDs.get(i);
                 String name = Bukkit.getOfflinePlayer(playerUUID).getName();
-                if (Bukkit.getPlayer(playerUUID) == null) {
+                if (!plugin.getVanishStateMgr().getOnlineVanishedPlayers().contains(playerUUID)) {
                     name = name + ChatColor.RED + "[offline]" + ChatColor.WHITE;
                 }
                 stringBuilder.append(name);

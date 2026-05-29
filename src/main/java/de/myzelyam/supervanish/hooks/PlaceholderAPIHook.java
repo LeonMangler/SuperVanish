@@ -9,9 +9,9 @@
 package de.myzelyam.supervanish.hooks;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -91,14 +91,15 @@ public class PlaceholderAPIHook extends PluginHook {
                             .getOnlineVanishedPlayers();
                     String playerListMessage = "";
                     for (UUID uuid : onlineVanishedPlayers) {
-                        Player onlineVanished = Bukkit.getPlayer(uuid);
-                        if (onlineVanished == null) continue;
                         if (superVanish.getSettings().getBoolean(
                                 "IndicationFeatures.LayeredPermissions.HideInvisibleInCommands", false)
-                                && !superVanish.hasPermissionToSee(p, onlineVanished)) {
+                                && (p == null || superVanish.getVisibilityChanger().getHider()
+                                .isHidden(uuid, p))) {
                             continue;
                         }
-                        playerListMessage = playerListMessage + onlineVanished.getName() + ", ";
+                        String name = superVanish.getPlayerData().getString(
+                                "PlayerData." + uuid + ".information.name", uuid.toString());
+                        playerListMessage = playerListMessage + name + ", ";
                     }
                     return playerListMessage.length() > 3
                             ? playerListMessage.substring(0, playerListMessage.length() - 2)
@@ -106,12 +107,11 @@ public class PlaceholderAPIHook extends PluginHook {
                 }
                 if (id.equalsIgnoreCase("playercount")
                         || id.equalsIgnoreCase("onlineplayers")) {
-                    int playercount = Bukkit.getOnlinePlayers().size();
+                    int playercount = FoliaUtil.onlinePlayersSnapshot().size();
                     for (UUID uuid : superVanish.getVanishStateMgr()
                             .getOnlineVanishedPlayers()) {
-                        Player onlineVanished = Bukkit.getPlayer(uuid);
-                        if (onlineVanished == null) continue;
-                        if (p == null || !superVanish.canSee(p, onlineVanished)) playercount--;
+                        if (p == null || superVanish.getVisibilityChanger().getHider()
+                                .isHidden(uuid, p)) playercount--;
                     }
                     return playercount + "";
                 }

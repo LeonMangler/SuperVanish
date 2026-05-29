@@ -10,14 +10,10 @@ package de.myzelyam.supervanish.config;
 
 import de.myzelyam.supervanish.SuperVanish;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Collections;
 import java.util.logging.Level;
-
-import static de.myzelyam.supervanish.SuperVanish.*;
 
 public class ConfigMgr {
 
@@ -56,8 +52,8 @@ public class ConfigMgr {
             String currentSettingsVersion = settings.getString("ConfigVersion");
             String newestVersion = plugin.getDescription().getVersion();
             String currentMessagesVersion = messages.getString("MessagesVersion");
-            messagesUpdateRequired = fileRequiresRecreation(currentMessagesVersion, false);
-            settingsUpdateRequired = fileRequiresRecreation(currentSettingsVersion, true);
+            messagesUpdateRequired = fileRequiresRecreation(currentMessagesVersion);
+            settingsUpdateRequired = fileRequiresRecreation(currentSettingsVersion);
             if (newestVersion.equals(currentSettingsVersion))
                 settingsUpdateRequired = false;
             if (newestVersion.equals(currentMessagesVersion))
@@ -69,23 +65,13 @@ public class ConfigMgr {
                 if (!isDismissed) plugin.log(Level.WARNING, "At least one config file is outdated, " +
                         "it's recommended to regenerate it using '/sv recreatefiles'");
             }
-            if (currentSettingsVersion.startsWith("1.5.") || currentSettingsVersion.startsWith("1.4.")) {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "You have a very outdated " +
-                        "config file, your settings will not work until you regenerate your SV-files " +
-                        "using /sv recreatefiles");
-            }
         } catch (Exception e) {
             plugin.logException(e);
         }
     }
 
-    private boolean fileRequiresRecreation(String currentVersion, boolean isSettingsFile) {
-        if (currentVersion == null) return true;
-        for (String ignoredVersion : isSettingsFile ? NON_REQUIRED_SETTINGS_UPDATES
-                : NON_REQUIRED_MESSAGES_UPDATES) {
-            if (currentVersion.equalsIgnoreCase(ignoredVersion)) return false;
-        }
-        return true;
+    private boolean fileRequiresRecreation(String currentVersion) {
+        return currentVersion == null || !currentVersion.equalsIgnoreCase(plugin.getDescription().getVersion());
     }
 
     public FileMgr getFileMgr() {

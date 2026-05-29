@@ -11,11 +11,10 @@ package de.myzelyam.supervanish.commands.subcommands;
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.commands.CommandAction;
 import de.myzelyam.supervanish.commands.SubCommand;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class BroadcastLogin extends SubCommand {
 
@@ -26,8 +25,8 @@ public class BroadcastLogin extends SubCommand {
     @Override
     public void execute(Command cmd, CommandSender p, String[] args, String label) {
         if (canDo(p, CommandAction.BROADCAST_LOGIN, true)) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                plugin.sendMessage(onlinePlayer, "ReappearMessage", p, onlinePlayer);
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer ->
+                    plugin.sendMessage(onlinePlayer, "ReappearMessage", p, onlinePlayer));
         }
     }
 }

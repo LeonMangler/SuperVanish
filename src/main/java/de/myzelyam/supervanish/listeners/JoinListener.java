@@ -10,15 +10,16 @@ package de.myzelyam.supervanish.listeners;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.features.Broadcast;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.EventExecutor;
-import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.UUID;
 
 public class JoinListener implements EventExecutor, Listener {
 
@@ -35,16 +36,20 @@ public class JoinListener implements EventExecutor, Listener {
                 PlayerJoinEvent e = (PlayerJoinEvent) event;
                 final Player p = e.getPlayer();
                 // hide others
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+                for (Player onlinePlayer : FoliaUtil.onlinePlayersSnapshot())
                     if (plugin.getVanishStateMgr().isVanished(onlinePlayer.getUniqueId())
-                            && !plugin.hasPermissionToSee(p, onlinePlayer))
+                            && !plugin.hasPermissionToSee(p, onlinePlayer.getUniqueId(),
+                            plugin.getCachedUsePermissionLevel(onlinePlayer.getUniqueId())))
                         plugin.getVisibilityChanger().getHider().setHidden(onlinePlayer, p, true);
                 // vanished:
                 if (plugin.getVanishStateMgr().isVanished(p.getUniqueId())) {
                     // hide self
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                        if (!plugin.hasPermissionToSee(onlinePlayer, p))
+                    UUID playerUuid = p.getUniqueId();
+                    int playerUsePermissionLevel = plugin.getVanishPlayer(p).getUsePermissionLevel();
+                    FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
+                        if (!plugin.hasPermissionToSee(onlinePlayer, playerUuid, playerUsePermissionLevel))
                             plugin.getVisibilityChanger().getHider().setHidden(p, onlinePlayer, true);
+                    });
                     // Join message
                     if (plugin.getSettings().getBoolean("MessageOptions.HideRealJoinQuitMessages")) {
                         e.setJoinMessage(null);
@@ -82,12 +87,7 @@ public class JoinListener implements EventExecutor, Listener {
                             plugin.getPlayerData().getBoolean("PlayerData." + p.getUniqueId() + ".dismissed."
                                     + currentVersion.replace(".", "_"), false);
                     if (!isDismissed)
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                plugin.sendMessage(p, "RecreationRequiredMsg", p);
-                            }
-                        }.runTaskLater(plugin, 1);
+                        FoliaUtil.runAtEntity(plugin, p, () -> plugin.sendMessage(p, "RecreationRequiredMsg", p));
                 }
             }
         } catch (Exception er) {

@@ -13,15 +13,17 @@ import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.PostPlayerHideEvent;
 import de.myzelyam.api.vanish.PostPlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 import de.myzelyam.supervanish.utils.Validation;
 import de.myzelyam.supervanish.visibility.hiders.PlayerHider;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class VisibilityChanger {
@@ -53,6 +55,11 @@ public class VisibilityChanger {
     }
 
     public void hidePlayer(final Player player, final String hiderName, boolean silent) {
+        if (!FoliaUtil.isOwnedByCurrentRegion(player)) {
+            final boolean finalSilent = silent;
+            FoliaUtil.runAtEntity(plugin, player, () -> hidePlayer(player, hiderName, finalSilent));
+            return;
+        }
         try {
             Validation.checkNotNull("player cannot be null", player);
             if (plugin.getVanishStateMgr().isVanished(player.getUniqueId())) {
@@ -71,9 +78,12 @@ public class VisibilityChanger {
             // metadata
             player.setMetadata("vanished", new FixedMetadataValue(plugin, true));
             // hide
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                if (!plugin.hasPermissionToSee(onlinePlayer, player))
+            UUID playerUuid = player.getUniqueId();
+            int playerUsePermissionLevel = plugin.getVanishPlayer(player).getUsePermissionLevel();
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
+                if (!plugin.hasPermissionToSee(onlinePlayer, playerUuid, playerUsePermissionLevel))
                     plugin.getVisibilityChanger().getHider().setHidden(player, onlinePlayer, true);
+            });
             // fly check
             if (config.getBoolean("InvisibilityFeatures.Fly.Enable")) {
                 player.setAllowFlight(true);
@@ -91,12 +101,10 @@ public class VisibilityChanger {
                 plugin.sendMessage(player, "OnVanishCausedByOtherPlayer", player, hiderName);
             // stop player from being a mob target
             if (config.getBoolean("InvisibilityFeatures.DisableMobTarget")) {
-                player.getWorld().getEntities().stream()
-                        .filter(ent -> ent instanceof Creature)
-                        .map(ent -> (Creature) ent)
-                        .filter(mob -> mob.getTarget() != null)
-                        .filter(mob -> player.getUniqueId().equals(mob.getTarget().getUniqueId()))
-                        .forEach(mob -> mob.setTarget(null));
+                for (Entity ent : player.getNearbyEntities(128, 128, 128)) {
+                    if (ent instanceof Creature)
+                        stopTarget((Creature) ent, player);
+                }
             }
             // call post event
             PostPlayerHideEvent e2 = new PostPlayerHideEvent(player, silent);
@@ -106,7 +114,21 @@ public class VisibilityChanger {
         }
     }
 
+    private void stopTarget(Creature mob, Player player) {
+        Runnable runnable = () -> {
+            if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(player.getUniqueId())) {
+                mob.setTarget(null);
+            }
+        };
+        FoliaUtil.runAtEntity(plugin, mob, runnable);
+    }
+
     public void showPlayer(final Player player, final String showerName, boolean silent) {
+        if (!FoliaUtil.isOwnedByCurrentRegion(player)) {
+            final boolean finalSilent = silent;
+            FoliaUtil.runAtEntity(plugin, player, () -> showPlayer(player, showerName, finalSilent));
+            return;
+        }
         try {
             Validation.checkNotNull("player cannot be null", player);
             if (!plugin.getVanishStateMgr().isVanished(player.getUniqueId())) {
@@ -119,12 +141,15 @@ public class VisibilityChanger {
             plugin.getServer().getPluginManager().callEvent(e);
             if (e.isCancelled()) return;
             silent = e.isSilent();
+            UUID playerUuid = player.getUniqueId();
+            int playerUsePermissionLevel = plugin.getVanishPlayer(player).getUsePermissionLevel();
             // metadata
             player.removeMetadata("vanished", plugin);
             // show
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers())
-                if (!plugin.hasPermissionToSee(onlinePlayer, player))
+            FoliaUtil.forEachOnlinePlayer(plugin, onlinePlayer -> {
+                if (!plugin.hasPermissionToSee(onlinePlayer, playerUuid, playerUsePermissionLevel))
                     plugin.getVisibilityChanger().getHider().setHidden(player, onlinePlayer, false);
+            });
             // action bars
             if (plugin.getActionBarMgr() != null && config.getBoolean("MessageOptions.DisplayActionBar")) {
                 plugin.getActionBarMgr().removeActionBar(player);

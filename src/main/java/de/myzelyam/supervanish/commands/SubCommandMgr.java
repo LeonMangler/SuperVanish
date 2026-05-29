@@ -10,6 +10,7 @@ package de.myzelyam.supervanish.commands;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.commands.subcommands.*;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -170,7 +171,7 @@ public class SubCommandMgr {
 
     private List<String> getOnlinePlayerNameTabCompletions(String arg) {
         List<String> playerNames = new ArrayList<>();
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
+        for (Player p : FoliaUtil.onlinePlayersSnapshot()) {
             if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(arg.toLowerCase(Locale.ENGLISH)))
                 playerNames.add(p.getName());
         }

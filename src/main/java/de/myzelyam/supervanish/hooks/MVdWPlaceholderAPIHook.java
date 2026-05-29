@@ -9,8 +9,8 @@
 package de.myzelyam.supervanish.hooks;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -50,10 +50,7 @@ public class MVdWPlaceholderAPIHook extends PluginHook {
                         }
                         return null;
                     } catch (Throwable t) {
-                        if (!(t instanceof NoClassDefFoundError || t instanceof
-                                ConcurrentModificationException))
-                            superVanish.logException(t);
-                        return no;
+                        return handlePlaceholderFailure(t, no);
                     }
                 });
         PlaceholderAPI.registerPlaceholder(superVanish, "supervanish_vanishprefix",
@@ -68,10 +65,7 @@ public class MVdWPlaceholderAPIHook extends PluginHook {
                         }
                         return null;
                     } catch (Throwable t) {
-                        if (!(t instanceof NoClassDefFoundError || t instanceof
-                                ConcurrentModificationException))
-                            superVanish.logException(t);
-                        return "";
+                        return handlePlaceholderFailure(t, "");
                     }
                 });
         PlaceholderAPI.registerPlaceholder(superVanish, "supervanish_vanishsuffix",
@@ -86,10 +80,7 @@ public class MVdWPlaceholderAPIHook extends PluginHook {
                         }
                         return null;
                     } catch (Throwable t) {
-                        if (!(t instanceof NoClassDefFoundError || t instanceof
-                                ConcurrentModificationException))
-                            superVanish.logException(t);
-                        return "";
+                        return handlePlaceholderFailure(t, "");
                     }
                 });
         PlaceholderAPI.registerPlaceholder(superVanish, "supervanish_vanishedplayers",
@@ -100,44 +91,44 @@ public class MVdWPlaceholderAPIHook extends PluginHook {
                                 .getOnlineVanishedPlayers();
                         String playerListMessage = "";
                         for (UUID uuid : onlineVanishedPlayers) {
-                            Player onlineVanished = Bukkit.getPlayer(uuid);
-                            if (onlineVanished == null) continue;
                             if (p != null && superVanish.getSettings().getBoolean(
                                     "IndicationFeatures.LayeredPermissions.HideInvisibleInCommands", false)
-                                    && !superVanish.hasPermissionToSee(p, onlineVanished)) {
+                                    && superVanish.getVisibilityChanger().getHider().isHidden(uuid, p)) {
                                 continue;
                             }
-                            playerListMessage = playerListMessage + onlineVanished.getName() + ", ";
+                            String name = superVanish.getPlayerData().getString(
+                                    "PlayerData." + uuid + ".information.name", uuid.toString());
+                            playerListMessage = playerListMessage + name + ", ";
                         }
                         return playerListMessage.length() > 3
                                 ? playerListMessage.substring(0, playerListMessage.length() - 2)
                                 : playerListMessage;
                     } catch (Throwable t) {
-                        if (!(t instanceof NoClassDefFoundError || t instanceof
-                                ConcurrentModificationException))
-                            superVanish.logException(t);
-                        return "";
+                        return handlePlaceholderFailure(t, "");
                     }
                 });
         PlaceholderAPI.registerPlaceholder(superVanish, "supervanish_playercount",
                 e -> {
                     try {
                         Player p = e.getPlayer();
-                        int playercount = Bukkit.getOnlinePlayers().size();
+                        int playercount = FoliaUtil.onlinePlayersSnapshot().size();
                         for (UUID uuid : superVanish.getVanishStateMgr()
                                 .getOnlineVanishedPlayers()) {
-                            Player onlineVanished = Bukkit.getPlayer(uuid);
-                            if (onlineVanished == null) continue;
-                            if (p == null || !superVanish.canSee(p, onlineVanished))
+                            if (p == null || superVanish.getVisibilityChanger().getHider()
+                                    .isHidden(uuid, p))
                                 playercount--;
                         }
                         return playercount + "";
                     } catch (Throwable t) {
-                        if (!(t instanceof NoClassDefFoundError || t instanceof
-                                ConcurrentModificationException))
-                            superVanish.logException(t);
-                        return Bukkit.getOnlinePlayers().size() + "";
+                        return handlePlaceholderFailure(t, FoliaUtil.onlinePlayersSnapshot().size() + "");
                     }
                 });
+    }
+
+    private String handlePlaceholderFailure(Throwable throwable, String fallback) {
+        if (!(throwable instanceof LinkageError || throwable instanceof ConcurrentModificationException)) {
+            superVanish.logException(throwable);
+        }
+        return fallback;
     }
 }

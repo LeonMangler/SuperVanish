@@ -10,26 +10,25 @@ package de.myzelyam.supervanish.visibility.hiders;
 
 import de.myzelyam.supervanish.SuperVanish;
 import de.myzelyam.supervanish.utils.BukkitPlayerHidingUtil;
-import de.myzelyam.supervanish.visibility.hiders.modules.PlayerInfoModule;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 import de.myzelyam.supervanish.visibility.hiders.modules.TabCompleteModule;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class PreventionHider extends PlayerHider implements Runnable {
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
-    private int taskId;
-
+public class PreventionHider extends PlayerHider implements BooleanSupplier {
     public PreventionHider(SuperVanish plugin) {
         super(plugin);
         if (!BukkitPlayerHidingUtil.isNewPlayerHidingAPISupported(plugin)) {
-            taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 2, 2).getTaskId();
+            FoliaUtil.runGlobalTimer(plugin, this, 2, 2);
         }
-        if (plugin.isUseProtocolLib() && plugin.getVersionUtil().isOneDotXOrHigher(8)
-                && !plugin.getVersionUtil().isOneDotXOrHigher(19)
-                && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTablistPackets", true))
-            PlayerInfoModule.register(plugin, this);
         if (plugin.isUseProtocolLib()
                 && plugin.getSettings().getBoolean("InvisibilityFeatures.ModifyTabCompletePackets", true)
-                && !plugin.getVersionUtil().isOneDotXOrHigher(21)) {
+                && !plugin.getVersionUtil().isMinecraftAtLeast("1.21")) {
             // Not supported anymore on 1.21 and above (ProtocolLib broken)
             TabCompleteModule.register(plugin, this);
         }
@@ -38,8 +37,11 @@ public class PreventionHider extends PlayerHider implements Runnable {
     @Override
     public boolean setHidden(Player player, Player viewer, boolean hidden) {
         if (super.setHidden(player, viewer, hidden) || BukkitPlayerHidingUtil.isNewPlayerHidingAPISupported(plugin)) {
-            if (hidden) BukkitPlayerHidingUtil.hidePlayer(player, viewer, plugin);
-            else BukkitPlayerHidingUtil.showPlayer(player, viewer, plugin);
+            FoliaUtil.runAtEntity(plugin, viewer, () -> {
+                if (!viewer.isOnline()) return;
+                if (hidden) BukkitPlayerHidingUtil.hidePlayer(player, viewer, plugin);
+                else BukkitPlayerHidingUtil.showPlayer(player, viewer, plugin);
+            });
             return true;
         }
         return false;
@@ -51,15 +53,21 @@ public class PreventionHider extends PlayerHider implements Runnable {
     }
 
     @Override
-    public void run() {
-        for (Player hidden : playerHiddenFromPlayersMap.keySet()) {
+    public boolean getAsBoolean() {
+        for (Map.Entry<UUID, Set<UUID>> entry : playerHiddenFromPlayersMap.entrySet()) {
             if (BukkitPlayerHidingUtil.isNewPlayerHidingAPISupported(plugin)) {
-                plugin.getServer().getScheduler().cancelTask(taskId);
-                return;
+                return false;
             }
-            for (Player viewer : playerHiddenFromPlayersMap.get(hidden)) {
-                BukkitPlayerHidingUtil.hidePlayer(hidden, viewer, plugin);
+            Player hidden = Bukkit.getPlayer(entry.getKey());
+            if (hidden == null) continue;
+            for (UUID viewerUuid : entry.getValue()) {
+                Player viewer = Bukkit.getPlayer(viewerUuid);
+                if (viewer == null) continue;
+                FoliaUtil.runAtEntity(plugin, viewer, () -> {
+                    if (viewer.isOnline()) BukkitPlayerHidingUtil.hidePlayer(hidden, viewer, plugin);
+                });
             }
         }
+        return true;
     }
 }

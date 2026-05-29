@@ -61,8 +61,8 @@ public class PluginHookMgr implements Listener {
             activeHooks.add(hook);
             PluginHookMgr.this.plugin.log(
                     Level.INFO, "Hooked into " + plugin.getName());
-        } catch (NoClassDefFoundError er) {
-            Bukkit.getLogger().warning("NoClassDefFoundError for SV-Hook(v"
+        } catch (LinkageError er) {
+            Bukkit.getLogger().warning("Linkage error for SV-Hook(v"
                     + this.plugin.getDescription().getVersion() + ") "
                     + (hook != null ? hook.getClass().getSimpleName() : "?") + " of plugin "
                     + plugin.getName() + " v" + plugin.getDescription().getVersion()

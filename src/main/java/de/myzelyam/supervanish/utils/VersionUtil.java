@@ -30,19 +30,7 @@ public class VersionUtil {
         return 0;
     }
 
-    public boolean isOneDotX(int majorRelease) {
-        return minecraftVersion.equals("1." + majorRelease) || minecraftVersion.startsWith("1." + majorRelease + ".")
-                || minecraftVersion.equals(majorRelease + "") || minecraftVersion.startsWith(majorRelease + ".");
-    }
-
-    public boolean isOneDotXOrHigher(int majorRelease) {
-        for (int i = 26; i <= 99; i++) {
-            if (minecraftVersion.equals(i + "") || minecraftVersion.startsWith(i + ".")) {
-                return i >= majorRelease;
-            }
-        }
-        for (int i = majorRelease; i < 40; i++)
-            if (minecraftVersion.equals("1." + i) || minecraftVersion.startsWith("1." + i + ".")) return true;
-        return false;
+    public boolean isMinecraftAtLeast(String version) {
+        return compareVersions(minecraftVersion, version) >= 0;
     }
 }

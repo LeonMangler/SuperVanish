@@ -11,13 +11,13 @@ package de.myzelyam.supervanish.features;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.FoliaUtil;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
 public class NoPush extends Feature {
@@ -36,11 +36,8 @@ public class NoPush extends Feature {
         if (team == null) {
             team = p.getScoreboard().registerNewTeam("Vanished");
         }
-        try {
-            team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-            team.addEntry(p.getName());
-        } catch (NoSuchMethodError | NoClassDefFoundError ignored) {
-        }
+        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        team.addEntry(p.getName());
     }
 
     public void setCanPush(Player p) {
@@ -61,13 +58,9 @@ public class NoPush extends Feature {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
-        if (plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId()))
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    setCantPush(e.getPlayer());
-                }
-            }.runTaskLater(plugin, 5);
+        if (plugin.getVanishStateMgr().isVanished(e.getPlayer().getUniqueId())) {
+            FoliaUtil.runAtEntityLater(plugin, e.getPlayer(), () -> setCantPush(e.getPlayer()), 5);
+        }
     }
 
     @EventHandler

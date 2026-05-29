@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,8 +25,6 @@ import java.util.Set;
 public class FeatureMgr {
 
     private static final Requirement<FeatureInfo> protocolLibInstalled = featureInfo -> Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"),
-            oneDotEightOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(8),
-            oneDotSeventeenOrHigher = featureInfo -> featureInfo.getPlugin().getVersionUtil().isOneDotXOrHigher(17),
             supportedServer = featureInfo -> Bukkit.getServer().getName().equals("Paper") || Bukkit.getServer().getName().equals("Purpur");
     private final Map<String, FeatureInfo> registeredFeatures = new HashMap<>();
     private final Set<Feature> activeFeatures = new HashSet<>();
@@ -35,21 +32,13 @@ public class FeatureMgr {
 
     public FeatureMgr(SuperVanish plugin) {
         this.plugin = plugin;
-        registeredFeatures.put("SilentOpenChest", new FeatureInfo(SilentOpenChest.class, plugin,
-                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
-        registeredFeatures.put("NightVision", new FeatureInfo(NightVision.class, plugin,
-                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
-        registeredFeatures.put("VanishIndication", new FeatureInfo(VanishIndication.class, plugin,
-                Arrays.asList(protocolLibInstalled, oneDotEightOrHigher)));
+        registeredFeatures.put("SilentOpenChest", new FeatureInfo(SilentOpenChest.class, plugin));
+        registeredFeatures.put("NightVision", new FeatureInfo(NightVision.class, plugin));
         registeredFeatures.put("Broadcast", new FeatureInfo(Broadcast.class, plugin));
-        registeredFeatures.put("NoSculkSensorDetection", new FeatureInfo(NoSculkSensorDetection.class, plugin,
-                Collections.singletonList(oneDotSeventeenOrHigher)));
-        registeredFeatures.put("NoTurtleEggBreaking", new FeatureInfo(NoTurtleEggBreaking.class, plugin,
-                Collections.singletonList(oneDotSeventeenOrHigher)));
-        registeredFeatures.put("NoDripLeafTilt", new FeatureInfo(NoDripLeafTilt.class, plugin,
-            Collections.singletonList(oneDotSeventeenOrHigher)));
-        registeredFeatures.put("NoRaidTrigger", new FeatureInfo(NoRaidTrigger.class, plugin,
-            Collections.singletonList(oneDotSeventeenOrHigher)));
+        registeredFeatures.put("NoSculkSensorDetection", new FeatureInfo(NoSculkSensorDetection.class, plugin));
+        registeredFeatures.put("NoTurtleEggBreaking", new FeatureInfo(NoTurtleEggBreaking.class, plugin));
+        registeredFeatures.put("NoDripLeafTilt", new FeatureInfo(NoDripLeafTilt.class, plugin));
+        registeredFeatures.put("NoRaidTrigger", new FeatureInfo(NoRaidTrigger.class, plugin));
         registeredFeatures.put("NoMobSpawn", new FeatureInfo(NoMobSpawn.class, plugin,
             Collections.singletonList(supportedServer)));
         registeredFeatures.put("HideAdvancementMessages", new FeatureInfo(HideAdvancementMessages.class, plugin,

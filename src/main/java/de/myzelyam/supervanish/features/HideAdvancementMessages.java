@@ -1,6 +1,7 @@
 package de.myzelyam.supervanish.features;
 
 import de.myzelyam.supervanish.SuperVanish;
+import de.myzelyam.supervanish.utils.OneTimeWarning;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,10 +10,11 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 // This feature is paper-only because the PlayerAdvancementDoneEvent#message() method doesn't exist in Spigot
 public class HideAdvancementMessages extends Feature {
 
-    private boolean suppressErrors = false;
+    private final OneTimeWarning warning;
 
     public HideAdvancementMessages(SuperVanish plugin) {
         super(plugin);
+        warning = new OneTimeWarning(plugin, null);
     }
 
     @EventHandler
@@ -26,10 +28,7 @@ public class HideAdvancementMessages extends Feature {
             e.message(null);
             p.sendMessage(message);
         } catch (Exception er) {
-            if (!suppressErrors) {
-                plugin.logException(er);
-                suppressErrors = true;
-            }
+            warning.log(er);
         }
     }
 
