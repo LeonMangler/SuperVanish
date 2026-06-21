@@ -71,6 +71,8 @@ public class JoinListener implements EventExecutor, Listener {
                     // not vanished:
                     // metadata
                     p.removeMetadata("vanished", plugin);
+                    // clear vanish-granted flight that may persist in player data after relog
+                    plugin.getVisibilityChanger().resetVanishFlight(p);
                 }
                 // not necessarily vanished:
                 // recreate files msg
