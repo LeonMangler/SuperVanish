@@ -140,19 +140,26 @@ public class VisibilityChanger {
             else
                 plugin.sendMessage(player, "OnReappearCausedByOtherPlayer", player, showerName);
             // fly
-            // remove fly if not spectator or creative and no perm
-            if (config.getBoolean("InvisibilityFeatures.Fly.DisableOnReappear")
-                    && !player.hasPermission("sv.keepfly")
-                    && (player.getGameMode() == GameMode.SURVIVAL
-                    || player.getGameMode() == GameMode.ADVENTURE)
-                    && config.getBoolean("InvisibilityFeatures.Fly.Enable")) {
-                player.setAllowFlight(false);
-            }
+            resetVanishFlight(player);
             // call post event
             PostPlayerShowEvent e2 = new PostPlayerShowEvent(player, silent);
             plugin.getServer().getPluginManager().callEvent(e2);
         } catch (Exception e) {
             plugin.logException(e);
+        }
+    }
+
+    /**
+     * Removes vanish-granted flight from a player who is no longer invisible.
+     */
+    public void resetVanishFlight(Player player) {
+        if (config.getBoolean("InvisibilityFeatures.Fly.DisableOnReappear")
+                && !player.hasPermission("sv.keepfly")
+                && (player.getGameMode() == GameMode.SURVIVAL
+                || player.getGameMode() == GameMode.ADVENTURE)
+                && config.getBoolean("InvisibilityFeatures.Fly.Enable")) {
+            player.setAllowFlight(false);
+            player.setFlying(false);
         }
     }
 
